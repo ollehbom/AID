@@ -1,0 +1,13 @@
+name: Intake Feedback
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Append to feedback inbox
+        run: |
+          echo "- ${{ github.event.issue.body }}" >> product/feedback/inbox.md

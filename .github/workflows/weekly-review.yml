@@ -1,0 +1,13 @@
+name: Weekly Product Review
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate weekly summary
+        run: |
+          echo "Summarize feedback, beliefs, experiments"

@@ -1,0 +1,12 @@
+name: Plan Change
+
+on:
+  workflow_dispatch:
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Product synthesis
+        run: |
+          echo "Product agent synthesizes feedback → belief update"
