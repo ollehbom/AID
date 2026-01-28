@@ -36,13 +36,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Product Agent
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
         run: |
-          echo "Product Agent analyzing feedback..."
-          # TODO: Invoke Product Agent (Copilot CLI or script)
-          # Reads: product/feedback/inbox.md
-          # Writes: product/decisions/${{ inputs.feature_id }}.md
-          #         experiments/active.md
+          pip install openai
+
+      - name: Run Product Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "🤖 Invoking Product Agent with GPT-4.1..."
+          python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
+
+      - name: Create GitHub Issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f ".ai/pipeline/${{ inputs.feature_id }}-issue.md" ]; then
+            echo "📝 Creating GitHub issue from generated content..."
+            gh issue create \
+              --title "[Experiment] ${{ inputs.feature_id }}" \
+              --body-file ".ai/pipeline/${{ inputs.feature_id }}-issue.md" \
+              --label "experiment,size: small"
+          fi
 
       - name: Update state
         run: |
