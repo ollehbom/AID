@@ -1,0 +1,30 @@
+feature: onboarding-v2
+status: design_complete
+created: 2026-01-28
+updated: 2026-01-29
+
+stages:
+  product: ✓ 2026-01-28
+  design: ✓ 2026-01-29
+  dev: in_progress
+  qa: pending
+  ops: pending
+
+artifacts:
+  product:
+    - product/decisions/2026-01-28-onboarding.md
+    - experiments/active.md
+  design:
+    - design/intents/onboarding-v2.md
+    - design/specs/onboarding-v2.md
+  dev:
+    - pr: #123 (pending)
+  qa:
+    - pending
+  ops:
+    - pending
+
+notes: |
+  Product identified hesitation in onboarding flow.
+  Design created simplified spec with inline explanations.
+  Dev implementation in progress.
