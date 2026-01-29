@@ -1,5 +1,8 @@
 name: Auto-Fix Pipeline Errors
 
+# DISABLED: Temporarily disabled to prevent infinite loops during development
+# To re-enable: Remove the "false &&" from the if conditions below
+
 on:
   workflow_run:
     workflows: ["Pipeline Orchestrator"]
@@ -7,7 +10,7 @@ on:
 
 jobs:
   create-error-issue:
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: ${{ false && github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -73,23 +76,20 @@ jobs:
           WORKFLOW_NAME="${{ github.event.workflow_run.name }}"
           WORKFLOW_URL="${{ github.event.workflow_run.html_url }}"
 
-          # Read error log
-          ERROR_LOG=$(cat error_log.txt)
-
-          # Create issue body
-          cat > issue_body.md << 'EOF'
+          # Create issue body directly with variable substitution
+          cat > issue_body.md << EOF
           # Pipeline Error: Auto-Fix Required
 
           ## Error Details
 
-          - **Workflow**: $WORKFLOW_NAME
-          - **Run URL**: $WORKFLOW_URL
-          - **Error ID**: $ERROR_ID
+          - **Workflow**: ${WORKFLOW_NAME}
+          - **Run URL**: ${WORKFLOW_URL}
+          - **Error ID**: ${ERROR_ID}
           - **Timestamp**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
 
           ## Error Log
 
-          $ERROR_LOG
+          $(cat error_log.txt)
 
           ## Agent Task
 
@@ -107,12 +107,6 @@ jobs:
           - Root cause is documented
           - Fix is minimal and targeted
           EOF
-
-          # Replace variables in issue body
-          sed -i "s|\$WORKFLOW_NAME|$WORKFLOW_NAME|g" issue_body.md
-          sed -i "s|\$WORKFLOW_URL|$WORKFLOW_URL|g" issue_body.md
-          sed -i "s|\$ERROR_ID|$ERROR_ID|g" issue_body.md
-          sed -i "s|\$ERROR_LOG|$ERROR_LOG|g" issue_body.md
 
           # Create the issue
           ISSUE_URL=$(gh issue create \
