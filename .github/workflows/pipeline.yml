@@ -33,6 +33,9 @@ jobs:
     needs: detect-stage
     if: needs.detect-stage.outputs.current_stage == 'intake'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
     outputs:
       needs_design: ${{ steps.check-design.outputs.needs_design }}
     steps:
