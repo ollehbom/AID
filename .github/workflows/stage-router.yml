@@ -1,0 +1,159 @@
+name: Stage Router
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - "feature/**"
+
+jobs:
+  route-next-stage:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Extract feature ID from branch
+        id: extract-id
+        run: |
+          BRANCH="${{ github.event.pull_request.base.ref }}"
+          FEATURE_ID="${BRANCH#feature/}"
+          echo "feature_id=$FEATURE_ID" >> $GITHUB_OUTPUT
+          echo "Feature ID: $FEATURE_ID"
+
+      - name: Read pipeline state
+        id: read-state
+        run: |
+          FEATURE_ID="${{ steps.extract-id.outputs.feature_id }}"
+
+          if [ -f ".ai/pipeline/$FEATURE_ID.state" ]; then
+            STATUS=$(grep "status:" .ai/pipeline/$FEATURE_ID.state | cut -d: -f2 | xargs)
+            NEEDS_DESIGN=$(grep "needs_design:" .ai/pipeline/$FEATURE_ID.state | cut -d: -f2 | xargs || echo "false")
+            
+            echo "status=$STATUS" >> $GITHUB_OUTPUT
+            echo "needs_design=$NEEDS_DESIGN" >> $GITHUB_OUTPUT
+            echo "Current status: $STATUS"
+            echo "Needs design: $NEEDS_DESIGN"
+          else
+            echo "No state file found"
+            exit 1
+          fi
+
+      - name: Determine next stage
+        id: next-stage
+        run: |
+          STATUS="${{ steps.read-state.outputs.status }}"
+          NEEDS_DESIGN="${{ steps.read-state.outputs.needs_design }}"
+
+          case "$STATUS" in
+            product_awaiting_approval)
+              if [ "$NEEDS_DESIGN" = "true" ]; then
+                echo "next=design" >> $GITHUB_OUTPUT
+              else
+                echo "next=architect" >> $GITHUB_OUTPUT
+              fi
+              ;;
+            design_awaiting_approval)
+              echo "next=architect" >> $GITHUB_OUTPUT
+              ;;
+            architect_awaiting_approval)
+              echo "next=dev" >> $GITHUB_OUTPUT
+              ;;
+            dev_awaiting_approval)
+              echo "next=qa" >> $GITHUB_OUTPUT
+              ;;
+            qa_awaiting_approval)
+              echo "next=ops" >> $GITHUB_OUTPUT
+              ;;
+            ops_awaiting_approval)
+              echo "next=complete" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "next=none" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Update state to approved
+        run: |
+          FEATURE_ID="${{ steps.extract-id.outputs.feature_id }}"
+          STATUS="${{ steps.read-state.outputs.status }}"
+          STAGE="${STATUS%_awaiting_approval}"
+
+          sed -i "s/$STAGE: in-progress/$STAGE: ✓ $(date +%Y-%m-%d)/" .ai/pipeline/$FEATURE_ID.state
+
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add .ai/pipeline/$FEATURE_ID.state
+          git commit -m "Pipeline: $STAGE approved for $FEATURE_ID"
+          git push
+
+      - name: Trigger next stage
+        if: steps.next-stage.outputs.next != 'none' && steps.next-stage.outputs.next != 'complete'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FEATURE_ID="${{ steps.extract-id.outputs.feature_id }}"
+          NEXT_STAGE="${{ steps.next-stage.outputs.next }}"
+
+          echo "🚀 Triggering $NEXT_STAGE stage for $FEATURE_ID"
+
+          gh workflow run pipeline.yml \
+            -f stage=$NEXT_STAGE \
+            -f feature_id=$FEATURE_ID
+
+      - name: Create final PR to main
+        if: steps.next-stage.outputs.next == 'complete'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FEATURE_ID="${{ steps.extract-id.outputs.feature_id }}"
+
+          echo "🎉 All stages complete! Creating PR to main..."
+
+          gh pr create \
+            --base main \
+            --head feature/$FEATURE_ID \
+            --title "🚀 Deploy: $FEATURE_ID" \
+            --body "## Ready for Deployment
+
+          All pipeline stages have been completed and approved for \`$FEATURE_ID\`.
+
+          ### ✅ Completed Stages
+          - [x] Product Agent
+          - [x] Design Agent (if applicable)
+          - [x] Architect Agent
+          - [x] Dev Agent
+          - [x] QA Agent
+          - [x] Ops Agent
+
+          ### 📦 What's Included
+          See the feature branch history for all changes from each stage.
+
+          ### 🚀 Deployment
+          Merging this PR will deploy the feature to production.
+
+          _Review and merge to deploy to main._" \
+            --label "deployment,ready-to-merge"
+
+      - name: Post status comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NEXT="${{ steps.next-stage.outputs.next }}"
+          FEATURE_ID="${{ steps.extract-id.outputs.feature_id }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          if [ "$NEXT" = "complete" ]; then
+            MESSAGE="✅ All stages complete! PR to \`main\` has been created."
+          elif [ "$NEXT" = "none" ]; then
+            MESSAGE="ℹ️ No next stage configured."
+          else
+            MESSAGE="🚀 Next stage: **$NEXT** has been automatically triggered."
+          fi
+
+          gh pr comment $PR_NUMBER --body "$MESSAGE"

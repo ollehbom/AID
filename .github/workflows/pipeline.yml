@@ -4,42 +4,66 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: "Which stage to execute (auto-detect if empty)"
-        required: false
-        default: ""
+        description: "Which stage to execute"
+        required: true
+        type: choice
+        options:
+          - product
+          - design
+          - architect
+          - dev
+          - qa
+          - ops
       feature_id:
         description: "Feature ID to process"
         required: true
 
 jobs:
-  detect-stage:
+  setup-branch:
     runs-on: ubuntu-latest
     outputs:
-      current_stage: ${{ steps.read-state.outputs.stage }}
+      feature_branch: ${{ steps.branch-info.outputs.feature_branch }}
+      branch_exists: ${{ steps.check-branch.outputs.exists }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Read pipeline state
-        id: read-state
+      - name: Check if feature branch exists
+        id: check-branch
         run: |
-          if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
-            STAGE=$(grep "status:" .ai/pipeline/${{ inputs.feature_id }}.state | cut -d: -f2 | xargs)
-            echo "stage=$STAGE" >> $GITHUB_OUTPUT
+          if git ls-remote --heads origin feature/${{ inputs.feature_id }} | grep -q feature/${{ inputs.feature_id }}; then
+            echo "exists=true" >> $GITHUB_OUTPUT
           else
-            echo "stage=intake" >> $GITHUB_OUTPUT
+            echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Create feature branch if needed
+        if: steps.check-branch.outputs.exists == 'false'
+        run: |
+          git checkout -b feature/${{ inputs.feature_id }}
+          git push -u origin feature/${{ inputs.feature_id }}
+
+      - name: Output branch info
+        id: branch-info
+        run: |
+          echo "feature_branch=feature/${{ inputs.feature_id }}" >> $GITHUB_OUTPUT
+
   product-agent:
-    needs: detect-stage
-    if: needs.detect-stage.outputs.current_stage == 'intake'
+    needs: setup-branch
+    if: inputs.stage == 'product'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
       issues: write
-    outputs:
-      needs_design: ${{ steps.check-design.outputs.needs_design }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-product-stage
+          git push -u origin ${{ inputs.feature_id }}-product-stage
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -60,17 +84,7 @@ jobs:
           echo "🤖 Invoking Product Agent..."
           python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
 
-      - name: Check if design needed
-        id: check-design
-        run: |
-          if grep -q "needs_design: true" .ai/pipeline/${{ inputs.feature_id }}.state; then
-            echo "needs_design=true" >> $GITHUB_OUTPUT
-          else
-            echo "needs_design=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Create GitHub Issue
-        if: success()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -79,18 +93,19 @@ jobs:
             gh issue create \
               --title "[Experiment] ${{ inputs.feature_id }}" \
               --body-file ".ai/pipeline/${{ inputs.feature_id }}-issue.md" \
-              --label "experiment,size: small"
+              --label "experiment,size: small" || echo "Issue may already exist"
           fi
 
-      - name: Update state
+      - name: Initialize pipeline state
         run: |
           mkdir -p .ai/pipeline
           cat > .ai/pipeline/${{ inputs.feature_id }}.state << EOF
           feature: ${{ inputs.feature_id }}
-          status: product_complete
+          status: product_awaiting_approval
           stages:
-            product: ✓ $(date +%Y-%m-%d)
+            product: in-progress
             design: pending
+            architect: pending
             dev: pending
             qa: pending
             ops: pending
@@ -101,19 +116,54 @@ jobs:
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
           git add product/decisions/ experiments/active.md .ai/pipeline/
-          git commit -m "Product: ${{ inputs.feature_id }} analysis complete"
+          git commit -m "Product: ${{ inputs.feature_id }} analysis complete" || echo "No changes to commit"
           git push
 
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-product-stage \
+            --title "🤖 Product Agent: ${{ inputs.feature_id }}" \
+            --body "## Product Agent Output
+
+          This PR contains the Product Agent's analysis for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Product decision record
+          - Experiment tracking entry
+          - GitHub issue created
+          - Pipeline state initialized
+
+          ### ✅ Review Checklist
+          - [ ] Decision record is clear and actionable
+          - [ ] Experiment hypothesis is testable
+          - [ ] Success criteria are measurable
+          - [ ] Affected beliefs are identified
+
+          **Next Stage:** After approval, the $(grep 'needs_design:' .ai/pipeline/${{ inputs.feature_id }}.state | grep -q 'true' && echo 'Design' || echo 'Architect') Agent will be triggered.
+
+          _Merge this PR to approve and proceed to the next stage._" \
+            --label "stage:product,awaiting-approval"
+
   design-agent:
-    needs: [detect-stage, product-agent]
-    if: |
-      (!cancelled() && needs.product-agent.result == 'success' && needs.product-agent.outputs.needs_design == 'true') ||
-      needs.detect-stage.outputs.current_stage == 'design_pending'
+    needs: setup-branch
+    if: inputs.stage == 'design'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-design-stage
+          git push -u origin ${{ inputs.feature_id }}-design-stage
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -134,6 +184,11 @@ jobs:
           echo "🎨 Invoking Design Agent..."
           python scripts/invoke_design_agent.py ${{ inputs.feature_id }}
 
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: design_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/design: pending/design: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
+
       - name: Commit outputs
         run: |
           git config user.name "Pipeline Bot"
@@ -142,17 +197,50 @@ jobs:
           git commit -m "Design: ${{ inputs.feature_id }} spec complete" || echo "No changes to commit"
           git push
 
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-design-stage \
+            --title "🎨 Design Agent: ${{ inputs.feature_id }}" \
+            --body "## Design Agent Output
+
+          This PR contains the Design Agent's specifications for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Design specifications
+          - User flows and wireframes
+          - UI/UX requirements
+
+          ### ✅ Review Checklist
+          - [ ] Design meets user needs
+          - [ ] Flows are clear and intuitive
+          - [ ] Edge cases are addressed
+          - [ ] Accessibility considerations included
+
+          **Next Stage:** After approval, the Architect Agent will be triggered.
+
+          _Merge this PR to approve and proceed to the next stage._" \
+            --label "stage:design,awaiting-approval"
+
   architect-agent:
-    needs: [detect-stage, product-agent, design-agent]
-    if: |
-      (!cancelled() && needs.design-agent.result == 'success') ||
-      (!cancelled() && needs.product-agent.result == 'success' && needs.product-agent.outputs.needs_design == 'false') ||
-      needs.detect-stage.outputs.current_stage == 'design_complete'
+    needs: setup-branch
+    if: inputs.stage == 'architect'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-architect-stage
+          git push -u origin ${{ inputs.feature_id }}-architect-stage
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -173,122 +261,244 @@ jobs:
           echo "🏗️ Invoking Architect Agent..."
           python scripts/invoke_architect_agent.py ${{ inputs.feature_id }}
 
-      - name: Update state
+      - name: Update pipeline state
         run: |
-          sed -i 's/status:.*/status: architect_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/architect: pending/architect: ✓ '"$(date +%Y-%m-%d)"'/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/status:.*/status: architect_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/architect: pending/architect: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
           git add design/architecture/ design/technical-specs/ .ai/pipeline/
-          git commit -m "Architect: ${{ inputs.feature_id }} review complete"
+          git commit -m "Architect: ${{ inputs.feature_id }} review complete" || echo "No changes to commit"
           git push
 
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-architect-stage \
+            --title "🏗️ Architect Agent: ${{ inputs.feature_id }}" \
+            --body "## Architect Agent Output
+
+          This PR contains the Architect Agent's technical review for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Architecture Decision Records (ADRs)
+          - Technical specifications
+          - Implementation guidance
+
+          ### ✅ Review Checklist
+          - [ ] Architecture is sound and scalable
+          - [ ] Technical approach is appropriate
+          - [ ] Dependencies are identified
+          - [ ] Security considerations addressed
+
+          **Next Stage:** After approval, the Dev Agent will be triggered.
+
+          _Merge this PR to approve and proceed to the next stage._" \
+            --label "stage:architect,awaiting-approval"
+
   dev-agent:
-    needs: [detect-stage, architect-agent]
-    if: needs.detect-stage.outputs.current_stage == 'architect_complete'
+    needs: setup-branch
+    if: inputs.stage == 'dev'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-dev-stage
+          git push -u origin ${{ inputs.feature_id }}-dev-stage
 
       - name: Run Dev Agent
         run: |
-          echo "Dev Agent implementing feature..."
-          # TODO: Invoke Dev Agent
-          # Reads: design/architecture/ADR-*-${{ inputs.feature_id }}.md
-          #        design/technical-specs/${{ inputs.feature_id }}.md
-          #        design/specs/${{ inputs.feature_id }}.md (if exists)
-          # Writes: Code changes, creates PR
+          echo "💻 Dev Agent implementing feature..."
+          echo "TODO: Invoke Dev Agent"
+          echo "Reads: design/architecture/ADR-*-${{ inputs.feature_id }}.md"
+          echo "       design/technical-specs/${{ inputs.feature_id }}.md"
+          echo "       design/specs/${{ inputs.feature_id }}.md (if exists)"
+          echo "Writes: Code changes"
 
-      - name: Create implementation PR
+      - name: Update pipeline state
         run: |
-          # This would create a PR with the implementation
-          echo "Implementation PR created"
+          sed -i 's/status:.*/status: dev_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/dev: pending/dev: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
 
-      - name: Update state (after PR merge)
+      - name: Commit outputs
         run: |
-          sed -i 's/status:.*/status: dev_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/dev: pending/dev: ✓ '"$(date +%Y-%m-%d)"'/' .ai/pipeline/${{ inputs.feature_id }}.state
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add .ai/pipeline/
+          git commit -m "Dev: ${{ inputs.feature_id }} implementation complete" || echo "No changes to commit"
+          git push
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-dev-stage \
+            --title "💻 Dev Agent: ${{ inputs.feature_id }}" \
+            --body "## Dev Agent Output
+
+          This PR contains the Dev Agent's implementation for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Implementation code
+          - Unit tests
+          - Documentation updates
+
+          ### ✅ Review Checklist
+          - [ ] Code follows style guidelines
+          - [ ] Tests are comprehensive
+          - [ ] Documentation is updated
+          - [ ] No obvious bugs or issues
+
+          **Next Stage:** After approval, the QA Agent will be triggered.
+
+          _Merge this PR to approve and proceed to the next stage._" \
+            --label "stage:dev,awaiting-approval"
 
   qa-agent:
-    needs: detect-stage
-    if: needs.detect-stage.outputs.current_stage == 'dev_complete'
+    needs: setup-branch
+    if: inputs.stage == 'qa'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-qa-stage
+          git push -u origin ${{ inputs.feature_id }}-qa-stage
 
       - name: Run QA Agent
         run: |
-          echo "QA Agent validating implementation..."
-          # TODO: Invoke QA Agent
-          # Reads: design/intents/${{ inputs.feature_id }}.md
-          # Writes: design/validations/${{ inputs.feature_id }}.md
+          echo "🧪 QA Agent validating implementation..."
+          echo "TODO: Invoke QA Agent"
+          echo "Reads: design/intents/${{ inputs.feature_id }}.md"
+          echo "Writes: design/validations/${{ inputs.feature_id }}.md"
 
-      - name: Check validation results
-        id: qa-check
+      - name: Update pipeline state
         run: |
-          # Check if validation passed
-          if grep -q "PASS" design/validations/${{ inputs.feature_id }}.md; then
-            echo "result=pass" >> $GITHUB_OUTPUT
-          else
-            echo "result=fail" >> $GITHUB_OUTPUT
-          fi
+          sed -i 's/status:.*/status: qa_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/qa: pending/qa: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
 
-      - name: Update state (pass)
-        if: steps.qa-check.outputs.result == 'pass'
-        run: |
-          sed -i 's/status:.*/status: qa_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/qa: pending/qa: ✓ '"$(date +%Y-%m-%d)"'/' .ai/pipeline/${{ inputs.feature_id }}.state
-
-      - name: Update state (fail - rollback to dev)
-        if: steps.qa-check.outputs.result == 'fail'
-        run: |
-          sed -i 's/status:.*/status: dev_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
-          echo "QA validation failed. Returning to Dev stage."
-
-      - name: Commit results
+      - name: Commit outputs
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
           git add design/validations/ .ai/pipeline/
-          git commit -m "QA: ${{ inputs.feature_id }} validation results"
+          git commit -m "QA: ${{ inputs.feature_id }} validation complete" || echo "No changes to commit"
           git push
 
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-qa-stage \
+            --title "🧪 QA Agent: ${{ inputs.feature_id }}" \
+            --body "## QA Agent Output
+
+          This PR contains the QA Agent's validation for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Test results
+          - Validation report
+          - Issues found (if any)
+
+          ### ✅ Review Checklist
+          - [ ] All tests pass
+          - [ ] No critical bugs
+          - [ ] Performance is acceptable
+          - [ ] Ready for deployment
+
+          **Next Stage:** After approval, the Ops Agent will be triggered.
+
+          _Merge this PR to approve and proceed to the next stage._" \
+            --label "stage:qa,awaiting-approval"
+
   ops-agent:
-    needs: detect-stage
-    if: needs.detect-stage.outputs.current_stage == 'qa_complete'
+    needs: setup-branch
+    if: inputs.stage == 'ops'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-ops-stage
+          git push -u origin ${{ inputs.feature_id }}-ops-stage
 
       - name: Run Ops Agent
         run: |
-          echo "Ops Agent deploying feature..."
-          # TODO: Invoke Ops Agent
-          # Reads: design/validations/${{ inputs.feature_id }}.md
-          # Writes: Deployment logs, monitoring config
+          echo "🚀 Ops Agent deploying feature..."
+          echo "TODO: Invoke Ops Agent"
+          echo "Reads: design/validations/${{ inputs.feature_id }}.md"
+          echo "Writes: Deployment logs, monitoring config"
 
-      - name: Deploy with feature flag
+      - name: Update pipeline state
         run: |
-          echo "Deploying behind feature flag: ${{ inputs.feature_id }}"
-          # Gradual rollout logic here
+          sed -i 's/status:.*/status: ops_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/ops: pending/ops: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
 
-      - name: Update state
-        run: |
-          sed -i 's/status:.*/status: deployed/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/ops: pending/ops: ✓ '"$(date +%Y-%m-%d)"'/' .ai/pipeline/${{ inputs.feature_id }}.state
-
-      - name: Archive experiment
-        run: |
-          # Move from active to archive
-          echo "Feature deployed: ${{ inputs.feature_id }}"
-
-      - name: Commit completion
+      - name: Commit outputs
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
-          git add .ai/pipeline/ experiments/
-          git commit -m "Ops: ${{ inputs.feature_id }} deployed"
+          git add .ai/pipeline/
+          git commit -m "Ops: ${{ inputs.feature_id }} deployment ready" || echo "No changes to commit"
           git push
+
+      - name: Create Pull Request to Main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # First push the ops changes to feature branch
+          git push origin ${{ inputs.feature_id }}-ops-stage
+
+          # Create PR from working branch to feature branch
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-ops-stage \
+            --title "🚀 Ops Agent: ${{ inputs.feature_id }}" \
+            --body "## Ops Agent Output
+
+          This PR contains the Ops Agent's deployment preparation for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Deployment configuration
+          - Monitoring setup
+          - Feature flag configuration
+
+          ### ✅ Review Checklist
+          - [ ] Deployment plan is sound
+          - [ ] Monitoring is configured
+          - [ ] Rollback plan is ready
+          - [ ] Ready to merge to main
+
+          **Final Stage:** After approval, merge this PR, then create a PR from feature branch to main for final deployment.
+
+          _Merge this PR to approve._" \
+            --label "stage:ops,awaiting-approval"
