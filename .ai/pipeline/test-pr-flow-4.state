@@ -1,7 +1,7 @@
 feature: test-pr-flow-4
 status: product_awaiting_approval
 stages:
-  product: in-progress
+  product: ✓ 2026-01-29
   design: pending
   architect: pending
   dev: pending
