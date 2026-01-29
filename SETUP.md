@@ -304,9 +304,69 @@ pip install openai
 
 ### GitHub Actions failing
 
-1. Verify `OPENAI_API_KEY` secret is set in repository settings
+1. Verify `OPENAI_API_KEY` or `GOOGLE_API_KEY` secret is set in repository settings
 2. Check workflow logs: `gh run view --log`
 3. Ensure `scripts/` directory is committed to repository
+
+## Model Configuration
+
+The Product Agent supports multiple AI providers:
+
+### OpenAI (Default)
+
+- **GPT-4.1** - Most capable
+- **GPT-4o** - Faster, cheaper
+- **GPT-4-turbo** - Balance of speed and capability
+
+Edit `.env`:
+
+```bash
+AI_PROVIDER=openai
+OPENAI_API_KEY=sk-proj-...
+MODEL=gpt-4.1
+```
+
+### Google Gemini (Alternative)
+
+- **gemini-2.5-pro** - Advanced reasoning, 2M context
+- **gemini-3-flash** - Fast and cheap (45x cheaper than GPT-4.1!)
+- **gemini-3-pro** - Highest intelligence
+
+Edit `.env`:
+
+```bash
+AI_PROVIDER=gemini
+GOOGLE_API_KEY=AIzaSy...
+MODEL=gemini-2.5-pro
+```
+
+See **[GEMINI-SETUP.md](GEMINI-SETUP.md)** for detailed Gemini configuration.
+
+## Cost Estimation
+
+### OpenAI Pricing
+
+GPT-4.1 (approximate):
+
+- **Input**: $10 / 1M tokens
+- **Output**: $30 / 1M tokens
+- **Cost per run**: ~$0.09
+
+### Google Gemini Pricing (Alternative)
+
+Gemini 2.5 Pro:
+
+- **Input**: $1.25 / 1M tokens
+- **Output**: $10 / 1M tokens
+- **Cost per run**: ~$0.056 (38% cheaper)
+
+Gemini 3 Flash:
+
+- **Input**: $0.10 / 1M tokens
+- **Output**: $0.30 / 1M tokens
+- **Cost per run**: ~$0.002 (98% cheaper!)
+
+💡 **Tip**: Use Gemini 3 Flash for development, 2.5 Pro for production.
 
 ## Model Configuration
 

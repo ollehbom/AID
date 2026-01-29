@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Product Agent Executor
-Invokes the Product Agent using OpenAI GPT-4.1 to analyze feedback and create experiments.
+Invokes the Product Agent using AI models (OpenAI GPT-4.1 or Google Gemini 2.5 Pro).
 """
 
 import os
@@ -9,7 +9,6 @@ import sys
 import json
 from datetime import datetime
 from pathlib import Path
-import openai
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -17,6 +16,7 @@ load_dotenv()
 
 # Configuration
 MODEL = os.getenv("MODEL", "gpt-4.1")
+AI_PROVIDER = os.getenv("AI_PROVIDER", "openai")  # "openai" or "gemini"
 REPO_ROOT = Path(__file__).parent.parent
 AGENT_FILE = REPO_ROOT / ".ai/agents/product.md"
 FEEDBACK_INBOX = REPO_ROOT / "product/feedback/inbox.md"
@@ -127,35 +127,72 @@ Provide your response in JSON format with these keys:
   "summary": "Brief 2-3 sentence summary of the decision"
 }}
 ```
-
-Begin your analysis and generate the outputs now.
 """
 
-    # Call OpenAI API
+    # Invoke AI API based on provider
     try:
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY not found in environment. Create a .env file with your API key.")
+        if AI_PROVIDER == "gemini":
+            result = _invoke_gemini(system_prompt, user_prompt)
+        else:
+            result = _invoke_openai(system_prompt, user_prompt)
         
-        client = openai.OpenAI(api_key=api_key)
-        
-        response = client.chat.completions.create(
-            model=MODEL,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            temperature=float(os.getenv("TEMPERATURE", "0.7")),
-            max_tokens=4000,
-            response_format={"type": "json_object"}
-        )
-        
-        result = json.loads(response.choices[0].message.content)
         return result
         
     except Exception as e:
         print(f"Error invoking Product Agent: {e}", file=sys.stderr)
         raise
+
+
+def _invoke_openai(system_prompt, user_prompt):
+    """Invoke OpenAI API."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY not found in environment. Create a .env file with your API key.")
+    
+    import openai
+    client = openai.OpenAI(api_key=api_key)
+    
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        temperature=float(os.getenv("TEMPERATURE", "0.7")),
+        max_tokens=4000,
+        response_format={"type": "json_object"}
+    )
+    
+    return json.loads(response.choices[0].message.content)
+
+
+def _invoke_gemini(system_prompt, user_prompt):
+    """Invoke Google Gemini API."""
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("GOOGLE_API_KEY not found in environment. Create a .env file with your API key.")
+    
+    from google import genai
+    client = genai.Client(api_key=api_key)
+    
+    # Combine system and user prompts for Gemini
+    combined_prompt = f"""{system_prompt}
+
+---
+
+{user_prompt}"""
+    
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=combined_prompt,
+        config={
+            "temperature": float(os.getenv("TEMPERATURE", "0.7")),
+            "max_output_tokens": 8192,
+            "response_mime_type": "application/json"
+        }
+    )
+    
+    return json.loads(response.text)
 
 
 def main():
@@ -169,6 +206,7 @@ def main():
     
     print(f"🤖 Invoking Product Agent for feature: {feature_id}")
     print(f"📅 Date: {datetime.now().strftime('%Y-%m-%d')}")
+    print(f"🤖 Provider: {AI_PROVIDER.upper()}")
     print(f"🤖 Model: {MODEL}")
     print()
     

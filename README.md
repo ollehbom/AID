@@ -84,6 +84,7 @@ gh workflow run pipeline.yml -f feature_id=signup-simplification
 ## Documentation
 
 - **[SETUP.md](SETUP.md)** - Complete installation and configuration guide
+- **[GEMINI-SETUP.md](GEMINI-SETUP.md)** - Using Google Gemini 2.5 Pro (cheaper alternative)
 - **[WINDOWS-SETUP.md](WINDOWS-SETUP.md)** - Windows-specific quick start guide
 - **[SECURITY.md](SECURITY.md)** - API key security and .env best practices
 - **[PRODUCT-AGENT-QUICKSTART.md](PRODUCT-AGENT-QUICKSTART.md)** - 5-minute Product Agent guide
