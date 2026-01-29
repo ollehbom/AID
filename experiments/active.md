@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+ID: EXP-2026-01-29-TEST-PR-FLOW-4
+Belief: Establishing a modern foundational app and design system accelerates feature development and ensures UI consistency.
+Change: Implement a basic React app with Google login, mock dashboard, and shadcn design system.
+Owner: Product Agent
+Status: Proposed
+Success Signal: Successful internal deployment, functional login/dashboard, positive developer feedback on design system utility.
