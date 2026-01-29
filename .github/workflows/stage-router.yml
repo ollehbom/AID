@@ -103,9 +103,10 @@ jobs:
 
           echo "🚀 Triggering $NEXT_STAGE stage for $FEATURE_ID"
 
-          gh workflow run $NEXT_STAGE-agent.yml \
+          gh workflow run $NEXT_STAGE-agent.yml -f feature_id=$FEATURE_ID
 
-          gh pr create \
+          if [ "$NEXT_STAGE" = "ops" ]; then
+            gh pr create \
             --base main \
             --head feature/$FEATURE_ID \
             --title "🚀 Deploy: $FEATURE_ID" \
