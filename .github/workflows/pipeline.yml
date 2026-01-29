@@ -107,10 +107,11 @@ jobs:
   design-agent:
     needs: [detect-stage, product-agent]
     if: |
-      (needs.detect-stage.outputs.current_stage == 'product_complete' &&
-       needs.product-agent.outputs.needs_design == 'true') ||
+      (!cancelled() && needs.product-agent.result == 'success' && needs.product-agent.outputs.needs_design == 'true') ||
       needs.detect-stage.outputs.current_stage == 'design_pending'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -142,11 +143,14 @@ jobs:
           git push
 
   architect-agent:
-    needs: [detect-stage, design-agent]
+    needs: [detect-stage, product-agent, design-agent]
     if: |
-      needs.detect-stage.outputs.current_stage == 'product_complete' ||
+      (!cancelled() && needs.design-agent.result == 'success') ||
+      (!cancelled() && needs.product-agent.result == 'success' && needs.product-agent.outputs.needs_design == 'false') ||
       needs.detect-stage.outputs.current_stage == 'design_complete'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
