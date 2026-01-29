@@ -95,7 +95,15 @@ States stored in `.ai/pipeline/<feature-id>.state`
   **Writes**:
 - `design/intents/<feature-id>.md`
 - `design/specs/<feature-id>.md`
+- `design/wireframes/<feature-id>.json`
+- `design/validations/<feature-id>.md`
 - Updates state to `design_complete`
+
+**Execution**:
+
+```bash
+python scripts/invoke_design_agent.py <feature-id>
+```
 
 ### Dev Agent
 

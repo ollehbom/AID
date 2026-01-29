@@ -111,25 +111,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Design Agent
-        run: |
-          echo "Design Agent creating intent and spec..."
-          # TODO: Invoke Design Agent
-          # Reads: experiments/active.md, product/beliefs/current.md
-          # Writes: design/intents/${{ inputs.feature_id }}.md
-          #         design/specs/${{ inputs.feature_id }}.md
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-      - name: Update state
+      - name: Install dependencies
         run: |
-          sed -i 's/status:.*/status: design_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/design: pending/design: ✓ '"$(date +%Y-%m-%d)"'/' .ai/pipeline/${{ inputs.feature_id }}.state
+          pip install -r requirements.txt
+
+      - name: Run Design Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ secrets.MODEL || 'gpt-4.1' }}
+        run: |
+          echo "🎨 Invoking Design Agent..."
+          python scripts/invoke_design_agent.py ${{ inputs.feature_id }}
 
       - name: Commit outputs
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
           git add design/ .ai/pipeline/
-          git commit -m "Design: ${{ inputs.feature_id }} spec complete"
+          git commit -m "Design: ${{ inputs.feature_id }} spec complete" || echo "No changes to commit"
           git push
 
   architect-agent:
