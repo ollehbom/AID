@@ -1,0 +1,9 @@
+feature: test-pr-flow-2
+status: product_awaiting_approval
+stages:
+  product: in-progress
+  design: pending
+  architect: pending
+  dev: pending
+  qa: pending
+  ops: pending

@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+- ID: EXP-2026-01-29-test-pr-flow-2
+  Belief: A modern, well-designed application foundation will enable rapid future development and provide a positive initial user experience for technically competent users.
+  Change: Implement core React app with Shadcn UI, Google Login, and basic dashboard.
+  Owner: Product Agent (handoff to Design Agent then Engineering)
+  Status: Defined, Pending Design
+  Success Signal: Functional authenticated app foundation ready for feature integration.
