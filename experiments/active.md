@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-test-pr-flow-5
+- **Belief**: Establish a rapid-development foundation for technically competent users, enabling faster validation of core product concepts.
+- **Change**: Implement a shadcn/ui-based React application with Google login and a basic dashboard.
+- **Owner**: Product Agent (initial definition)
+- **Status**: active
+- **Success Signal**: Successful Google login, dashboard renders, positive developer feedback on design system extensibility and ease of use.
