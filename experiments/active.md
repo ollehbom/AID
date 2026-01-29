@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-test-separate-pipelines-1
+
+- **Belief**: A modern React application with a consistent design system (Shadcn) and basic login/dashboard provides a solid, aesthetically pleasing, and efficient foundation for building future product features.
+- **Change**: Implement a foundational React app with Shadcn UI, Google login, and a basic dashboard.
+- **Owner**: Product Agent (handoff to Design Agent, then Dev)
+- **Status**: Active
+- **Success Signal**: Successful deployment, functional login and dashboard, positive developer feedback on Shadcn integration and development speed.
