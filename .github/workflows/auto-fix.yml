@@ -1,0 +1,146 @@
+name: Auto-Fix Pipeline Errors
+
+on:
+  workflow_run:
+    workflows: ["Pipeline Orchestrator"]
+    types: [completed]
+
+jobs:
+  create-error-issue:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      actions: read
+      contents: write
+    outputs:
+      issue_number: ${{ steps.create-issue.outputs.issue_number }}
+      error_id: ${{ steps.generate-id.outputs.error_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download workflow logs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const runId = context.payload.workflow_run.id;
+
+            // Get jobs for the failed workflow
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            });
+
+            let errorLog = '';
+            for (const job of jobs.data.jobs) {
+              if (job.conclusion === 'failure') {
+                errorLog += `## Job: ${job.name}\n\n`;
+                errorLog += `Status: ${job.conclusion}\n\n`;
+                
+                // Get log for this job
+                try {
+                  const log = await github.rest.actions.downloadJobLogsForWorkflowRun({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    job_id: job.id,
+                  });
+                  
+                  // Extract last 50 lines or error section
+                  const logLines = log.data.split('\n').slice(-50).join('\n');
+                  errorLog += '```\n' + logLines + '\n```\n\n';
+                } catch (e) {
+                  errorLog += `Could not fetch logs: ${e.message}\n\n`;
+                }
+              }
+            }
+
+            fs.writeFileSync('error_log.txt', errorLog);
+
+      - name: Generate Error ID
+        id: generate-id
+        run: |
+          ERROR_ID="error-$(date +%Y%m%d-%H%M%S)"
+          echo "error_id=$ERROR_ID" >> $GITHUB_OUTPUT
+
+      - name: Create Error Issue
+        id: create-issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ERROR_ID="${{ steps.generate-id.outputs.error_id }}"
+          WORKFLOW_NAME="${{ github.event.workflow_run.name }}"
+          WORKFLOW_URL="${{ github.event.workflow_run.html_url }}"
+
+          # Read error log
+          ERROR_LOG=$(cat error_log.txt)
+
+          # Create issue body
+          cat > issue_body.md << 'EOF'
+          # Pipeline Error: Auto-Fix Required
+
+          ## Error Details
+
+          - **Workflow**: $WORKFLOW_NAME
+          - **Run URL**: $WORKFLOW_URL
+          - **Error ID**: $ERROR_ID
+          - **Timestamp**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          ## Error Log
+
+          $ERROR_LOG
+
+          ## Agent Task
+
+          This error should be automatically analyzed and fixed by the Error Recovery Agent.
+
+          ### Expected Actions:
+          1. Analyze the error log to identify root cause
+          2. Determine if this is a code error, configuration issue, or environment problem
+          3. Implement the minimal fix required
+          4. Create a PR with the fix
+          5. Update this issue with findings and resolution
+
+          ### Success Criteria:
+          - Pipeline runs successfully after fix
+          - Root cause is documented
+          - Fix is minimal and targeted
+          EOF
+
+          # Replace variables in issue body
+          sed -i "s|\$WORKFLOW_NAME|$WORKFLOW_NAME|g" issue_body.md
+          sed -i "s|\$WORKFLOW_URL|$WORKFLOW_URL|g" issue_body.md
+          sed -i "s|\$ERROR_ID|$ERROR_ID|g" issue_body.md
+          sed -i "s|\$ERROR_LOG|$ERROR_LOG|g" issue_body.md
+
+          # Create the issue
+          ISSUE_URL=$(gh issue create \
+            --title "🔴 Auto-Fix: $WORKFLOW_NAME Failed - $ERROR_ID" \
+            --body-file issue_body.md \
+            --label "pipeline-error,auto-fix,critical")
+
+          ISSUE_NUMBER=$(echo $ISSUE_URL | grep -oP '\d+$')
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+          echo "Created issue: $ISSUE_URL"
+
+  trigger-fix-pipeline:
+    needs: create-error-issue
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Trigger Error Fix Pipeline
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'error-fix.yml',
+              ref: 'main',
+              inputs: {
+                error_id: '${{ needs.create-error-issue.outputs.error_id }}',
+                issue_number: '${{ needs.create-error-issue.outputs.issue_number }}'
+              }
+            });
