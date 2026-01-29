@@ -88,7 +88,7 @@ Your task is to analyze the feedback and produce structured outputs according to
 ### Change Intake Workflow
 {change_intake}
 
-{f"### Additional Context\n{feedback_context}\n" if feedback_context else ""}
+{"### Additional Context" if feedback_context else ""}{feedback_context if feedback_context else ""}
 
 ---
 
