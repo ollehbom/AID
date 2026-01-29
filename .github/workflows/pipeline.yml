@@ -21,6 +21,8 @@ on:
 jobs:
   setup-branch:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       feature_branch: ${{ steps.branch-info.outputs.feature_branch }}
       branch_exists: ${{ steps.check-branch.outputs.exists }}
