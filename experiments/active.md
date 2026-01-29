@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-TEST-PR-FLOW-3
+- **Belief**: A modern, consistent design system (e.g., shadcn) and basic app scaffold (login, dashboard) significantly accelerate early-stage product development and ensure a professional, intuitive user experience.
+- **Change**: Establish React frontend with shadcn/ui, Google login, and basic dashboard.
+- **Owner**: Product Agent (or designated frontend lead)
+- **Status**: active
+- **Success Signal**: Founder reports faster feature development and high UI consistency; first small user story built within 2 days.
