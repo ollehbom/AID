@@ -1,0 +1,8 @@
+feature: first-trigger-design
+status: product_complete
+stages:
+  product: ✓ 2026-01-29
+  design: pending
+  dev: pending
+  qa: pending
+  ops: pending

@@ -23,3 +23,11 @@
 - **Owner**: Product Agent (definition), Design Agent (design), Engineering (implementation).
 - **Status**: Defined.
 - **Success Signal**: Core UI components built, consistent look/feel, developer velocity increase for subsequent features, positive early user feedback on UI intuitiveness.
+
+### EXP-2026-01-29-first-trigger-design
+
+-   **Belief**: The product must feel obvious without documentation.
+-   **Change**: Establish foundational React UI with shadcn/ui, Google login, and basic dashboard.
+-   **Owner**: Product Agent
+-   **Status**: Active
+-   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
