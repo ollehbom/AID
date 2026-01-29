@@ -1,0 +1,72 @@
+name: QA Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_id:
+        description: "Feature ID to process"
+        required: true
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-qa-stage
+          git push -u origin ${{ inputs.feature_id }}-qa-stage
+
+      - name: Run QA Agent
+        run: |
+          echo "🧪 QA Agent validating implementation..."
+          echo "TODO: Invoke QA Agent"
+          echo "Reads: design/intents/${{ inputs.feature_id }}.md"
+          echo "Writes: design/validations/${{ inputs.feature_id }}.md"
+
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: qa_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/qa: pending/qa: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add design/validations/ .ai/pipeline/
+          git commit -m "QA: ${{ inputs.feature_id }} validation complete" || echo "No changes to commit"
+          git push
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-qa-stage \
+            --title "🧪 QA Agent: ${{ inputs.feature_id }}" \
+            --body "## QA Agent Output
+
+          This PR contains the QA Agent's validation for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Test results
+          - Validation report
+          - Issues found (if any)
+
+          ### ✅ Review Checklist
+          - [ ] All tests pass
+          - [ ] No critical bugs
+          - [ ] Performance is acceptable
+          - [ ] Ready for deployment
+
+          **Next Stage:** After approval, the Ops Agent will be triggered.
+
+          _Merge this PR to approve and proceed to the next stage._" \
+            --label "stage:qa,awaiting-approval"

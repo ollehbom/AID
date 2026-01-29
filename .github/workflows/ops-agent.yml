@@ -1,0 +1,72 @@
+name: Ops Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_id:
+        description: "Feature ID to process"
+        required: true
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-ops-stage
+          git push -u origin ${{ inputs.feature_id }}-ops-stage
+
+      - name: Run Ops Agent
+        run: |
+          echo "🚀 Ops Agent deploying feature..."
+          echo "TODO: Invoke Ops Agent"
+          echo "Reads: design/validations/${{ inputs.feature_id }}.md"
+          echo "Writes: Deployment logs, monitoring config"
+
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: ops_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/ops: pending/ops: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add .ai/pipeline/
+          git commit -m "Ops: ${{ inputs.feature_id }} deployment ready" || echo "No changes to commit"
+          git push
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-ops-stage \
+            --title "🚀 Ops Agent: ${{ inputs.feature_id }}" \
+            --body "## Ops Agent Output
+
+          This PR contains the Ops Agent's deployment preparation for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Deployment configuration
+          - Monitoring setup
+          - Feature flag configuration
+
+          ### ✅ Review Checklist
+          - [ ] Deployment plan is sound
+          - [ ] Monitoring is configured
+          - [ ] Rollback plan is ready
+          - [ ] Ready to merge to main
+
+          **Final Stage:** After approval, a PR from feature branch to main will be created for final deployment.
+
+          _Merge this PR to approve._" \
+            --label "stage:ops,awaiting-approval"

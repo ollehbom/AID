@@ -1,0 +1,121 @@
+name: Product Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_id:
+        description: "Feature ID to process"
+        required: true
+
+jobs:
+  setup-branch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      feature_branch: ${{ steps.branch-info.outputs.feature_branch }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if feature branch exists
+        id: check-branch
+        run: |
+          if git ls-remote --heads origin feature/${{ inputs.feature_id }} | grep -q feature/${{ inputs.feature_id }}; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create feature branch if needed
+        if: steps.check-branch.outputs.exists == 'false'
+        run: |
+          git checkout -b feature/${{ inputs.feature_id }}
+          git push -u origin feature/${{ inputs.feature_id }}
+
+      - name: Output branch info
+        id: branch-info
+        run: |
+          echo "feature_branch=feature/${{ inputs.feature_id }}" >> $GITHUB_OUTPUT
+
+  run-agent:
+    needs: setup-branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-product-stage
+          git push -u origin ${{ inputs.feature_id }}-product-stage
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Product Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
+        run: |
+          echo "🤖 Invoking Product Agent..."
+          python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
+
+      - name: Read needs_design flag
+        id: read-needs-design
+        run: |
+          NEEDS_DESIGN=$(grep "needs_design:" .ai/pipeline/${{ inputs.feature_id }}.state | cut -d: -f2 | xargs || echo "false")
+          echo "needs_design=$NEEDS_DESIGN" >> $GITHUB_OUTPUT
+          echo "Needs design: $NEEDS_DESIGN"
+
+      - name: Update pipeline state to awaiting approval
+        run: |
+          sed -i "s/status: product_complete/status: product_awaiting_approval/" .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i "s/product: ✓/product: in-progress/" .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add product/decisions/ experiments/active.md .ai/pipeline/
+          git commit -m "Product: ${{ inputs.feature_id }} analysis complete" || echo "No changes to commit"
+          git push
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-product-stage \
+            --title "🤖 Product Agent: ${{ inputs.feature_id }}" \
+            --body "## Product Agent Output
+
+          This PR contains the Product Agent's analysis for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Product decision record
+          - Experiment tracking entry
+          - Pipeline state initialized
+
+          ### ✅ Review Checklist
+          - [ ] Decision record is clear and actionable
+          - [ ] Experiment hypothesis is testable
+          - [ ] Success criteria are measurable
+          - [ ] Affected beliefs are identified
+
+          **Next Stage:** After approval, the $(grep 'needs_design:' .ai/pipeline/${{ inputs.feature_id }}.state | grep -q 'true' && echo 'Design' || echo 'Architect') Agent will be triggered.
+
+          _Merge this PR to approve and proceed to the next stage._" \
+            --label "stage:product,awaiting-approval"

@@ -103,18 +103,7 @@ jobs:
 
           echo "🚀 Triggering $NEXT_STAGE stage for $FEATURE_ID"
 
-          gh workflow run pipeline.yml \
-            -f stage=$NEXT_STAGE \
-            -f feature_id=$FEATURE_ID
-
-      - name: Create final PR to main
-        if: steps.next-stage.outputs.next == 'complete'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          FEATURE_ID="${{ steps.extract-id.outputs.feature_id }}"
-
-          echo "🎉 All stages complete! Creating PR to main..."
+          gh workflow run $NEXT_STAGE-agent.yml \
 
           gh pr create \
             --base main \

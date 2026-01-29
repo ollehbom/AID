@@ -1,0 +1,74 @@
+name: Dev Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_id:
+        description: "Feature ID to process"
+        required: true
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Create working branch
+        run: |
+          git checkout -b ${{ inputs.feature_id }}-dev-stage
+          git push -u origin ${{ inputs.feature_id }}-dev-stage
+
+      - name: Run Dev Agent
+        run: |
+          echo "💻 Dev Agent implementing feature..."
+          echo "TODO: Invoke Dev Agent"
+          echo "Reads: design/architecture/ADR-*-${{ inputs.feature_id }}.md"
+          echo "       design/technical-specs/${{ inputs.feature_id }}.md"
+          echo "       design/specs/${{ inputs.feature_id }}.md (if exists)"
+          echo "Writes: Code changes"
+
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: dev_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/dev: pending/dev: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add .ai/pipeline/
+          git commit -m "Dev: ${{ inputs.feature_id }} implementation complete" || echo "No changes to commit"
+          git push
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base feature/${{ inputs.feature_id }} \
+            --head ${{ inputs.feature_id }}-dev-stage \
+            --title "💻 Dev Agent: ${{ inputs.feature_id }}" \
+            --body "## Dev Agent Output
+
+          This PR contains the Dev Agent's implementation for \`${{ inputs.feature_id }}\`.
+
+          ### 📋 Outputs
+          - Implementation code
+          - Unit tests
+          - Documentation updates
+
+          ### ✅ Review Checklist
+          - [ ] Code follows style guidelines
+          - [ ] Tests are comprehensive
+          - [ ] Documentation is updated
+          - [ ] No obvious bugs or issues
+
+          **Next Stage:** After approval, the QA Agent will be triggered.
+
+          _Merge this PR to approve and proceed to the next stage._" \
+            --label "stage:dev,awaiting-approval"

@@ -2,14 +2,24 @@
 
 ## Overview
 
-The AID pipeline now uses a PR-based approval workflow. Each agent stage creates a PR that requires human approval before proceeding to the next stage.
+The AID pipeline uses a PR-based approval workflow with **separate workflows for each stage**. Each agent creates a PR that requires human approval before the next stage automatically triggers.
+
+## Workflow Files
+
+- `product-agent.yml` - Analyzes feedback and creates product decisions
+- `design-agent.yml` - Creates design specifications and wireframes
+- `architect-agent.yml` - Reviews architecture and creates technical specs
+- `dev-agent.yml` - Implements the feature (placeholder)
+- `qa-agent.yml` - Validates implementation (placeholder)
+- `ops-agent.yml` - Prepares deployment (placeholder)
+- `stage-router.yml` - Automatically triggers next stage on PR merge
 
 ## How It Works
 
 ### 1. Start a New Feature
 
 ```bash
-gh workflow run pipeline.yml -f stage=product -f feature_id=my-feature
+gh workflow run product-agent.yml -f feature_id=my-feature
 ```
 
 This will:
@@ -32,13 +42,15 @@ When you merge a stage PR:
 
 - The `stage-router` workflow automatically triggers
 - Updates pipeline state to mark stage as approved
-- Triggers the next stage based on the workflow logic:
+- **Triggers the next stage workflow** based on the routing logic:
   - Product → Design (if needed) OR Architect
   - Design → Architect
   - Architect → Dev
   - Dev → QA
   - QA → Ops
   - Ops → Creates PR to `main`
+
+**Key benefit:** Each stage runs as an independent workflow, giving you clear separation and the ability to re-run any stage independently.
 
 ### 4. Final Deployment
 
@@ -83,20 +95,23 @@ main
 If you need to manually trigger a specific stage:
 
 ```bash
+# Trigger Product stage (start new feature)
+gh workflow run product-agent.yml -f feature_id=my-feature
+
 # Trigger Design stage
-gh workflow run pipeline.yml -f stage=design -f feature_id=my-feature
+gh workflow run design-agent.yml -f feature_id=my-feature
 
 # Trigger Architect stage
-gh workflow run pipeline.yml -f stage=architect -f feature_id=my-feature
+gh workflow run architect-agent.yml -f feature_id=my-feature
 
 # Trigger Dev stage
-gh workflow run pipeline.yml -f stage=dev -f feature_id=my-feature
+gh workflow run dev-agent.yml -f feature_id=my-feature
 
 # Trigger QA stage
-gh workflow run pipeline.yml -f stage=qa -f feature_id=my-feature
+gh workflow run qa-agent.yml -f feature_id=my-feature
 
 # Trigger Ops stage
-gh workflow run pipeline.yml -f stage=ops -f feature_id=my-feature
+gh workflow run ops-agent.yml -f feature_id=my-feature
 ```
 
 ## Labels
