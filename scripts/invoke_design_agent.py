@@ -205,7 +205,20 @@ def _invoke_gemini(system_prompt, user_prompt):
         }
     )
     
-    return json.loads(response.text)
+    # Clean and parse response
+    response_text = response.text.strip()
+    
+    # Try to extract JSON if wrapped in markdown code blocks
+    if response_text.startswith("```"):
+        lines = response_text.split('\n')
+        response_text = '\n'.join(lines[1:-1]) if len(lines) > 2 else response_text
+    
+    try:
+        return json.loads(response_text)
+    except json.JSONDecodeError as e:
+        print(f"Failed to parse JSON response. Error: {e}", file=sys.stderr)
+        print(f"Response text (first 500 chars): {response_text[:500]}", file=sys.stderr)
+        raise
 
 
 def main():

@@ -85,20 +85,20 @@ jobs:
           echo "🤖 Invoking Product Agent..."
           python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
 
-      - name: Initialize pipeline state
+      - name: Read needs_design flag
+        id: read-needs-design
         run: |
-          mkdir -p .ai/pipeline
-          cat > .ai/pipeline/${{ inputs.feature_id }}.state << EOF
-          feature: ${{ inputs.feature_id }}
-          status: product_awaiting_approval
-          stages:
-            product: in-progress
-            design: pending
-            architect: pending
-            dev: pending
-            qa: pending
-            ops: pending
-          EOF
+          NEEDS_DESIGN=$(grep "needs_design:" .ai/pipeline/${{ inputs.feature_id }}.state | cut -d: -f2 | xargs || echo "false")
+          echo "needs_design=$NEEDS_DESIGN" >> $GITHUB_OUTPUT
+          echo "Needs design: $NEEDS_DESIGN"
+
+      - name: Update pipeline state to awaiting approval
+        run: |
+          # Preserve needs_design from product agent output
+          NEEDS_DESIGN="${{ steps.read-needs-design.outputs.needs_design }}"
+
+          sed -i "s/status: product_complete/status: product_awaiting_approval/" .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i "s/product: ✓/product: in-progress/" .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
         run: |
