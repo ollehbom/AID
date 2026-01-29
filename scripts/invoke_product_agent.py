@@ -102,7 +102,7 @@ Analyze the feedback in the inbox and create the following outputs:
    - Reference affected beliefs explicitly
 
 2. **Experiment Update** (experiments/active.md - append/update)
-   - Add the new experiment with ID EXP-{datetime.now().strftime("%Y-%m-%d")}-{feature_id.upper()}
+   - Add the new experiment with ID EXP-YYYY-MM-DD-FEATURE_ID
    - Include belief, change, owner, status, success signal
 
 3. **GitHub Issue Content**
