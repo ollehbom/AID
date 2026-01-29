@@ -1,0 +1,10 @@
+feature: test-separate-pipelines-2
+status: product_awaiting_approval
+needs_design: true
+stages:
+  product: in-progress 2026-01-29
+  design: pending
+  architect: pending
+  dev: pending
+  qa: pending
+  ops: pending

@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2024-05-15-test-separate-pipelines-2
+
+- **Belief**: Establishing a modern, component-based UI foundation (React + shadcn) will accelerate UI development and improve product consistency for technical users, supporting the core belief that "Users value speed over configurability".
+- **Change**: Implement a foundational React application with shadcn UI, including Google login and a basic dashboard with mock content, to serve as the application's UI backbone.
+- **Owner**: Product Agent
+- **Status**: Active
+- **Success Signal**: Measurable reduction in time for subsequent UI development, high consistency across new UI components, and positive developer feedback on the ease of use of the design system.
