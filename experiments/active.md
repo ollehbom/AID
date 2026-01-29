@@ -16,3 +16,10 @@
   - **Owner**: Backend Team
   - **Status**: active
   - **Success Signal**: Clear data on Gemini's performance (latency, cost) and qualitative output assessment meets defined targets.
+
+## EXP-2026-01-29-PIPELINE-PERMISSIONS
+- **Belief**: A modern, consistent UI foundation (React, Shadcn, design system) is critical for rapid development and an intuitive user experience for technically competent users.
+- **Change**: Implement core React app, Shadcn integration, Google login, basic dashboard, and initial design system.
+- **Owner**: Product Agent (definition), Design Agent (design), Engineering (implementation).
+- **Status**: Defined.
+- **Success Signal**: Core UI components built, consistent look/feel, developer velocity increase for subsequent features, positive early user feedback on UI intuitiveness.
