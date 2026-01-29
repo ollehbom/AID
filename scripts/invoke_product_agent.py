@@ -114,6 +114,10 @@ Analyze the feedback in the inbox and create the following outputs:
    - Note if any belief should be updated in product/beliefs/current.md
    - Specify what changed and why
 
+5. **Design Requirement Flag**
+   - Set `needs_design: true` if this change requires UI/UX work (user-facing changes, flows, visual design)
+   - Set `needs_design: false` if this is purely technical (backend, infrastructure, API changes with no UI impact)
+
 ## Output Format
 
 Provide your response in JSON format with these keys:
@@ -124,6 +128,7 @@ Provide your response in JSON format with these keys:
   "experiment_update": "Content to append to experiments/active.md",
   "github_issue": "Full GitHub issue markdown content",
   "belief_update": "Updated beliefs section or 'NO_CHANGE' if no update needed",
+  "needs_design": true or false,
   "summary": "Brief 2-3 sentence summary of the decision"
 }}
 ```
@@ -240,13 +245,33 @@ def main():
         save_file(beliefs_path, result["belief_update"])
         print(f"✅ Updated beliefs: {beliefs_path.relative_to(REPO_ROOT)}")
     
+    # Create pipeline state file
+    needs_design = result.get("needs_design", True)
+    state_content = f"""feature: {feature_id}
+status: product_complete
+needs_design: {str(needs_design).lower()}
+stages:
+  product: ✓ {datetime.now().strftime('%Y-%m-%d')}
+  design: {'pending' if needs_design else 'skipped'}
+  architect: pending
+  dev: pending
+  qa: pending
+  ops: pending
+"""
+    state_path = REPO_ROOT / f".ai/pipeline/{feature_id}.state"
+    save_file(state_path, state_content)
+    print(f"✅ Created pipeline state: {state_path.relative_to(REPO_ROOT)}")
+    
     # Print summary
     print()
     print("📋 Summary:")
     print(result["summary"])
     print()
+    print(f"🎯 Needs Design: {'Yes' if needs_design else 'No (purely technical)'}")
+    print()
     print("✅ Product Agent execution complete!")
-    print("👉 Next: Design Agent will process this in the next pipeline stage")
+    next_stage = "Design Agent" if needs_design else "Architect Agent"
+    print(f"👉 Next: {next_stage} will process this in the next pipeline stage")
 
 
 if __name__ == "__main__":

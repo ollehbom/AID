@@ -5,8 +5,14 @@
 This system implements a **single-direction pipeline** where each agent produces artifacts for the next:
 
 ```
-Founder Input → Product → Design → Dev → QA → Ops → Deployed
+Founder Input → Product → Design (conditional) → Architect → Dev → QA → Ops → Deployed
 ```
+
+**Key Flow Logic:**
+
+- Product Agent decides if Design stage is needed (UI/UX changes)
+- Architect Agent always runs before Dev (validates technical approach)
+- All changes go through Architecture review regardless of Design involvement
 
 ## Stage Definitions
 
@@ -25,9 +31,9 @@ Founder Input → Product → Design → Dev → QA → Ops → Deployed
 
 ---
 
-### Stage 2: Design Intent
+### Stage 2: Design Intent (Conditional)
 
-**Trigger**: Product agent completes experiment proposal  
+**Trigger**: Product agent completes experiment proposal AND sets `needs_design: true`  
 **Agent**: Design Agent  
 **Input**: `experiments/active.md` + `product/beliefs/current.md`  
 **Outputs**:
@@ -37,13 +43,83 @@ Founder Input → Product → Design → Dev → QA → Ops → Deployed
 
 **Exit Criteria**: Spec ready with flow, states, and copy tone defined
 
+**Skipped When**: Product Agent determines change is purely technical (no UI/UX impact)
+
 ---
 
-### Stage 3: Development
+### Stage 3: Architecture Review
 
-**Trigger**: Design spec completed  
+**Trigger**: Product agent completes OR Design spec completed  
+**Agent**: Architect Agent  
+**Input**:
+
+- `product/decisions/<feature-id>.md`
+- `design/specs/<feature-id>.md` (if design stage ran)
+- `experiments/active.md`
+
+**Outputs**:
+
+- `design/architecture/ADR-<number>-<feature-id>.md` (Architecture Decision Record)
+- `design/technical-specs/<feature-id>.md` (Technical specification)
+- Updated pipeline state with architecture review
+
+**Exit Criteria**:
+
+- ADR documenting key architectural decisions
+- Technical spec with implementation guidance
+- Security, scalability, and reliability considerations addressed
+
+**Focus Areas**:
+
+- Well-Architected Framework (security, reliability, performance, cost)
+- AI/ML-specific concerns (model fallbacks, orchestration)
+- Database and infrastructure decisions
+- Testing and deployment strategies
+
+---
+
+### Stage 3: Architecture Review
+
+**Trigger**: Product agent completes OR Design spec completed  
+**Agent**: Architect Agent  
+**Input**:
+
+- `product/decisions/<feature-id>.md`
+- `design/specs/<feature-id>.md` (if design stage ran)
+- `experiments/active.md`
+
+**Outputs**:
+
+- `design/architecture/ADR-<number>-<feature-id>.md` (Architecture Decision Record)
+- `design/technical-specs/<feature-id>.md` (Technical specification)
+- Updated pipeline state with architecture review
+
+**Exit Criteria**:
+
+- ADR documenting key architectural decisions
+- Technical spec with implementation guidance
+- Security, scalability, and reliability considerations addressed
+
+**Focus Areas**:
+
+- Well-Architected Framework (security, reliability, performance, cost)
+- AI/ML-specific concerns (model fallbacks, orchestration)
+- Database and infrastructure decisions
+- Testing and deployment strategies
+
+---
+
+### Stage 4: Development
+
+**Trigger**: Architect spec completed  
 **Agent**: Dev Agent  
-**Input**: `design/specs/<feature-id>.md` + `engineering/architecture.md`  
+**Input**:
+
+- `design/architecture/ADR-<number>-<feature-id>.md`
+- `design/technical-specs/<feature-id>.md`
+- `design/specs/<feature-id>.md` (if design stage ran)
+- `engineering/architecture.md`
+
 **Outputs**:
 
 - Code changes (PR)
@@ -54,7 +130,7 @@ Founder Input → Product → Design → Dev → QA → Ops → Deployed
 
 ---
 
-### Stage 4: QA Validation
+### Stage 5: QA Validation
 
 **Trigger**: Dev PR merged  
 **Agent**: QA Agent  
@@ -69,7 +145,7 @@ Founder Input → Product → Design → Dev → QA → Ops → Deployed
 
 ---
 
-### Stage 5: Operations Rollout
+### Stage 6: Operations Rollout
 
 **Trigger**: QA validation passes  
 **Agent**: Ops Agent  
@@ -92,13 +168,18 @@ Each stage writes its completion state to track progress:
 
 ```yaml
 feature: onboarding-v2
-status: design_complete
+status: architect_complete
+needs_design: true
 stages:
   product: ✓ 2026-01-28
   design: ✓ 2026-01-29
+  architect: ✓ 2026-01-29
   dev: in_progress
   qa: pending
   ops: pending
+architecture:
+  adr_number: ADR-042
+  complexity: moderate
 ```
 
 ## Handoff Rules

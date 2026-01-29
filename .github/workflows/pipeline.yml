@@ -33,6 +33,8 @@ jobs:
     needs: detect-stage
     if: needs.detect-stage.outputs.current_stage == 'intake'
     runs-on: ubuntu-latest
+    outputs:
+      needs_design: ${{ steps.check-design.outputs.needs_design }}
     steps:
       - uses: actions/checkout@v4
 
@@ -43,14 +45,26 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install openai
+          pip install -r requirements.txt
 
       - name: Run Product Agent
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ secrets.MODEL || 'gpt-4.1' }}
         run: |
-          echo "🤖 Invoking Product Agent with GPT-4.1..."
+          echo "🤖 Invoking Product Agent..."
           python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
+
+      - name: Check if design needed
+        id: check-design
+        run: |
+          if grep -q "needs_design: true" .ai/pipeline/${{ inputs.feature_id }}.state; then
+            echo "needs_design=true" >> $GITHUB_OUTPUT
+          else
+            echo "needs_design=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create GitHub Issue
         if: success()
@@ -88,8 +102,11 @@ jobs:
           git push
 
   design-agent:
-    needs: detect-stage
-    if: needs.detect-stage.outputs.current_stage == 'product_complete'
+    needs: [detect-stage, product-agent]
+    if: |
+      (needs.detect-stage.outputs.current_stage == 'product_complete' &&
+       needs.product-agent.outputs.needs_design == 'true') ||
+      needs.detect-stage.outputs.current_stage == 'design_pending'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -115,9 +132,50 @@ jobs:
           git commit -m "Design: ${{ inputs.feature_id }} spec complete"
           git push
 
+  architect-agent:
+    needs: [detect-stage, design-agent]
+    if: |
+      needs.detect-stage.outputs.current_stage == 'product_complete' ||
+      needs.detect-stage.outputs.current_stage == 'design_complete'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Architect Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ secrets.MODEL || 'gpt-4.1' }}
+        run: |
+          echo "🏗️ Invoking Architect Agent..."
+          python scripts/invoke_architect_agent.py ${{ inputs.feature_id }}
+
+      - name: Update state
+        run: |
+          sed -i 's/status:.*/status: architect_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/architect: pending/architect: ✓ '"$(date +%Y-%m-%d)"'/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add design/architecture/ design/technical-specs/ .ai/pipeline/
+          git commit -m "Architect: ${{ inputs.feature_id }} review complete"
+          git push
+
   dev-agent:
-    needs: detect-stage
-    if: needs.detect-stage.outputs.current_stage == 'design_complete'
+    needs: [detect-stage, architect-agent]
+    if: needs.detect-stage.outputs.current_stage == 'architect_complete'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -126,7 +184,9 @@ jobs:
         run: |
           echo "Dev Agent implementing feature..."
           # TODO: Invoke Dev Agent
-          # Reads: design/specs/${{ inputs.feature_id }}.md
+          # Reads: design/architecture/ADR-*-${{ inputs.feature_id }}.md
+          #        design/technical-specs/${{ inputs.feature_id }}.md
+          #        design/specs/${{ inputs.feature_id }}.md (if exists)
           # Writes: Code changes, creates PR
 
       - name: Create implementation PR
