@@ -51,8 +51,8 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
-          MODEL: ${{ secrets.MODEL || 'gpt-4.1' }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
         run: |
           echo "🤖 Invoking Product Agent..."
           python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
@@ -124,8 +124,8 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
-          MODEL: ${{ secrets.MODEL || 'gpt-4.1' }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
         run: |
           echo "🎨 Invoking Design Agent..."
           python scripts/invoke_design_agent.py ${{ inputs.feature_id }}
@@ -160,8 +160,8 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
-          MODEL: ${{ secrets.MODEL || 'gpt-4.1' }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
         run: |
           echo "🏗️ Invoking Architect Agent..."
           python scripts/invoke_architect_agent.py ${{ inputs.feature_id }}
