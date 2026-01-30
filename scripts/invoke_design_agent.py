@@ -117,6 +117,7 @@ Based on the product decision, create the following design outputs:
    - Include all key UI elements
    - Use semantic naming
    - Specify sizing, spacing, and hierarchy
+   - KEEP IT SIMPLE: Use minimal nesting and straightforward structure
 
 4. **Validation Notes**
    - Check against validation rules:
@@ -128,22 +129,29 @@ Based on the product decision, create the following design outputs:
 
 ## Output Format
 
-Provide your response as valid JSON. IMPORTANT: All string values containing markdown must have newlines, quotes, and backslashes properly escaped for JSON.
+Provide your response as valid JSON. To avoid JSON escaping issues, provide wireframe as a JSON-formatted STRING (not an object).
 
 ```json
 {{
   "design_intent": "Full markdown content for design/intents/{feature_id}.md",
   "design_spec": "Full markdown content for design/specs/{feature_id}.md",
-  "wireframe_json": {{}},
+  "wireframe_json_string": "Entire wireframe JSON as an escaped string - this makes it easier to handle",
   "validation_notes": "Validation findings and concerns",
   "summary": "Brief 2-3 sentence summary of the design approach"
 }}
 ```
 
+Example of wireframe_json_string (note it's a STRING containing JSON, properly escaped):
+```json
+{{
+  "wireframe_json_string": "{{\\"name\\": \\"LoginScreen\\", \\"type\\": \\"FRAME\\", \\"children\\": []}}"
+}}
+```
+
 Remember: 
 - Your designs should reduce friction, match stated intent, and be immediately understandable to new users
-- Ensure ALL newlines in markdown strings are escaped as \\n in the JSON
-- Ensure ALL quotes in content are escaped as \\" in the JSON
+- The wireframe_json_string should contain valid JSON, but AS A STRING VALUE
+- Use simple structures to avoid nested escaping complexity
 """
 
     # Invoke AI API based on provider
@@ -235,7 +243,28 @@ def _invoke_gemini(system_prompt, user_prompt):
             print(f"\nContext around error position:", file=sys.stderr)
             print(f"...{response_text[start:end]}...", file=sys.stderr)
         
-        print(f"\nTip: Gemini may have generated invalid JSON. Check the error file for details.", file=sys.stderr)
+        # Try to recover by truncating at the error position and closing the JSON
+        print(f"\nAttempting JSON recovery...", file=sys.stderr)
+        try:
+            if hasattr(e, 'pos') and e.pos:
+                # Find the last complete key-value pair before the error
+                truncated = response_text[:e.pos]
+                # Find last comma or opening brace
+                last_comma = truncated.rfind(',')
+                if last_comma > 0:
+                    truncated = truncated[:last_comma]
+                # Close the JSON object
+                truncated = truncated.rstrip() + "\n}"
+                recovered = json.loads(truncated)
+                print(f"✓ Recovered partial JSON with {len(recovered)} fields", file=sys.stderr)
+                # Add a note about incomplete data
+                recovered["_recovery_note"] = f"JSON was truncated due to parsing error at position {e.pos}"
+                return recovered
+        except Exception as recovery_error:
+            print(f"Recovery failed: {recovery_error}", file=sys.stderr)
+        
+        print(f"\nTip: Gemini generated invalid JSON. Check {error_file} for full output.", file=sys.stderr)
+        print(f"Consider simplifying the prompt or reducing output size.", file=sys.stderr)
         print(f"Common issues: unescaped quotes, unescaped newlines in string values, trailing commas.", file=sys.stderr)
         raise
 
@@ -281,7 +310,18 @@ def main():
     
     # Save wireframe JSON
     wireframe_path = REPO_ROOT / f"design/wireframes/{feature_id}.json"
-    save_file(wireframe_path, json.dumps(result["wireframe_json"], indent=2))
+    # Handle wireframe as either string or object (for backward compatibility)
+    if "wireframe_json_string" in result:
+        # It's provided as a JSON string, parse it to validate and then save pretty-printed
+        try:
+            wireframe_obj = json.loads(result["wireframe_json_string"])
+            save_file(wireframe_path, json.dumps(wireframe_obj, indent=2))
+        except json.JSONDecodeError:
+            # If it's not valid JSON, save as-is
+            save_file(wireframe_path, result["wireframe_json_string"])
+    else:
+        # Legacy format: object directly
+        save_file(wireframe_path, json.dumps(result.get("wireframe_json", {}), indent=2))
     print(f"✅ Created wireframe: {wireframe_path.relative_to(REPO_ROOT)}")
     
     # Save validation notes
