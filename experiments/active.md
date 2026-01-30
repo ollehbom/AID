@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2024-01-29-test-separate-pipelines-6
+
+- **Belief**: Establishes foundational UI to support core beliefs about speed, obviousness, and technical user competence.
+- **Change**: Implement a React app with Google login, basic dashboard, and a shadcn/ui-based design system.
+- **Owner**: Product Agent (initial definition), then Engineering for implementation.
+- **Status**: Defined, Awaiting Design Agent.
+- **Success Signal**: Functional login, dashboard rendering, design system components available for use, positive developer feedback on design system.
