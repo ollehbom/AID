@@ -238,7 +238,21 @@ def _invoke_gemini(system_prompt, user_prompt):
         return json.loads(response_text)
     except json.JSONDecodeError as e:
         print(f"Failed to parse JSON response. Error: {e}", file=sys.stderr)
-        print(f"Response text (first 500 chars): {response_text[:500]}", file=sys.stderr)
+        
+        # Save full response for debugging
+        error_file = f"architect_agent_error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        with open(error_file, 'w', encoding='utf-8') as f:
+            f.write(response_text)
+        print(f"Full response saved to {error_file}", file=sys.stderr)
+        
+        # Show context around the error
+        if hasattr(e, 'pos') and e.pos:
+            start = max(0, e.pos - 200)
+            end = min(len(response_text), e.pos + 200)
+            print(f"\nContext around error position:", file=sys.stderr)
+            print(f"...{response_text[start:end]}...", file=sys.stderr)
+        
+        print(f"\nTip: Gemini may have generated invalid JSON. Check the error file for details.", file=sys.stderr)
         raise
 
 
