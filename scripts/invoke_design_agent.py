@@ -221,21 +221,23 @@ def _invoke_gemini(system_prompt, user_prompt):
         return json.loads(response_text)
     except json.JSONDecodeError as e:
         print(f"Failed to parse JSON response. Error: {e}", file=sys.stderr)
-        print(f"Response text (first 1000 chars): {response_text[:1000]}", file=sys.stderr)
-        print(f"\nAttempting to fix common JSON issues...", file=sys.stderr)
         
-        # Try to fix common issues: unescaped newlines in strings
-        # This is a basic fix - replace literal \n with \\n if not already escaped
-        fixed_text = response_text.replace('\n', '\\n').replace('\\\\n', '\\n')
+        # Save full response for debugging
+        error_file = f"design_agent_error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        with open(error_file, 'w', encoding='utf-8') as f:
+            f.write(response_text)
+        print(f"Full response saved to {error_file}", file=sys.stderr)
         
-        try:
-            return json.loads(fixed_text)
-        except json.JSONDecodeError as e2:
-            print(f"Still failed after attempted fix. Error: {e2}", file=sys.stderr)
-            print(f"Saving full response to design_agent_error.json for debugging", file=sys.stderr)
-            with open('design_agent_error.json', 'w') as f:
-                f.write(response_text)
-            raise
+        # Show context around the error
+        if hasattr(e, 'pos') and e.pos:
+            start = max(0, e.pos - 200)
+            end = min(len(response_text), e.pos + 200)
+            print(f"\nContext around error position:", file=sys.stderr)
+            print(f"...{response_text[start:end]}...", file=sys.stderr)
+        
+        print(f"\nTip: Gemini may have generated invalid JSON. Check the error file for details.", file=sys.stderr)
+        print(f"Common issues: unescaped quotes, unescaped newlines in string values, trailing commas.", file=sys.stderr)
+        raise
 
 
 def main():
