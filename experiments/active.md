@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+- EXP-2024-03-08-test-separate-pipelines-7
+  -   **Belief**: Users value speed over configurability, The primary user is technically competent, The product must feel obvious without documentation
+  -   **Change**: Build React app with login, dashboard, and Shadcn UI.
+  -   **Owner**: Founder
+  -   **Status**: Active
+  -   **Success Signal**: Functional login, dashboard, and positive founder feedback within one week.
