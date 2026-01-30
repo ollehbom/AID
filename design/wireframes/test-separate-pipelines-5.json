@@ -1,0 +1,92 @@
+{
+  "name": "Dashboard Screen",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "backgroundColor": "#FFFFFF",
+  "children": [
+    {
+      "name": "TopHeaderArea",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "HUG",
+      "backgroundColor": "#F8F8F8",
+      "children": [
+        {
+          "name": "WelcomeText",
+          "type": "TEXT",
+          "characters": "Welcome, [User Name]!",
+          "fontSize": 20,
+          "width": "FILL",
+          "height": "HUG"
+        }
+      ]
+    },
+    {
+      "name": "MainContentContainer",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "FILL",
+      "children": [
+        {
+          "name": "DashboardCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "name": "CardTitle",
+              "type": "TEXT",
+              "characters": "Your Dashboard",
+              "fontSize": 18,
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "CardBodyText",
+              "type": "TEXT",
+              "characters": "This is your foundational dashboard. We're busy building powerful features for you. Stay tuned!",
+              "fontSize": 14,
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "CallToActionButton",
+              "type": "FRAME",
+              "layoutSizingHorizontal": "HUG",
+              "layoutSizingVertical": "HUG",
+              "backgroundColor": "#007AFF",
+              "cornerRadius": 4,
+              "children": [
+                {
+                  "name": "ButtonLabel",
+                  "type": "TEXT",
+                  "characters": "Learn More",
+                  "fontSize": 14
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FutureFeaturesPlaceholder",
+          "type": "RECTANGLE",
+          "layoutSizingHorizontal": "FILL",
+          "height": 120,
+          "backgroundColor": "#EAEAEA",
+          "cornerRadius": 8
+        },
+        {
+          "name": "FutureFeaturesLabel",
+          "type": "TEXT",
+          "characters": "More features coming soon...",
+          "fontSize": 12,
+          "width": "FILL",
+          "height": "HUG"
+        }
+      ]
+    }
+  ]
+}
