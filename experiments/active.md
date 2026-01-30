@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2024-07-16-test-separate-pipelines-5
+
+- **Belief**: We believe that providing a basic, modern, and consistent user interface (UI) is essential for users to interact with our product and for us to gather initial feedback on core value propositions.
+- **Change**: Implement a foundational React application with Google login, a basic dashboard, and integrate shadcn/ui as the core design system.
+- **Owner**: Product Agent (definition), Engineering (implementation)
+- **Status**: Active
+- **Success Signal**: 100% successful Google logins for internal testers, basic dashboard accessible, shadcn/ui consistently applied.
