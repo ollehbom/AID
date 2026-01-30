@@ -9,9 +9,11 @@ The `json_fixer.py` utility provides automatic recovery for malformed JSON respo
 AI models, especially Gemini, sometimes generate JSON with invalid control characters or formatting issues that cause parsing failures. Example errors:
 
 - `Invalid control character at: line 3 column 354 (char 2859)`
+- `Expecting ',' delimiter: line 3 column 2631 (char 10301)`
 - Unescaped newlines in string values
 - Trailing commas in objects/arrays
 - JSON wrapped in markdown code blocks
+- Missing commas between properties or array elements
 
 ## Solution
 
@@ -35,9 +37,13 @@ Returns: `(fixed_json_string, was_modified)`
 The main function used by all agent scripts. Attempts multiple recovery strategies:
 
 1. **First attempt**: Apply automatic fixes via `fix_json_string()`
-2. **Second attempt**: Aggressive recovery - truncate at error position and close JSON properly
-3. **Third attempt**: Extract JSON from surrounding text
-4. **If all fail**: Save detailed debug information and re-raise the error
+2. **Second attempt**: Fix missing comma/delimiter errors (NEW)
+   - Detects missing commas between object properties
+   - Detects missing commas between array elements
+   - Handles whitespace between elements
+3. **Third attempt**: Aggressive recovery - truncate at error position and close JSON properly
+4. **Fourth attempt**: Extract JSON from surrounding text
+5. **If all fail**: Save detailed debug information and re-raise the error
 
 Returns: Parsed JSON object (dict or list)
 
@@ -78,9 +84,14 @@ result = parse_json_with_recovery(
 - ✅ Markdown code block extraction
 - ✅ Trailing comma removal
 - ✅ Trailing content truncation
+- ✅ Missing comma detection and insertion (NEW)
 
 ### Recovery Strategies
 
+- ✅ **Missing comma fixes** - Intelligent detection and insertion of missing commas
+  - Between object properties: `{"a":"b" "c":"d"}` → `{"a":"b", "c":"d"}`
+  - Between array elements: `[{...}{...}]` → `[{...},{...}]`
+  - With whitespace handling: `{"a":"b"\n"c":"d"}` → `{"a":"b",\n"c":"d"}`
 - ✅ Truncate at error position and close JSON properly
 - ✅ Remove incomplete strings at the end
 - ✅ Balance brackets and braces
@@ -104,6 +115,9 @@ The utility successfully handles:
 - ✅ Control characters in strings (`\x01`, `\x08`, etc.)
 - ✅ JSON wrapped in markdown code blocks
 - ✅ Trailing commas in objects and arrays
+- ✅ Missing commas between properties (NEW)
+- ✅ Missing commas between array elements (NEW)
+- ✅ Missing commas with whitespace/newlines (NEW)
 - ⚠️ Incomplete JSON (partial recovery where possible)
 
 ## Performance Impact

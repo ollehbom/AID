@@ -137,7 +137,20 @@ def parse_json_with_recovery(json_string, save_error_file=True, error_prefix="js
         print(f"⚠ JSON parsing failed after auto-fix: {e}", file=sys.stderr)
         first_error = e
     
-    # Second attempt: Aggressive recovery - truncate and close
+    # Second attempt: Try to fix missing comma/delimiter issues
+    if "delimiter" in str(first_error).lower() or "expecting ','" in str(first_error).lower():
+        print(f"Attempting to fix missing delimiter...", file=sys.stderr)
+        try:
+            fixed_string, _ = fix_json_string(json_string)
+            comma_fixed = _fix_missing_commas(fixed_string, first_error)
+            if comma_fixed:
+                result = json.loads(comma_fixed)
+                print(f"✓ Fixed missing delimiter issue", file=sys.stderr)
+                return result
+        except Exception as comma_error:
+            print(f"Comma fix failed: {comma_error}", file=sys.stderr)
+    
+    # Third attempt: Aggressive recovery - truncate and close
     print(f"Attempting aggressive JSON recovery...", file=sys.stderr)
     try:
         fixed_string, _ = fix_json_string(json_string)
@@ -152,7 +165,7 @@ def parse_json_with_recovery(json_string, save_error_file=True, error_prefix="js
     except Exception as recovery_error:
         print(f"Aggressive recovery failed: {recovery_error}", file=sys.stderr)
     
-    # Third attempt: Try to extract JSON from possible surrounding text
+    # Fourth attempt: Try to extract JSON from possible surrounding text
     try:
         print(f"Attempting to extract JSON from surrounding text...", file=sys.stderr)
         extracted = _extract_json_from_text(original_string)
@@ -209,6 +222,113 @@ def parse_json_with_recovery(json_string, save_error_file=True, error_prefix="js
     
     # Re-raise the original error
     raise first_error
+
+
+def _fix_missing_commas(json_string, error):
+    """
+    Attempt to fix missing comma/delimiter errors.
+    
+    Common issues:
+    - Missing comma between object properties
+    - Missing comma between array elements
+    - Extra/missing quotes causing delimiter confusion
+    
+    Args:
+        json_string: The JSON string with a delimiter error
+        error: The JSONDecodeError exception
+        
+    Returns:
+        str or None: Fixed JSON string or None if fix failed
+    """
+    if not hasattr(error, 'pos') or not error.pos:
+        return None
+    
+    # Get context around the error
+    pos = error.pos
+    start = max(0, pos - 100)
+    end = min(len(json_string), pos + 100)
+    context = json_string[start:end]
+    
+    # Try multiple comma fix strategies
+    attempts = []
+    
+    # Strategy 1: Insert comma before the error position
+    # Common case: }{ or ][ without comma
+    if pos > 0:
+        before_char = json_string[pos-1:pos]
+        at_char = json_string[pos:pos+1]
+        
+        # Look back further to handle whitespace
+        # Find the last non-whitespace character before position
+        look_back = pos - 1
+        while look_back >= 0 and json_string[look_back] in ' \t\n\r':
+            look_back -= 1
+        
+        if look_back >= 0:
+            last_nonwhite = json_string[look_back]
+            
+            # Case: }{"key" or ]{"key" or } "key" - missing comma after } or ]
+            if last_nonwhite in ['}', ']'] and at_char in ['{', '"']:
+                # Insert comma after the last non-whitespace char, before current pos
+                attempt = json_string[:look_back+1] + ',' + json_string[look_back+1:]
+                attempts.append(("Insert comma after } or ]", attempt))
+            
+            # Case: "value" "key" - missing comma between string values
+            if last_nonwhite == '"' and at_char == '"':
+                attempt = json_string[:look_back+1] + ',' + json_string[look_back+1:]
+                attempts.append(("Insert comma between string properties", attempt))
+            
+            # Case: number "key" or boolean "key" - missing comma after value
+            if last_nonwhite.isdigit() and at_char == '"':
+                attempt = json_string[:look_back+1] + ',' + json_string[look_back+1:]
+                attempts.append(("Insert comma after numeric value", attempt))
+        
+        # Direct character comparison (no whitespace)
+        # Case: "value"{"key" - missing comma after closing quote
+        if before_char == '"' and at_char in ['{', '"']:
+            attempt = json_string[:pos] + ',' + json_string[pos:]
+            attempts.append(("Insert comma directly after quote", attempt))
+    
+    # Strategy 2: Look for common patterns like }} or ]] that might need comma
+    # Search backwards from error position for property boundaries
+    if pos > 10:
+        # Find the last complete property before error
+        search_start = max(0, pos - 500)
+        substring = json_string[search_start:pos]
+        
+        # Look for patterns like: "value"\n\s*"key" (missing comma)
+        pattern = r'(["\]}])(\s+)(["\[{])'
+        matches = list(re.finditer(pattern, substring))
+        
+        if matches:
+            # Take the last match (closest to error)
+            last_match = matches[-1]
+            # Calculate absolute position
+            abs_pos = search_start + last_match.start() + len(last_match.group(1))
+            attempt = json_string[:abs_pos] + ',' + json_string[abs_pos:]
+            attempts.append(("Insert comma between elements (pattern match)", attempt))
+    
+    # Strategy 3: Try removing extra characters around the error position
+    # Sometimes there's a stray character causing issues
+    if pos > 0 and pos < len(json_string):
+        # Try removing character at error position
+        attempt = json_string[:pos] + json_string[pos+1:]
+        attempts.append(("Remove character at error position", attempt))
+        
+        # Try removing character before error position
+        attempt = json_string[:pos-1] + json_string[pos:]
+        attempts.append(("Remove character before error position", attempt))
+    
+    # Try each attempt
+    for strategy, attempt in attempts:
+        try:
+            json.loads(attempt)
+            print(f"✓ Fixed using: {strategy}", file=sys.stderr)
+            return attempt
+        except:
+            continue
+    
+    return None
 
 
 def _truncate_and_close_json(json_string, error):
