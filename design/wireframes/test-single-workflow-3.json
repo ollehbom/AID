@@ -1,0 +1,90 @@
+{
+  "name": "LoginScreen",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "layoutMode": "VERTICAL",
+  "paddingTop": 80,
+  "paddingBottom": 80,
+  "paddingLeft": 24,
+  "paddingRight": 24,
+  "itemSpacing": 32,
+  "backgroundColor": "#FFFFFF",
+  "children": [
+    {
+      "name": "AppTitle",
+      "type": "TEXT",
+      "characters": "[Product Name]",
+      "fontSize": 36,
+      "fontWeight": "BOLD",
+      "color": "#333333",
+      "width": "FILL",
+      "height": "HUG",
+      "textAlign": "CENTER"
+    },
+    {
+      "name": "Subtitle",
+      "type": "TEXT",
+      "characters": "Your AI-powered workflow",
+      "fontSize": 18,
+      "color": "#666666",
+      "width": "FILL",
+      "height": "HUG",
+      "textAlign": "CENTER"
+    },
+    {
+      "name": "Spacer",
+      "type": "RECTANGLE",
+      "width": "FILL",
+      "height": 64,
+      "backgroundColor": "transparent"
+    },
+    {
+      "name": "GoogleSignInButton",
+      "type": "FRAME",
+      "layoutMode": "HORIZONTAL",
+      "layoutSizingHorizontal": "HUG",
+      "layoutSizingVertical": "HUG",
+      "itemSpacing": 12,
+      "paddingTop": 12,
+      "paddingBottom": 12,
+      "paddingLeft": 24,
+      "paddingRight": 24,
+      "backgroundColor": "#4285F4",
+      "cornerRadius": 4,
+      "children": [
+        {
+          "name": "GoogleIconPlaceholder",
+          "type": "RECTANGLE",
+          "width": 20,
+          "height": 20,
+          "backgroundColor": "transparent",
+          "strokeColor": "#FFFFFF",
+          "strokeWeight": 2,
+          "cornerRadius": 100
+        },
+        {
+          "name": "ButtonText",
+          "type": "TEXT",
+          "characters": "Sign in with Google",
+          "fontSize": 16,
+          "color": "#FFFFFF",
+          "fontWeight": "MEDIUM",
+          "width": "HUG",
+          "height": "HUG"
+        }
+      ]
+    },
+    {
+      "name": "PrivacyText",
+      "type": "TEXT",
+      "characters": "By signing in, you agree to our Terms of Service and Privacy Policy.",
+      "fontSize": 12,
+      "color": "#999999",
+      "width": "FILL",
+      "height": "HUG",
+      "textAlign": "CENTER",
+      "marginTop": 16
+    }
+  ]
+}
