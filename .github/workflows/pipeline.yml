@@ -306,14 +306,45 @@ jobs:
     permissions:
       actions: write
       contents: read
+      issues: write
     steps:
-      - name: Trigger error recovery
+      - uses: actions/checkout@v4
+
+      - name: Create error issue and trigger fix
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           ERROR_ID="error-$(date -u +%Y%m%d-%H%M%S)"
-          echo "🔴 Pipeline failed - triggering auto-fix: $ERROR_ID"
+          echo "🔴 Pipeline failed - creating issue and triggering auto-fix: $ERROR_ID"
+
+          # Create issue
+          ISSUE_URL=$(gh issue create \
+            --title "🔴 Pipeline Failed: ${{ inputs.feature_id }} - $ERROR_ID" \
+            --body "## Pipeline Failure
+
+          **Feature ID:** \`${{ inputs.feature_id }}\`  
+          **Error ID:** \`$ERROR_ID\`  
+          **Workflow:** Pipeline  
+          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          ### Failed Stage
+          One or more pipeline stages failed. Check the workflow run for details.
+
+          ### Error Recovery Agent Task
+          1. Download and analyze the failed workflow logs
+          2. Identify the root cause of the failure
+          3. Implement a minimal fix
+          4. Create a PR with the fix
+          5. Update this issue with findings
+
+          ---
+          _Auto-fix will be triggered automatically._" \
+            --label "pipeline-error,auto-fix")
+
+          ISSUE_NUMBER=$(echo $ISSUE_URL | grep -oP '\d+$')
+          echo "Created issue #$ISSUE_NUMBER"
+
+          # Trigger error-fix workflow
           gh workflow run error-fix.yml \
             -f error_id="$ERROR_ID" \
-            -f workflow_name="Pipeline" \
-            -f feature_id="${{ inputs.feature_id }}"
+            -f issue_number="$ISSUE_NUMBER"
