@@ -1,5 +1,5 @@
 feature: test-separate-pipelines-7
-status: product_awaiting_approval
+status: product_approved
 needs_design: true
 stages:
   product: in-progress 2026-01-30
