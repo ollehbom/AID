@@ -85,13 +85,17 @@ jobs:
           STATUS="${{ steps.read-state.outputs.status }}"
           STAGE="${STATUS%_awaiting_approval}"
 
-          sed -i "s/$STAGE: in-progress/$STAGE: ✓ $(date +%Y-%m-%d)/" .ai/pipeline/$FEATURE_ID.state
+          sed -i "s/status: ${STATUS}/status: ${STAGE}_approved/" .ai/pipeline/$FEATURE_ID.state
 
-          git config user.name "Pipeline Bot"
-          git config user.email "pipeline@aid.local"
-          git add .ai/pipeline/$FEATURE_ID.state
-          git commit -m "Pipeline: $STAGE approved for $FEATURE_ID"
-          git push
+          if git diff --quiet .ai/pipeline/$FEATURE_ID.state; then
+            echo "No changes to commit, state already updated"
+          else
+            git config user.name "Pipeline Bot"
+            git config user.email "pipeline@aid.local"
+            git add .ai/pipeline/$FEATURE_ID.state
+            git commit -m "Pipeline: $STAGE approved for $FEATURE_ID"
+            git push
+          fi
 
       - name: Trigger next stage
         if: steps.next-stage.outputs.next != 'none' && steps.next-stage.outputs.next != 'complete'
