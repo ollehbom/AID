@@ -11,6 +11,73 @@ import sys
 from datetime import datetime
 
 
+def _escape_newlines_in_string_values(json_string):
+    """
+    Escape actual newlines within JSON string values.
+    
+    This is critical for fixing Gemini's tendency to include raw newlines
+    in markdown content within JSON strings.
+    
+    Args:
+        json_string: The JSON string to fix
+        
+    Returns:
+        str: Fixed JSON string with escaped newlines in string values
+    """
+    result = []
+    in_string = False
+    escape_next = False
+    i = 0
+    
+    while i < len(json_string):
+        char = json_string[i]
+        
+        if escape_next:
+            # This character is escaped, keep as-is
+            result.append(char)
+            escape_next = False
+            i += 1
+            continue
+        
+        if char == '\\':
+            # Next character will be escaped
+            result.append(char)
+            escape_next = True
+            i += 1
+            continue
+        
+        if char == '"':
+            # Toggle string state
+            in_string = not in_string
+            result.append(char)
+            i += 1
+            continue
+        
+        if in_string:
+            # We're inside a string value
+            if char == '\n':
+                # Replace actual newline with escaped version
+                result.append('\\n')
+                i += 1
+                continue
+            elif char == '\r':
+                # Replace actual carriage return with escaped version
+                result.append('\\r')
+                i += 1
+                continue
+            elif char == '\t':
+                # Replace actual tab with escaped version
+                result.append('\\t')
+                i += 1
+                continue
+        
+        # Keep character as-is
+        result.append(char)
+        i += 1
+    
+    return ''.join(result)
+
+
 def fix_json_string(json_string):
     """
     Attempt to fix common JSON errors in AI-generated content.
@@ -50,7 +117,13 @@ def fix_json_string(json_string):
         json_string = re.sub(control_char_pattern, '', json_string)
         modified = True
     
-    # 5. Fix common escape sequence issues
+    # 5. Escape unescaped newlines within JSON string values
+    # This is crucial for markdown content in JSON strings
+    json_string = _escape_newlines_in_string_values(json_string)
+    if json_string != original or modified:
+        modified = True
+    
+    # 6. Fix common escape sequence issues
     # Replace unescaped newlines in strings (but not actual JSON structure newlines)
     # This is tricky - we need to find strings and escape newlines within them
     def escape_newlines_in_strings(match):
@@ -70,7 +143,7 @@ def fix_json_string(json_string):
     except Exception:
         pass  # If any replacement fails, continue with original
     
-    # 6. Fix common trailing comma issues
+    # 7. Fix common trailing comma issues
     json_string = re.sub(r',(\s*[}\]])', r'\1', json_string)
     
     # 7. Remove any trailing content after the main JSON object/array
@@ -600,6 +673,10 @@ if __name__ == "__main__":
         ('{"text": "Hello world, "count": 42}', 'Unterminated string (missing quote)'),
         # Nested JSON string (like wireframe scenario)
         ('{"data": "{\\"nested\\": \\"value\\"}", "other": "test"}', 'Nested JSON (properly escaped)'),
+        # Markdown with actual newlines (design agent scenario)
+        ('{\n  "design_spec": "### Title\\nContent\\nMore lines"\n}', 'Markdown with escaped newlines'),
+        # Markdown with ACTUAL newlines (the real problem)
+        ('{\n  "design_spec": "### Title\nActual newline\nMore lines"\n}', 'Markdown with ACTUAL newlines (fixed)'),
         # Incomplete JSON (expected to fail)
         ('{"complete": true, "incomplete": "val', 'Incomplete JSON (expected fail)'),
     ]
