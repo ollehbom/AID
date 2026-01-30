@@ -18,11 +18,6 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
-      - name: Create working branch
-        run: |
-          git checkout -b ${{ inputs.feature_id }}-architect-stage
-          git push -u origin ${{ inputs.feature_id }}-architect-stage
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -44,8 +39,8 @@ jobs:
 
       - name: Update pipeline state
         run: |
-          sed -i 's/status:.*/status: architect_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/architect: pending/architect: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/status:.*/status: architect_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/architect: .*/architect: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
         run: |
@@ -55,30 +50,9 @@ jobs:
           git commit -m "Architect: ${{ inputs.feature_id }} review complete" || echo "No changes to commit"
           git push
 
-      - name: Create Pull Request
+      - name: Trigger next stage
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr create \
-            --base feature/${{ inputs.feature_id }} \
-            --head ${{ inputs.feature_id }}-architect-stage \
-            --title "🏗️ Architect Agent: ${{ inputs.feature_id }}" \
-            --body "## Architect Agent Output
-
-          This PR contains the Architect Agent's technical review for \`${{ inputs.feature_id }}\`.
-
-          ### 📋 Outputs
-          - Architecture Decision Records (ADRs)
-          - Technical specifications
-          - Implementation guidance
-
-          ### ✅ Review Checklist
-          - [ ] Architecture is sound and scalable
-          - [ ] Technical approach is appropriate
-          - [ ] Dependencies are identified
-          - [ ] Security considerations addressed
-
-          **Next Stage:** After approval, the Dev Agent will be triggered.
-
-          _Merge this PR to approve and proceed to the next stage._" \
-            --label "stage:architect,awaiting-approval"
+          echo "💻 Triggering Dev Agent..."
+          gh workflow run dev-agent.yml -f feature_id=${{ inputs.feature_id }}

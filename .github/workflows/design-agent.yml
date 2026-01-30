@@ -18,11 +18,6 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
-      - name: Create working branch
-        run: |
-          git checkout -b ${{ inputs.feature_id }}-design-stage
-          git push -u origin ${{ inputs.feature_id }}-design-stage
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -44,8 +39,8 @@ jobs:
 
       - name: Update pipeline state
         run: |
-          sed -i 's/status:.*/status: design_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/design: pending/design: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/status:.*/status: design_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/design: .*/design: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
         run: |
@@ -55,30 +50,9 @@ jobs:
           git commit -m "Design: ${{ inputs.feature_id }} spec complete" || echo "No changes to commit"
           git push
 
-      - name: Create Pull Request
+      - name: Trigger next stage
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr create \
-            --base feature/${{ inputs.feature_id }} \
-            --head ${{ inputs.feature_id }}-design-stage \
-            --title "🎨 Design Agent: ${{ inputs.feature_id }}" \
-            --body "## Design Agent Output
-
-          This PR contains the Design Agent's specifications for \`${{ inputs.feature_id }}\`.
-
-          ### 📋 Outputs
-          - Design specifications
-          - User flows and wireframes
-          - UI/UX requirements
-
-          ### ✅ Review Checklist
-          - [ ] Design meets user needs
-          - [ ] Flows are clear and intuitive
-          - [ ] Edge cases are addressed
-          - [ ] Accessibility considerations included
-
-          **Next Stage:** After approval, the Architect Agent will be triggered.
-
-          _Merge this PR to approve and proceed to the next stage._" \
-            --label "stage:design,awaiting-approval"
+          echo "🏗️ Triggering Architect Agent..."
+          gh workflow run architect-agent.yml -f feature_id=${{ inputs.feature_id }}

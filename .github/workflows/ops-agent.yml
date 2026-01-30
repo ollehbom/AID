@@ -18,11 +18,6 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
-      - name: Create working branch
-        run: |
-          git checkout -b ${{ inputs.feature_id }}-ops-stage
-          git push -u origin ${{ inputs.feature_id }}-ops-stage
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -41,6 +36,11 @@ jobs:
         run: |
           python scripts/invoke_ops_agent.py "${{ inputs.feature_id }}"
 
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: ops_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/ops: .*/ops: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
+
       - name: Commit outputs
         run: |
           git config user.name "Pipeline Bot"
@@ -49,30 +49,28 @@ jobs:
           git commit -m "Ops: ${{ inputs.feature_id }} deployment ready" || echo "No changes to commit"
           git push
 
-      - name: Create Pull Request
+      - name: Create final PR to main
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh pr create \
-            --base feature/${{ inputs.feature_id }} \
-            --head ${{ inputs.feature_id }}-ops-stage \
-            --title "🚀 Ops Agent: ${{ inputs.feature_id }}" \
-            --body "## Ops Agent Output
+            --base main \
+            --head feature/${{ inputs.feature_id }} \
+            --title "✅ Deploy: ${{ inputs.feature_id }}" \
+            --body "## Feature Ready for Deployment
 
-          This PR contains the Ops Agent's deployment preparation for \`${{ inputs.feature_id }}\`.
+          All pipeline stages completed for \`${{ inputs.feature_id }}\`.
 
-          ### 📋 Outputs
-          - Deployment configuration
-          - Monitoring setup
-          - Feature flag configuration
+          ### 🔍 Pipeline Status
+          - ✓ Product Agent: Decision & experiment defined
+          - ✓ Design Agent: Specifications created
+          - ✓ Architect Agent: Technical review complete
+          - ✓ Dev Agent: Implementation complete
+          - ✓ QA Agent: Validation passed
+          - ✓ Ops Agent: Deployment ready
 
-          ### ✅ Review Checklist
-          - [ ] Deployment plan is sound
-          - [ ] Monitoring is configured
-          - [ ] Rollback plan is ready
-          - [ ] Ready to merge to main
+          ### 🚀 Deployment
+          Merge this PR to deploy to main.
 
-          **Final Stage:** After approval, a PR from feature branch to main will be created for final deployment.
-
-          _Merge this PR to approve._" \
-            --label "stage:ops,awaiting-approval"
+          _Ready for final review and deployment._" \
+            --label "deploy,awaiting-approval"
