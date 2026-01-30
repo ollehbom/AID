@@ -128,19 +128,22 @@ Based on the product decision, create the following design outputs:
 
 ## Output Format
 
-Provide your response in JSON format with these keys:
+Provide your response as valid JSON. IMPORTANT: All string values containing markdown must have newlines, quotes, and backslashes properly escaped for JSON.
 
 ```json
 {{
   "design_intent": "Full markdown content for design/intents/{feature_id}.md",
   "design_spec": "Full markdown content for design/specs/{feature_id}.md",
-  "wireframe_json": {{}},  // Complete JSON object following the wireframe template
+  "wireframe_json": {{}},
   "validation_notes": "Validation findings and concerns",
   "summary": "Brief 2-3 sentence summary of the design approach"
 }}
 ```
 
-Remember: Your designs should reduce friction, match stated intent, and be immediately understandable to new users.
+Remember: 
+- Your designs should reduce friction, match stated intent, and be immediately understandable to new users
+- Ensure ALL newlines in markdown strings are escaped as \\n in the JSON
+- Ensure ALL quotes in content are escaped as \\" in the JSON
 """
 
     # Invoke AI API based on provider
@@ -218,8 +221,21 @@ def _invoke_gemini(system_prompt, user_prompt):
         return json.loads(response_text)
     except json.JSONDecodeError as e:
         print(f"Failed to parse JSON response. Error: {e}", file=sys.stderr)
-        print(f"Response text (first 500 chars): {response_text[:500]}", file=sys.stderr)
-        raise
+        print(f"Response text (first 1000 chars): {response_text[:1000]}", file=sys.stderr)
+        print(f"\nAttempting to fix common JSON issues...", file=sys.stderr)
+        
+        # Try to fix common issues: unescaped newlines in strings
+        # This is a basic fix - replace literal \n with \\n if not already escaped
+        fixed_text = response_text.replace('\n', '\\n').replace('\\\\n', '\\n')
+        
+        try:
+            return json.loads(fixed_text)
+        except json.JSONDecodeError as e2:
+            print(f"Still failed after attempted fix. Error: {e2}", file=sys.stderr)
+            print(f"Saving full response to design_agent_error.json for debugging", file=sys.stderr)
+            with open('design_agent_error.json', 'w') as f:
+                f.write(response_text)
+            raise
 
 
 def main():
