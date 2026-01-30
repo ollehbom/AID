@@ -130,19 +130,30 @@ Unit Tests (many, fast, isolated) → Integration Tests (service boundaries) →
 
 ## Your Task
 
-Implement the feature according to the specifications above. Create:
+Implement the feature according to the specifications above. 
+
+**IMPORTANT**: This may be a greenfield project (no existing code). If the technical spec describes a new project, create the COMPLETE project structure including:
+- All configuration files (package.json, tsconfig.json, .gitignore, etc.)
+- All implementation files
+- All test files
+- README and documentation
+- Build and development scripts
+
+Create:
 
 1. **Implementation Files**
    - Core implementation following the technical architecture
    - Proper error handling and edge cases
    - Security considerations implemented
    - Performance optimizations where specified
+   - ALL necessary configuration files for the project
 
 2. **Test Suite**
    - Unit tests for all core functionality
    - Integration tests for component interactions
    - Test edge cases and error conditions
    - Achieve comprehensive logical coverage
+   - Test configuration files
 
 3. **Documentation**
    - Code comments explaining "why" (not "what")
@@ -346,17 +357,35 @@ def main():
     print(f"\nImplementation Summary:")
     print(result.get('implementation_summary', 'No summary provided'))
     
+    # Validate that files were generated
+    files_created = result.get('files_created', [])
+    tests_created = result.get('tests_created', [])
+    
+    if not files_created and not tests_created:
+        print(f"\n⚠️  WARNING: No files were generated!")
+        print(f"   This usually means:")
+        print(f"   1. JSON parsing failed (check error files)")
+        print(f"   2. The agent didn't generate file content")
+        print(f"   3. Recovery only captured summary fields")
+        print(f"\n   Recommendation: Run again or switch to OpenAI (AI_PROVIDER=openai)")
+        if "_recovery_note" not in result:
+            sys.exit(1)
+    
     # Create all files
-    for file_info in result.get('files_created', []):
+    for file_info in files_created:
         filepath = REPO_ROOT / file_info['path']
         save_file(filepath, file_info['content'])
         print(f"  ✓ Created: {file_info['path']}")
     
     # Create all tests
-    for test_info in result.get('tests_created', []):
+    for test_info in tests_created:
         filepath = REPO_ROOT / test_info['path']
         save_file(filepath, test_info['content'])
         print(f"  ✓ Created test: {test_info['path']}")
+    
+    # Summary of created files
+    if files_created or tests_created:
+        print(f"\n📦 Generated {len(files_created)} implementation files and {len(tests_created)} test files")
     
     # Update documentation
     for doc_info in result.get('documentation_updates', []):
