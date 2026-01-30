@@ -338,11 +338,13 @@ jobs:
           5. Update this issue with findings
 
           ---
-          _Auto-fix will be triggered automatically._" \
-            --label "pipeline-error,auto-fix")
+          _Auto-fix will be triggered automatically._")
 
           ISSUE_NUMBER=$(echo $ISSUE_URL | grep -oP '\d+$')
           echo "Created issue #$ISSUE_NUMBER"
+
+          # Try to add labels (ignore if labels don't exist)
+          gh issue edit "$ISSUE_NUMBER" --add-label "pipeline-error,auto-fix" 2>/dev/null || echo "Note: Labels not added (may not exist in repo)"
 
           # Trigger error-fix workflow
           gh workflow run error-fix.yml \
