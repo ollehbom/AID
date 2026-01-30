@@ -1,11 +1,11 @@
 feature: test-separate-pipelines-6
-status: architect_approved
+status: dev_awaiting_approval
 needs_design: true
 stages:
   product: in-progress 2026-01-30
   design: ✓ 2026-01-30
   architect: ✓ 2026-01-30
-  dev: pending
+  dev: in-progress
   qa: pending
   ops: pending
 architecture:
