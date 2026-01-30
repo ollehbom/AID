@@ -31,3 +31,12 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+## Active Experiments
+
+### EXP-2024-05-15-test-separate-pipelines-4
+- **Belief**: The product must feel obvious without documentation.
+- **Change**: Implement a foundational React app with secure Google login, a basic dashboard, and a modern design system.
+- **Owner**: Product Agent (definition) -> Design Agent (design) -> Engineering (implementation)
+- **Status**: DEFINED
+- **Success Signal**: High successful Google login rate, positive qualitative feedback on UI intuitiveness, and a consistent UI foundation.
