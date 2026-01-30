@@ -305,7 +305,34 @@ def _invoke_gemini(system_prompt, user_prompt):
             print(f"\nContext around error position:", file=sys.stderr)
             print(f"...{response_text[start:end]}...", file=sys.stderr)
         
-        print(f"\nTip: Gemini may have generated invalid JSON. Check the error file for details.", file=sys.stderr)
+        # Try to recover by truncating at the error position and closing the JSON
+        print(f"\nAttempting JSON recovery...", file=sys.stderr)
+        try:
+            if hasattr(e, 'pos') and e.pos:
+                # Find the last complete key-value pair before the error
+                truncated = response_text[:e.pos]
+                # Find last comma or opening brace
+                last_comma = truncated.rfind(',')
+                if last_comma > 0:
+                    truncated = truncated[:last_comma]
+                # Close the JSON object/arrays properly
+                open_braces = truncated.count('{') - truncated.count('}')
+                open_brackets = truncated.count('[') - truncated.count(']')
+                truncated = truncated.rstrip()
+                for _ in range(open_brackets):
+                    truncated += "]"
+                for _ in range(open_braces):
+                    truncated += "}"
+                
+                recovered = json.loads(truncated)
+                print(f"✓ Recovered partial JSON with {len(recovered)} top-level fields", file=sys.stderr)
+                recovered["_recovery_note"] = f"JSON was truncated due to parsing error at position {e.pos}. Some content may be incomplete."
+                return recovered
+        except Exception as recovery_error:
+            print(f"Recovery failed: {recovery_error}", file=sys.stderr)
+        
+        print(f"\nTip: Gemini generated invalid JSON. Check {error_file} for full output.", file=sys.stderr)
+        print(f"Consider using OpenAI instead (better JSON handling).", file=sys.stderr)
         raise
 
 

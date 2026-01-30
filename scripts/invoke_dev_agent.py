@@ -158,13 +158,13 @@ Implement the feature according to the specifications above. Create:
 
 ## Output Format
 
-Provide your response in JSON format with these keys:
+Provide your response in JSON format with these keys. CRITICAL: All code content must have special characters properly escaped (backslashes as \\\\, quotes as \\", newlines as \\n).
 
 ```json
 {{
   "implementation_summary": "Brief overview of what was implemented and key decisions made",
   "files_created": [
-    {{"path": "relative/path/to/file.py", "description": "Purpose of this file", "content": "Full file content"}}
+    {{"path": "relative/path/to/file.py", "description": "Purpose of this file", "content": "Full file content with proper JSON escaping"}}
   ],
   "tests_created": [
     {{"path": "relative/path/to/test.py", "description": "What this test validates", "content": "Full test content"}}
@@ -282,7 +282,36 @@ def _invoke_gemini(system_prompt, user_prompt):
             print(f"\nContext around error position:", file=sys.stderr)
             print(f"...{response_text[start:end]}...", file=sys.stderr)
         
-        print(f"\nTip: Gemini may have generated invalid JSON. Check the error file for details.", file=sys.stderr)
+        # Try to recover by truncating at the error position and closing the JSON
+        print(f"\nAttempting JSON recovery...", file=sys.stderr)
+        try:
+            if hasattr(e, 'pos') and e.pos:
+                # Find the last complete key-value pair before the error
+                truncated = response_text[:e.pos]
+                # Find last comma or opening brace
+                last_comma = truncated.rfind(',')
+                if last_comma > 0:
+                    truncated = truncated[:last_comma]
+                # Close the JSON object/arrays properly
+                # Count open brackets/braces to close them
+                open_braces = truncated.count('{') - truncated.count('}')
+                open_brackets = truncated.count('[') - truncated.count(']')
+                truncated = truncated.rstrip()
+                for _ in range(open_brackets):
+                    truncated += "]"
+                for _ in range(open_braces):
+                    truncated += "}"
+                
+                recovered = json.loads(truncated)
+                print(f"✓ Recovered partial JSON with {len(recovered)} top-level fields", file=sys.stderr)
+                # Add a note about incomplete data
+                recovered["_recovery_note"] = f"JSON was truncated due to parsing error at position {e.pos}. Some files may be incomplete."
+                return recovered
+        except Exception as recovery_error:
+            print(f"Recovery failed: {recovery_error}", file=sys.stderr)
+        
+        print(f"\nTip: Gemini generated invalid JSON with unescaped characters in code content.", file=sys.stderr)
+        print(f"Check {error_file} for full output. Consider using OpenAI instead (better JSON handling).", file=sys.stderr)
         raise
 
 
@@ -306,6 +335,12 @@ def main():
     except Exception as e:
         print(f"❌ Failed to invoke Dev Agent: {e}")
         sys.exit(1)
+    
+    # Check if this is a recovered result
+    if "_recovery_note" in result:
+        print(f"⚠️  Warning: Partial recovery - some content may be incomplete")
+        print(f"   {result['_recovery_note']}")
+        print()
     
     print(f"✅ Dev Agent execution complete!")
     print(f"\nImplementation Summary:")
