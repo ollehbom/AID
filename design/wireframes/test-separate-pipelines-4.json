@@ -1,0 +1,109 @@
+{
+  "name": "Dashboard Screen (Mobile)",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "backgroundColor": "#F9F9F9",
+  "children": [
+    {
+      "name": "Header",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "HUG",
+      "backgroundColor": "#FFFFFF",
+      "padding": 16,
+      "children": [
+        {
+          "name": "GreetingText",
+          "type": "TEXT",
+          "characters": "Welcome, [User Name]!",
+          "fontSize": 18,
+          "width": "FILL",
+          "height": "HUG"
+        }
+      ]
+    },
+    {
+      "name": "DashboardContentArea",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "FILL",
+      "padding": 16,
+      "children": [
+        {
+          "name": "DashboardTitle",
+          "type": "TEXT",
+          "characters": "Your Dashboard",
+          "fontSize": 24,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "IntroMessage",
+          "type": "TEXT",
+          "characters": "This is where your projects and insights will appear. Stay tuned for updates!",
+          "fontSize": 14,
+          "color": "#666666",
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "ContentCard1",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#FFFFFF",
+          "cornerRadius": 8,
+          "padding": 16,
+          "children": [
+            {
+              "name": "CardTitle1",
+              "type": "TEXT",
+              "characters": "Project Overview",
+              "fontSize": 16,
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "CardBody1",
+              "type": "TEXT",
+              "characters": "Summary of active projects and quick stats.",
+              "fontSize": 14,
+              "color": "#666666",
+              "width": "FILL",
+              "height": "HUG"
+            }
+          ]
+        },
+        {
+          "name": "ContentCard2",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#FFFFFF",
+          "cornerRadius": 8,
+          "padding": 16,
+          "children": [
+            {
+              "name": "CardTitle2",
+              "type": "TEXT",
+              "characters": "Recent Activity",
+              "fontSize": 16,
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "CardBody2",
+              "type": "TEXT",
+              "characters": "Logs of recent actions and system notifications.",
+              "fontSize": 14,
+              "color": "#666666",
+              "width": "FILL",
+              "height": "HUG"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
