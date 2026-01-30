@@ -311,7 +311,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          ERROR_ID="error-$(date +%Y%m%d-%H%M%S)"
+          ERROR_ID="error-$(date -u +%Y%m%d-%H%M%S)"
           echo "🔴 Pipeline failed - triggering auto-fix: $ERROR_ID"
           gh workflow run error-fix.yml \
             -f error_id="$ERROR_ID" \
