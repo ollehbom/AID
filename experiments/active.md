@@ -31,3 +31,14 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+# Active Experiments
+
+## EXP-2026-01-26-test-auto-fix-3
+
+- **Feature ID**: test-auto-fix-3
+- **Belief**: The product must feel obvious without documentation.
+- **Change**: Implement a foundational React UI with Shadcn/UI, including login, dashboard, and a comprehensive design system.
+- **Owner**: Product Agent
+- **Status**: active
+- **Success Signal**: Positive early user feedback on UI intuitiveness; demonstrated increase in frontend development velocity for subsequent features.
