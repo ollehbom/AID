@@ -1,5 +1,5 @@
 feature: test-separate-pipelines-6
-status: architect_awaiting_approval
+status: architect_approved
 needs_design: true
 stages:
   product: in-progress 2026-01-30
