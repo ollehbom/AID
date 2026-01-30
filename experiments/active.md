@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-test-single-workflow-3
+- **Belief**: Foundational enabler for "Product must feel obvious without documentation" and "Users value speed over configurability".
+- **Change**: Implement core React application with shadcn, Google login, and a basic dashboard.
+- **Owner**: Product Agent
+- **Status**: Defined
+- **Success Signal**: Functional deployment and stability of the application foundation.

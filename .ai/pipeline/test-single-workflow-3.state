@@ -1,0 +1,10 @@
+feature: test-single-workflow-3
+status: product_complete
+needs_design: true
+stages:
+  product: ✓
+  design: pending
+  architect: pending
+  dev: pending
+  qa: pending
+  ops: pending
