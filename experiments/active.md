@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+- ID: EXP-2026-01-29-test-single-workflow-5
+  Belief: Onboarding flow is intuitive without guidance (Open/Unproven)
+  Change: Implement Google login + basic dashboard + shadcn/ui design system
+  Owner: Product Agent (definition), Engineering (implementation)
+  Status: Active
+  Success Signal: Achieve 90% login success rate AND 90% dashboard view rate within 1 week of deployment.
