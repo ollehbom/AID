@@ -31,3 +31,12 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2024-01-29-test-auto-fix-1
+
+- **Belief**: Establishing a modern design system and basic application structure accelerates future feature development and enhances user experience.
+- **Change**: Implement a foundational React app with `shadcn/ui`, Google login, and a basic dashboard.
+- **Owner**: Product Agent
+- **Status**: Active
+- **Success Signal**: Rapid implementation of subsequent features, high UI consistency, successful internal user login and navigation.
+- **Decision Record**: `product/decisions/test-auto-fix-1.md`
