@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-TEST-SEPARATE-PIPELINES-3
+- **Belief**: Establish modern UI foundation aligned with "Users value speed over configurability", "The primary user is technically competent", "The product must feel obvious without documentation".
+- **Change**: Implement a React app with `shadcn/ui`, Google login, and basic dashboard, establishing a core design system.
+- **Owner**: Product Agent (definition), Frontend Team (implementation)
+- **Status**: Active
+- **Success Signal**: Functional application, defined design system, positive developer feedback on extensibility and adherence to modern standards.
