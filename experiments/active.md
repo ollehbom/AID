@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-TEST-SINGLE-WORKFLOW-7
+
+- **Belief**: A basic, modern UI with authentication is necessary for users (technical founders) to engage with the product.
+- **Change**: Implement a foundational React application with Google login and a basic dashboard, styled with shadcn/ui.
+- **Owner**: Product Agent (definition), Development Team (implementation)
+- **Status**: active
+- **Success Signal**: Successful deployment, founder validation of basic functionality, and ability for internal users to log in and navigate.
