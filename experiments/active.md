@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+- ID: EXP-2026-01-29-test-single-workflow-6
+  Belief: The product must feel obvious without documentation.
+  Change: Establish foundational React app with shadcn/ui, Google login, and basic dashboard.
+  Owner: Product Agent (definition), Engineering (implementation)
+  Status: active
+  Success Signal: Functional UI framework, successful Google login, basic dashboard, positive developer feedback on UI consistency/speed.
