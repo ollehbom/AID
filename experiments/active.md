@@ -31,3 +31,12 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+## Active Experiments
+
+- **ID**: EXP-2026-01-29-test-single-workflow-2
+  - **Belief**: Onboarding flow is intuitive without guidance (Open / Unproven)
+  - **Change**: Implement basic React app with Shadcn, Google login, and mock dashboard.
+  - **Owner**: Product Agent
+  - **Status**: active
+  - **Success Signal**: Login success rate > 90%, positive qualitative feedback on intuitiveness, >70% navigation to mock content.
