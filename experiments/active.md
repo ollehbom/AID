@@ -31,3 +31,16 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+# Active Experiments
+
+## EXP-2026-01-29-REACTAPP
+
+- **Feature ID**: test-single-workflow-8
+- **Belief**: "The primary user is technically competent", "The product must feel obvious without documentation", "Users value speed over configurability"
+- **Change**: Establish a core React application shell with `shadcn/ui`, Google login, and basic dashboard.
+- **Owner**: Product Agent (initiator) -> Engineering (implementation)
+- **Status**: Defined, Awaiting Implementation
+- **Success Signal**: 100% Google login success, positive developer feedback on design system, high visual consistency.
+- **Timeline**: Evaluate after 1 week post-deployment.
+- **Decision Record**: `product/decisions/test-single-workflow-8.md`
