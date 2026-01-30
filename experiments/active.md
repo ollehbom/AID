@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2024-01-20-test-auto-fix-6
+
+- **Belief**: A modern UI foundation (React/shadcn) enables rapid iteration and core hypothesis validation.
+- **Change**: Create a basic React application shell with Google login and a dashboard, using shadcn UI.
+- **Owner**: Product Agent / [Assigned Developer Lead]
+- **Status**: Defined, pending development
+- **Success Signal**: Basic app deployed and functional with Google login and dashboard, ready for feature development.
