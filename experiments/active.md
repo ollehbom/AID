@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+- ID: EXP-2026-01-29-test-auto-fix-8
+  Belief: The product must feel obvious without documentation; Users value speed over configurability; The primary user is technically competent
+  Change: Establish core React app with shadcn design system, Google login, and basic dashboard.
+  Owner: Product Agent (initial definition), then Design Agent, then Development Team
+  Status: defined
+  Success Signal: Functional app, positive developer feedback on design system, readiness for feature development.
