@@ -8,8 +8,10 @@ The AID pipeline uses multiple specialized agents:
 
 - **Product Agent**: Analyzes feedback and creates product decisions
 - **Design Agent**: Creates UX/UI specifications and wireframes
+  - **Iterative Mode** (Recommended): Breaks requests into 4 smaller steps to prevent JSON errors
 - **Architect Agent**: Reviews architecture and creates technical specs
 - **Dev Agent**: Implements code based on specifications
+  - **Iterative Mode**: Implements files one at a time for large features
 - **Ops Agent**: Creates deployment and CI/CD configurations
 
 ## Utilities
@@ -18,6 +20,24 @@ The AID pipeline uses multiple specialized agents:
   - See [JSON-FIXER-README.md](JSON-FIXER-README.md) for details
   - Fixes common issues with Gemini-generated JSON (control characters, formatting, etc.)
   - Used by all agent scripts for robust JSON parsing
+
+## Iterative vs Standard Modes
+
+For agents that generate large outputs (Design, Dev), we provide both modes:
+
+**Standard Mode**: Single large request
+
+- Faster execution
+- Risk of JSON parsing errors with large responses
+- Use for: Simple features, small outputs
+
+**Iterative Mode** (Recommended):
+
+- Breaks work into smaller, focused requests
+- Prevents JSON parsing errors
+- Better error recovery
+- More reliable with Gemini models
+- Use for: Complex features, large outputs, production workflows
 
 ## Configuration
 
@@ -103,15 +123,38 @@ The script will exit with code 1 if:
 
 ## Design Agent
 
+### Standard Mode
+
 **Script**: `invoke_design_agent.py`
 
-Invokes the Design Agent using OpenAI GPT-4.1 or Google Gemini 2.5 Pro to create design intent, specifications, and wireframes.
+Single large request for all design outputs. Faster but may have JSON parsing issues with complex designs.
+
+### Iterative Mode (Recommended)
+
+**Script**: `invoke_design_agent_iterative.py`
+
+Breaks the design process into 4 focused iterations to prevent JSON errors and improve reliability.
+
+**How it works:**
+
+1. **Step 1**: Create design intent (why, how it feels, principles)
+2. **Step 2**: Create design specification (flows, states, copy)
+3. **Step 3**: Create wireframe JSON (simple structure)
+4. **Step 4**: Create validation notes (friction points, concerns)
+
+**Benefits:**
+
+- ✅ Prevents large JSON parsing errors
+- ✅ More reliable with Gemini models
+- ✅ Better error recovery per step
+- ✅ Smaller, focused outputs
+- ✅ Easier to debug issues
 
 ### Prerequisites
 
 ```bash
 # Install dependencies
-pip install openai google-generativeai
+pip install openai google-genai python-dotenv
 
 # Set API key (choose one)
 export OPENAI_API_KEY="your-openai-api-key"
@@ -119,18 +162,21 @@ export OPENAI_API_KEY="your-openai-api-key"
 export GOOGLE_API_KEY="your-google-api-key"
 
 # Optional: Set provider and model
-export AI_PROVIDER="openai"  # or "gemini"
-export MODEL="gpt-4.1"  # or "gemini-2.0-flash-exp"
+export AI_PROVIDER="gemini"  # or "openai"
+export MODEL="gemini-2.5-flash"  # or "gpt-4.1"
 ```
 
 ### Usage
 
 ```bash
-# Basic usage
+# Iterative mode (recommended)
+python scripts/invoke_design_agent_iterative.py feature-name
+
+# Standard mode (legacy)
 python scripts/invoke_design_agent.py feature-name
 
 # With additional context
-python scripts/invoke_design_agent.py onboarding-v2 "Focus on mobile-first design"
+python scripts/invoke_design_agent_iterative.py onboarding-v2 "Focus on mobile-first design"
 ```
 
 ### What It Does

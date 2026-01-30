@@ -103,8 +103,8 @@ jobs:
           AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
           MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
         run: |
-          echo "🎨 Running Design Agent..."
-          python scripts/invoke_design_agent.py ${{ inputs.feature_id }}
+          echo "🎨 Running Design Agent (Iterative Mode)..."
+          python scripts/invoke_design_agent_iterative.py ${{ inputs.feature_id }}
 
       - name: Update pipeline state
         if: steps.check-design.outputs.needs_design == 'true'
