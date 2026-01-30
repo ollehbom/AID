@@ -150,7 +150,20 @@ def parse_json_with_recovery(json_string, save_error_file=True, error_prefix="js
         except Exception as comma_error:
             print(f"Comma fix failed: {comma_error}", file=sys.stderr)
     
-    # Third attempt: Aggressive recovery - truncate and close
+    # Third attempt: Try to fix unterminated string issues
+    if "unterminated string" in str(first_error).lower():
+        print(f"Attempting to fix unterminated string...", file=sys.stderr)
+        try:
+            fixed_string, _ = fix_json_string(json_string)
+            string_fixed = _fix_unterminated_string(fixed_string, first_error)
+            if string_fixed:
+                result = json.loads(string_fixed)
+                print(f"✓ Fixed unterminated string issue", file=sys.stderr)
+                return result
+        except Exception as string_error:
+            print(f"String fix failed: {string_error}", file=sys.stderr)
+    
+    # Fourth attempt: Aggressive recovery - truncate and close
     print(f"Attempting aggressive JSON recovery...", file=sys.stderr)
     try:
         fixed_string, _ = fix_json_string(json_string)
@@ -165,7 +178,7 @@ def parse_json_with_recovery(json_string, save_error_file=True, error_prefix="js
     except Exception as recovery_error:
         print(f"Aggressive recovery failed: {recovery_error}", file=sys.stderr)
     
-    # Fourth attempt: Try to extract JSON from possible surrounding text
+    # Fifth attempt: Try to extract JSON from possible surrounding text
     try:
         print(f"Attempting to extract JSON from surrounding text...", file=sys.stderr)
         extracted = _extract_json_from_text(original_string)
@@ -331,6 +344,150 @@ def _fix_missing_commas(json_string, error):
     return None
 
 
+def _fix_unterminated_string(json_string, error):
+    """
+    Attempt to fix unterminated string errors.
+    
+    Common causes:
+    - Unescaped quotes within string values
+    - Unescaped backslashes before quotes
+    - Nested JSON strings that aren't properly escaped
+    - Missing closing quote
+    
+    Args:
+        json_string: The JSON string with an unterminated string error
+        error: The JSONDecodeError exception
+        
+    Returns:
+        str or None: Fixed JSON string or None if fix failed
+    """
+    if not hasattr(error, 'pos') or not error.pos:
+        return None
+    
+    pos = error.pos
+    attempts = []
+    
+    # Strategy 1: Look backwards from error position to find the opening quote
+    # Then look forward to find unescaped quotes and escape them
+    if pos > 10:
+        # Find the start of the string (opening quote)
+        string_start = None
+        for i in range(pos - 1, max(0, pos - 1000), -1):
+            if json_string[i] == '"':
+                # Check if this quote is escaped
+                num_backslashes = 0
+                j = i - 1
+                while j >= 0 and json_string[j] == '\\':
+                    num_backslashes += 1
+                    j -= 1
+                # If even number of backslashes (including 0), the quote is not escaped
+                if num_backslashes % 2 == 0:
+                    string_start = i
+                    break
+        
+        if string_start is not None:
+            # Strategy 1a: Find and escape unescaped quotes within the string
+            # Look forward from string_start to find the problematic quote
+            attempt = list(json_string)
+            search_pos = string_start + 1
+            while search_pos < len(json_string):
+                if json_string[search_pos] == '"':
+                    # Check if escaped
+                    num_backslashes = 0
+                    j = search_pos - 1
+                    while j >= 0 and json_string[j] == '\\':
+                        num_backslashes += 1
+                        j -= 1
+                    
+                    # If not escaped and we're still in a string context
+                    if num_backslashes % 2 == 0:
+                        # Check if this might be a legitimate end quote
+                        # Look at what comes after: should be comma, brace, bracket, or whitespace
+                        next_non_space = search_pos + 1
+                        while next_non_space < len(json_string) and json_string[next_non_space] in ' \t\n\r':
+                            next_non_space += 1
+                        
+                        if next_non_space < len(json_string):
+                            next_char = json_string[next_non_space]
+                            # If it's not a valid JSON separator, this quote should be escaped
+                            if next_char not in [',', '}', ']', ':']:
+                                # Escape this quote
+                                attempt[search_pos] = '\\"'
+                                fixed_attempt = ''.join(attempt)
+                                attempts.append(("Escape unescaped quote in string", fixed_attempt))
+                                break
+                        
+                        # Otherwise this might be the legitimate end, stop here
+                        break
+                
+                search_pos += 1
+            
+            # Strategy 1b: Close the string at the error position
+            # Add a closing quote at the error position
+            if pos < len(json_string):
+                # Insert closing quote and continue
+                attempt = json_string[:pos] + '"' + json_string[pos:]
+                attempts.append(("Close string at error position", attempt))
+            
+            # Strategy 1c: Look for the next quote after error and assume that's the real end
+            # Remove content between error and next quote
+            next_quote = json_string.find('"', pos)
+            if next_quote != -1 and next_quote - pos < 200:  # Don't look too far
+                # Keep content up to error, then skip to the quote
+                attempt = json_string[:pos] + json_string[next_quote:]
+                attempts.append(("Skip to next quote", attempt))
+    
+    # Strategy 2: If the string contains nested JSON (common pattern)
+    # Try to properly escape the nested JSON
+    if pos > 50:
+        context_start = max(0, pos - 200)
+        context = json_string[context_start:pos + 200]
+        
+        # Look for patterns like: "wireframe_json_string": "{...
+        # This suggests nested JSON that needs escaping
+        if '": "{"' in context or '": "{' in context:
+            # Find the key that has nested JSON
+            key_match = re.search(r'"([^"]+)":\s*"(\{[^"]*)$', json_string[:pos])
+            if key_match:
+                # Try to find the end of this nested JSON
+                # Look for the closing brace pattern
+                nested_start = key_match.start(2)
+                # Find matching closing brace
+                brace_count = 1
+                search_pos = nested_start + 1
+                nested_end = None
+                
+                while search_pos < len(json_string) and brace_count > 0:
+                    if json_string[search_pos] == '{':
+                        brace_count += 1
+                    elif json_string[search_pos] == '}':
+                        brace_count -= 1
+                        if brace_count == 0:
+                            nested_end = search_pos
+                            break
+                    search_pos += 1
+                
+                if nested_end:
+                    # Extract the nested JSON
+                    nested_json = json_string[nested_start:nested_end + 1]
+                    # Escape it properly
+                    escaped_nested = nested_json.replace('\\', '\\\\').replace('"', '\\"')
+                    # Reconstruct
+                    attempt = json_string[:nested_start] + escaped_nested + '"' + json_string[nested_end + 1:]
+                    attempts.append(("Escape nested JSON string", attempt))
+    
+    # Try each attempt
+    for strategy, attempt in attempts:
+        try:
+            json.loads(attempt)
+            print(f"✓ Fixed using: {strategy}", file=sys.stderr)
+            return attempt
+        except:
+            continue
+    
+    return None
+
+
 def _truncate_and_close_json(json_string, error):
     """
     Attempt to recover JSON by truncating at error position and closing properly.
@@ -430,20 +587,37 @@ if __name__ == "__main__":
     # Test with some problematic JSON examples
     test_cases = [
         # Control character in string
-        '{"name": "test\x01value", "count": 42}',
+        ('{"name": "test\x01value", "count": 42}', 'Control characters'),
         # Markdown wrapped
-        '```json\n{"key": "value"}\n```',
+        ('```json\n{"key": "value"}\n```', 'Markdown wrapped'),
         # Trailing comma
-        '{"a": 1, "b": 2,}',
-        # Incomplete JSON
-        '{"complete": true, "incomplete": "val',
+        ('{"a": 1, "b": 2,}', 'Trailing comma'),
+        # Missing comma between properties
+        ('{"key1": "value1" "key2": "value2"}', 'Missing comma'),
+        # Unterminated string with unescaped quote
+        ('{"text": "Hello "world", "count": 42}', 'Unterminated string (unescaped quote)'),
+        # Unterminated string - missing closing quote
+        ('{"text": "Hello world, "count": 42}', 'Unterminated string (missing quote)'),
+        # Nested JSON string (like wireframe scenario)
+        ('{"data": "{\\"nested\\": \\"value\\"}", "other": "test"}', 'Nested JSON (properly escaped)'),
+        # Incomplete JSON (expected to fail)
+        ('{"complete": true, "incomplete": "val', 'Incomplete JSON (expected fail)'),
     ]
     
-    for i, test in enumerate(test_cases, 1):
-        print(f"\nTest {i}:")
-        print(f"Input: {repr(test)}")
+    passed = 0
+    failed = 0
+    
+    for i, (test, description) in enumerate(test_cases, 1):
+        print(f"\nTest {i}: {description}")
+        print(f"Input: {repr(test[:60])}{'...' if len(test) > 60 else ''}")
         try:
             result = parse_json_with_recovery(test, save_error_file=False)
             print(f"✓ Success: {result}")
+            passed += 1
         except Exception as e:
             print(f"✗ Failed: {e}")
+            failed += 1
+    
+    print(f"\n{'='*60}")
+    print(f"Results: {passed} passed, {failed} failed out of {len(test_cases)} tests")
+    print(f"{'='*60}")
