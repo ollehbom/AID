@@ -1,9 +1,9 @@
 feature: test-separate-pipelines-4
-status: product_awaiting_approval
+status: design_awaiting_approval
 needs_design: true
 stages:
   product: ✓ 2026-01-30 2026-01-30
-  design: pending
+  design: ✓ 2026-01-30
   architect: pending
   dev: pending
   qa: pending
