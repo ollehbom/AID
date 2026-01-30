@@ -141,15 +141,33 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write
+      actions: write
+    outputs:
+      merged: ${{ steps.merge.outputs.merged }}
+      failed_workflow: ${{ steps.get-failed-workflow.outputs.workflow_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Get failed workflow info
+        id: get-failed-workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Extract workflow name from issue body
+          WORKFLOW_NAME=$(gh issue view ${{ inputs.issue_number }} --json body -q '.body' | grep -oP '(?<=\*\*Workflow\*\*: ).*' | head -1)
+          echo "workflow_name=$WORKFLOW_NAME" >> $GITHUB_OUTPUT
+          echo "Failed workflow: $WORKFLOW_NAME"
 
       - name: Wait for PR checks
         run: |
-          echo "Waiting 30 seconds for PR checks to start..."
-          sleep 30
+          echo "Waiting 60 seconds for PR checks to complete..."
+          sleep 60
 
       - name: Auto-merge if tests pass
+        id: merge
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -158,16 +176,142 @@ jobs:
 
           if [ -z "$PR_NUMBER" ]; then
             echo "No PR found for branch fix/${{ inputs.error_id }}"
+            echo "merged=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          # Check if all checks passed
-          CHECK_STATUS=$(gh pr view $PR_NUMBER --json statusCheckRollup -q '.statusCheckRollup | length')
+          echo "Found PR #$PR_NUMBER"
 
-          if [ "$CHECK_STATUS" == "0" ] || gh pr checks $PR_NUMBER --watch; then
-            echo "All checks passed, auto-merging..."
-            gh pr merge $PR_NUMBER --auto --squash --delete-branch
+          # Wait for checks to complete (max 5 minutes)
+          RETRY_COUNT=0
+          MAX_RETRIES=30
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            CHECKS_STATUS=$(gh pr view $PR_NUMBER --json statusCheckRollup -q '.statusCheckRollup[] | select(.status == "IN_PROGRESS" or .status == "QUEUED") | .status' | wc -l)
+            
+            if [ "$CHECKS_STATUS" == "0" ]; then
+              echo "All checks completed"
+              break
+            fi
+            
+            echo "Waiting for checks to complete... ($RETRY_COUNT/$MAX_RETRIES)"
+            sleep 10
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+          done
+
+          # Check if all checks passed
+          FAILED_CHECKS=$(gh pr view $PR_NUMBER --json statusCheckRollup -q '.statusCheckRollup[] | select(.conclusion == "FAILURE") | .conclusion' | wc -l)
+
+          if [ "$FAILED_CHECKS" == "0" ]; then
+            echo "✅ All checks passed, auto-merging to main..."
+            gh pr merge $PR_NUMBER --merge --delete-branch
+            
+            echo "merged=true" >> $GITHUB_OUTPUT
+            
+            gh issue comment ${{ inputs.issue_number }} --body "✅ **Auto-Fix Merged Successfully**
+
+            The automated fix has been merged to main.
+            The pipeline will now be re-triggered to verify the fix."
+            
+            gh issue edit ${{ inputs.issue_number }} --add-label "fix-merged"
           else
-            echo "Checks failed or pending, skipping auto-merge"
-            gh issue comment ${{ inputs.issue_number }} --body "⚠️ PR created but checks did not pass. Manual review required."
+            echo "❌ Some checks failed, skipping auto-merge"
+            echo "merged=false" >> $GITHUB_OUTPUT
+            
+            gh issue comment ${{ inputs.issue_number }} --body "⚠️ **Auto-Merge Blocked**
+
+            PR #$PR_NUMBER created but some checks failed.
+            Please review the PR and fix any issues before merging manually."
+            
+            gh issue edit ${{ inputs.issue_number }} --add-label "needs-review"
           fi
+
+  trigger-workflow:
+    needs: auto-merge
+    if: needs.auto-merge.outputs.merged == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine workflow to trigger
+        id: determine-workflow
+        run: |
+          WORKFLOW_NAME="${{ needs.auto-merge.outputs.failed_workflow }}"
+
+          # Map workflow names to their file names
+          case "$WORKFLOW_NAME" in
+            "Product Agent")
+              WORKFLOW_FILE="product-agent.yml"
+              ;;
+            "Design Agent")
+              WORKFLOW_FILE="design-agent.yml"
+              ;;
+            "Architect Agent")
+              WORKFLOW_FILE="architect-agent.yml"
+              ;;
+            "Dev Agent")
+              WORKFLOW_FILE="dev-agent.yml"
+              ;;
+            "QA Agent")
+              WORKFLOW_FILE="qa-agent.yml"
+              ;;
+            "Ops Agent")
+              WORKFLOW_FILE="ops-agent.yml"
+              ;;
+            "Stage Router")
+              WORKFLOW_FILE="stage-router.yml"
+              ;;
+            "Pipeline Orchestrator")
+              WORKFLOW_FILE="pipeline-orchestrator.yml"
+              ;;
+            *)
+              # Default to full pipeline
+              WORKFLOW_FILE="pipeline-orchestrator.yml"
+              ;;
+          esac
+
+          echo "workflow_file=$WORKFLOW_FILE" >> $GITHUB_OUTPUT
+          echo "Will trigger: $WORKFLOW_FILE"
+
+      - name: Re-trigger workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflowFile = '${{ steps.determine-workflow.outputs.workflow_file }}';
+
+            console.log(`Re-triggering workflow: ${workflowFile}`);
+
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: workflowFile,
+                ref: 'main'
+              });
+              
+              console.log('✅ Workflow triggered successfully');
+            } catch (error) {
+              console.error('❌ Failed to trigger workflow:', error);
+              
+              // Comment on issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: ${{ inputs.issue_number }},
+                body: `⚠️ **Workflow Re-trigger Failed**\n\nCould not automatically re-trigger ${workflowFile}.\nPlease trigger it manually.\n\nError: ${error.message}`
+              });
+            }
+
+      - name: Update issue with re-trigger status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue comment ${{ inputs.issue_number }} --body "🔄 **Pipeline Re-triggered**
+
+          The workflow has been automatically re-triggered to verify the fix.
+          Workflow: ${{ steps.determine-workflow.outputs.workflow_file }}
+
+          If the pipeline succeeds, this issue can be closed."

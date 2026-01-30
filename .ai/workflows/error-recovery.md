@@ -2,11 +2,23 @@
 
 The AID system includes an automated error recovery mechanism that detects pipeline failures, analyzes errors, and implements fixes autonomously.
 
+## Safety Features
+
+### Daily Rate Limit
+
+To protect against excessive API usage and model provider rate limits, the auto-fix pipeline has a **maximum of 100 runs per day** (UTC timezone).
+
+- If the limit is reached, a warning issue is created
+- Auto-fix will resume the next day
+- The limit can be adjusted in [auto-fix.yml](../.github/workflows/auto-fix.yml) (`MAX_DAILY_RUNS`)
+
 ## How It Works
 
 ### 1. Error Detection
 
 When any workflow in the pipeline fails, the [auto-fix.yml](../.github/workflows/auto-fix.yml) workflow is automatically triggered via `workflow_run` event.
+
+**Rate Limit Check**: Before proceeding, the system checks if the daily limit has been reached by counting auto-fix issues created today.
 
 ### 2. Issue Creation
 
@@ -34,9 +46,23 @@ The [error-fix.yml](../.github/workflows/error-fix.yml) workflow is triggered wi
 ### 4. Validation & Merge
 
 - Runs validation tests on the fix
-- If tests pass, auto-merges the PR
-- If tests fail, requests human review
-- Updates the issue with results
+- Waits for all PR checks to complete (up to 5 minutes)
+- If all checks pass:
+  - **Auto-merges the PR to main**
+  - Deletes the fix branch
+  - Updates issue with success status
+- If checks fail:
+  - Requests human review
+  - Adds `needs-review` label to issue
+
+### 5. Automatic Pipeline Re-trigger
+
+After successful merge to main:
+
+- Identifies the workflow that originally failed
+- Automatically triggers that workflow (or full pipeline if needed)
+- Updates the issue with re-trigger status
+- Monitors the re-run for success
 
 ## Error Recovery Agent
 
@@ -131,11 +157,21 @@ GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
 ```yaml
 on:
   workflow_run:
-    workflows: ["Pipeline Orchestrator"]
+    workflows:
+      [
+        "Pipeline Orchestrator",
+        "Product Agent",
+        "Design Agent",
+        "Architect Agent",
+        "Dev Agent",
+        "QA Agent",
+        "Ops Agent",
+        "Stage Router",
+      ]
     types: [completed]
 ```
 
-Any time a workflow completes with failure status, auto-fix kicks in.
+Any time a workflow completes with failure status, auto-fix kicks in and monitors all main pipeline workflows.
 
 ### Manual Trigger
 
@@ -192,9 +228,13 @@ gh workflow run error-fix.yml \
 ✅ No unrelated changes  
 ✅ Fix properly documented  
 ✅ Tests pass after fix  
-✅ PR auto-merged if validated
+✅ PR auto-merged to main if all checks pass  
+✅ Original workflow re-triggered automatically after merge  
+✅ Pipeline succeeds on retry
 
 ## Limitations
+
+### Technical Limitations
 
 The agent cannot automatically fix:
 
@@ -209,6 +249,18 @@ For these cases, the agent:
 - Provides manual fix instructions
 - Tags issue with `needs-human-review`
 - Assigns to appropriate team
+
+### Rate Limit Protection
+
+To prevent excessive API usage and costs:
+
+- **Maximum 100 auto-fix runs per day** (configurable)
+- Limit resets at midnight UTC
+- When limit is reached:
+  - A warning issue is created with details
+  - Auto-fix is skipped for remaining failures
+  - Manual intervention required or wait until next day
+- Helps identify recurring issues that need permanent fixes
 
 ## Configuration
 
@@ -229,6 +281,7 @@ Track error recovery effectiveness:
 - Review PRs with label `auto-fix`
 - Monitor fix success rate
 - Review validation failures
+- **Watch for `rate-limit` issues**: Indicates daily limit reached
 
 ## Best Practices
 
@@ -236,12 +289,14 @@ Track error recovery effectiveness:
 2. **Clear error messages**: Ensure errors have good traceback and context
 3. **Review first fixes**: Human-review first few auto-fixes to validate behavior
 4. **Monitor patterns**: If same error repeats, address root cause
-5. **Update agent**: Improve agent instructions based on failure patterns
+5. **Check rate limit usage**: If hitting the daily limit frequently, investigate recurring failures
+6. **Adjust limit if needed**: Edit `MAX_DAILY_RUNS` in [auto-fix.yml](../.github/workflows/auto-fix.yml) if 100 is too restrictive
+7. **Update agent**: Improve agent instructions based on failure patterns
 
 ## Example Flow
 
 ```
-Pipeline fails
+Pipeline fails (e.g., Dev Agent)
     ↓
 auto-fix.yml detects failure
     ↓
@@ -259,18 +314,31 @@ Creates branch fix/error-20260129
     ↓
 Commits and pushes fix
     ↓
-Opens PR #124
+Opens PR #124 to main
     ↓
 Updates issue #123 with analysis
     ↓
 Runs validation tests
     ↓
-Tests pass → Auto-merge PR
+Tests pass → Auto-merge PR to main
+    ↓
+Re-triggers failed workflow (Dev Agent)
+    ↓
+Workflow runs successfully ✓
     ↓
 Closes issue #123
-    ↓
-Pipeline runs successfully ✓
 ```
+
+### Automatic Workflow Re-trigger
+
+After a successful auto-fix merge, the system intelligently determines which workflow to re-run:
+
+1. **Specific Stage Fix**: If a specific agent workflow failed (e.g., Dev Agent), that workflow is re-triggered
+2. **Router Fix**: If Stage Router failed, it's re-triggered to continue the pipeline
+3. **Orchestrator Fix**: If Pipeline Orchestrator failed, the full pipeline is re-run from the start
+4. **Unknown/Complex**: Defaults to re-running the full pipeline orchestrator for safety
+
+This ensures the pipeline automatically continues from where it failed after the fix is applied.
 
 ## Extending the System
 

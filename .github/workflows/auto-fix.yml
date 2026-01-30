@@ -1,16 +1,26 @@
 name: Auto-Fix Pipeline Errors
 
-# DISABLED: Temporarily disabled to prevent infinite loops during development
-# To re-enable: Remove the "false &&" from the if conditions below
+# Automatically detects pipeline failures and triggers error recovery
+# The Error Recovery Agent will analyze and attempt to fix the issue
 
 on:
   workflow_run:
-    workflows: ["Pipeline Orchestrator"]
+    workflows:
+      [
+        "Pipeline Orchestrator",
+        "Product Agent",
+        "Design Agent",
+        "Architect Agent",
+        "Dev Agent",
+        "QA Agent",
+        "Ops Agent",
+        "Stage Router",
+      ]
     types: [completed]
 
 jobs:
   create-error-issue:
-    if: ${{ false && github.event.workflow_run.conclusion == 'failure' }}
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -19,8 +29,58 @@ jobs:
     outputs:
       issue_number: ${{ steps.create-issue.outputs.issue_number }}
       error_id: ${{ steps.generate-id.outputs.error_id }}
+      should_continue: ${{ steps.rate-limit-check.outputs.should_continue }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check daily rate limit
+        id: rate-limit-check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const MAX_DAILY_RUNS = 100;
+
+            // Get today's date in UTC
+            const today = new Date().toISOString().split('T')[0];
+
+            // Search for auto-fix issues created today
+            const query = `repo:${context.repo.owner}/${context.repo.repo} is:issue label:auto-fix created:${today}`;
+
+            const issues = await github.rest.search.issuesAndPullRequests({
+              q: query,
+              per_page: 100
+            });
+
+            const todayCount = issues.data.total_count;
+            console.log(`Auto-fix runs today: ${todayCount}/${MAX_DAILY_RUNS}`);
+
+            if (todayCount >= MAX_DAILY_RUNS) {
+              console.log('❌ Daily rate limit reached. Skipping auto-fix.');
+              
+              // Create a warning issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '⚠️ Auto-Fix Rate Limit Reached',
+                body: `# Auto-Fix Rate Limit Exceeded\n\n` +
+                      `The auto-fix pipeline has reached its daily limit of ${MAX_DAILY_RUNS} runs.\n\n` +
+                      `**Current count**: ${todayCount} issues created today\n` +
+                      `**Failed workflow**: ${context.payload.workflow_run.name}\n` +
+                      `**Workflow URL**: ${context.payload.workflow_run.html_url}\n\n` +
+                      `This limit prevents excessive API usage and rate limit issues with the AI model provider.\n\n` +
+                      `## Actions Required\n\n` +
+                      `1. Review recent auto-fix issues to identify patterns\n` +
+                      `2. Fix any recurring issues manually\n` +
+                      `3. Wait until tomorrow for auto-fix to resume\n` +
+                      `4. Consider increasing the limit if needed (edit .github/workflows/auto-fix.yml)`,
+                labels: ['auto-fix', 'rate-limit', 'needs-attention']
+              });
+              
+              core.setOutput('should_continue', 'false');
+              process.exit(0);
+            }
+
+            core.setOutput('should_continue', 'true');
 
       - name: Download workflow logs
         uses: actions/github-script@v7
@@ -120,6 +180,7 @@ jobs:
 
   trigger-fix-pipeline:
     needs: create-error-issue
+    if: needs.create-error-issue.outputs.should_continue == 'true'
     runs-on: ubuntu-latest
     permissions:
       actions: write
