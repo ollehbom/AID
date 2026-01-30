@@ -1,0 +1,205 @@
+{
+  "name": "Mobile App",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "children": [
+    {
+      "name": "Login Screen",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "FILL",
+      "backgroundColor": "#FFFFFF",
+      "children": [
+        {
+          "name": "App Logo",
+          "type": "IMAGE",
+          "width": 100,
+          "height": 100,
+          "x": 137.5,
+          "y": 100
+        },
+        {
+          "name": "Login Title",
+          "type": "TEXT",
+          "characters": "Welcome",
+          "fontSize": 24,
+          "fontWeight": "bold",
+          "textAlignHorizontal": "CENTER",
+          "width": "FILL",
+          "height": "HUG",
+          "x": 0,
+          "y": 220,
+          "paddingTop": 16,
+          "paddingBottom": 16
+        },
+        {
+          "name": "Google Login Button",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#4285F4",
+          "cornerRadius": 8,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 12,
+          "paddingBottom": 12,
+          "x": 20,
+          "y": 300,
+          "width": 335,
+          "children": [
+            {
+              "name": "Google Icon",
+              "type": "IMAGE",
+              "width": 20,
+              "height": 20,
+              "x": 16,
+              "y": 12
+            },
+            {
+              "name": "Google Button Text",
+              "type": "TEXT",
+              "characters": "Sign in with Google",
+              "fontSize": 16,
+              "fontWeight": "medium",
+              "textAlignHorizontal": "CENTER",
+              "width": "FILL",
+              "height": "HUG",
+              "x": 48
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dashboard Screen",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "FILL",
+      "backgroundColor": "#F0F0F0",
+      "visible": false,
+      "children": [
+        {
+          "name": "Header",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#FFFFFF",
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 16,
+          "paddingBottom": 16,
+          "children": [
+            {
+              "name": "App Name",
+              "type": "TEXT",
+              "characters": "App Name",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "User Profile Icon",
+              "type": "RECTANGLE",
+              "width": 32,
+              "height": 32,
+              "cornerRadius": 16,
+              "backgroundColor": "#CCCCCC",
+              "x": 327
+            }
+          ]
+        },
+        {
+          "name": "Sidebar",
+          "type": "FRAME",
+          "width": 80,
+          "height": "FILL",
+          "backgroundColor": "#333333",
+          "x": 0,
+          "y": 64,
+          "children": [
+            {
+              "name": "Dashboard Icon",
+              "type": "IMAGE",
+              "width": 24,
+              "height": 24,
+              "x": 28,
+              "y": 24
+            },
+            {
+              "name": "Settings Icon",
+              "type": "IMAGE",
+              "width": 24,
+              "height": 24,
+              "x": 28,
+              "y": 80
+            }
+          ]
+        },
+        {
+          "name": "Content Area",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "FILL",
+          "x": 80,
+          "y": 64,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 16,
+          "children": [
+            {
+              "name": "Welcome Message",
+              "type": "TEXT",
+              "characters": "Welcome, [User's Name]!",
+              "fontSize": 24,
+              "fontWeight": "bold",
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "Placeholder Chart",
+              "type": "RECTANGLE",
+              "width": "FILL",
+              "height": 200,
+              "backgroundColor": "#FFFFFF",
+              "cornerRadius": 8,
+              "y": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Loading Overlay",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "FILL",
+      "backgroundColor": "rgba(0, 0, 0, 0.5)",
+      "visible": false,
+      "children": [
+        {
+          "name": "Loading Spinner",
+          "type": "ELLIPSE",
+          "width": 50,
+          "height": 50,
+          "cornerRadius": 25,
+          "backgroundColor": "#FFFFFF",
+          "x": 162.5,
+          "y": 381
+        },
+        {
+          "name": "Loading Text",
+          "type": "TEXT",
+          "characters": "Loading...",
+          "fontSize": 16,
+          "fontWeight": "medium",
+          "textAlignHorizontal": "CENTER",
+          "width": "FILL",
+          "height": "HUG",
+          "y": 440
+        }
+      ]
+    }
+  ]
+}
