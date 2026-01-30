@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+- ID: EXP-2026-01-29-TEST-AUTO-FIX-7
+  Belief: A basic, modern UI with authentication is a prerequisite for user engagement.
+  Change: Implement a React app with shadcn/ui, Google login, and a basic dashboard.
+  Owner: Product Agent
+  Status: active
+  Success Signal: >90% successful login rate, >90% dashboard access.
