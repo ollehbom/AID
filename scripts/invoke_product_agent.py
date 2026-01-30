@@ -10,6 +10,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
+from json_fixer import parse_json_with_recovery
 
 # Load environment variables from .env file
 load_dotenv()
@@ -168,7 +169,10 @@ def _invoke_openai(system_prompt, user_prompt):
         response_format={"type": "json_object"}
     )
     
-    return json.loads(response.choices[0].message.content)
+    return parse_json_with_recovery(
+        response.choices[0].message.content,
+        error_prefix="product_agent_error"
+    )
 
 
 def _invoke_gemini(system_prompt, user_prompt):
@@ -197,34 +201,11 @@ def _invoke_gemini(system_prompt, user_prompt):
         }
     )
     
-    # Clean and parse response
-    response_text = response.text.strip()
-    
-    # Try to extract JSON if wrapped in markdown code blocks
-    if response_text.startswith("```"):
-        lines = response_text.split('\n')
-        response_text = '\n'.join(lines[1:-1]) if len(lines) > 2 else response_text
-    
-    try:
-        return json.loads(response_text)
-    except json.JSONDecodeError as e:
-        print(f"Failed to parse JSON response. Error: {e}", file=sys.stderr)
-        
-        # Save full response for debugging
-        error_file = f"product_agent_error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-        with open(error_file, 'w', encoding='utf-8') as f:
-            f.write(response_text)
-        print(f"Full response saved to {error_file}", file=sys.stderr)
-        
-        # Show context around the error
-        if hasattr(e, 'pos') and e.pos:
-            start = max(0, e.pos - 200)
-            end = min(len(response_text), e.pos + 200)
-            print(f"\nContext around error position:", file=sys.stderr)
-            print(f"...{response_text[start:end]}...", file=sys.stderr)
-        
-        print(f"\nTip: Gemini may have generated invalid JSON. Check the error file for details.", file=sys.stderr)
-        raise
+    # Parse response with automatic error recovery
+    return parse_json_with_recovery(
+        response.text,
+        error_prefix="product_agent_error"
+    )
 
 
 def main():

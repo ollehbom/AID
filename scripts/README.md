@@ -12,6 +12,13 @@ The AID pipeline uses multiple specialized agents:
 - **Dev Agent**: Implements code based on specifications
 - **Ops Agent**: Creates deployment and CI/CD configurations
 
+## Utilities
+
+- **json_fixer.py**: Automatic JSON error recovery for AI model responses
+  - See [JSON-FIXER-README.md](JSON-FIXER-README.md) for details
+  - Fixes common issues with Gemini-generated JSON (control characters, formatting, etc.)
+  - Used by all agent scripts for robust JSON parsing
+
 ## Configuration
 
 All agents support both OpenAI and Google Gemini:

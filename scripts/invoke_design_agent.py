@@ -10,6 +10,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
+from json_fixer import parse_json_with_recovery
 
 # Load environment variables from .env file
 load_dotenv()
@@ -188,7 +189,10 @@ def _invoke_openai(system_prompt, user_prompt):
         response_format={"type": "json_object"}
     )
     
-    return json.loads(response.choices[0].message.content)
+    return parse_json_with_recovery(
+        response.choices[0].message.content,
+        error_prefix="design_agent_error"
+    )
 
 
 def _invoke_gemini(system_prompt, user_prompt):
@@ -217,56 +221,11 @@ def _invoke_gemini(system_prompt, user_prompt):
         }
     )
     
-    # Clean and parse response
-    response_text = response.text.strip()
-    
-    # Try to extract JSON if wrapped in markdown code blocks
-    if response_text.startswith("```"):
-        lines = response_text.split('\n')
-        response_text = '\n'.join(lines[1:-1]) if len(lines) > 2 else response_text
-    
-    try:
-        return json.loads(response_text)
-    except json.JSONDecodeError as e:
-        print(f"Failed to parse JSON response. Error: {e}", file=sys.stderr)
-        
-        # Save full response for debugging
-        error_file = f"design_agent_error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-        with open(error_file, 'w', encoding='utf-8') as f:
-            f.write(response_text)
-        print(f"Full response saved to {error_file}", file=sys.stderr)
-        
-        # Show context around the error
-        if hasattr(e, 'pos') and e.pos:
-            start = max(0, e.pos - 200)
-            end = min(len(response_text), e.pos + 200)
-            print(f"\nContext around error position:", file=sys.stderr)
-            print(f"...{response_text[start:end]}...", file=sys.stderr)
-        
-        # Try to recover by truncating at the error position and closing the JSON
-        print(f"\nAttempting JSON recovery...", file=sys.stderr)
-        try:
-            if hasattr(e, 'pos') and e.pos:
-                # Find the last complete key-value pair before the error
-                truncated = response_text[:e.pos]
-                # Find last comma or opening brace
-                last_comma = truncated.rfind(',')
-                if last_comma > 0:
-                    truncated = truncated[:last_comma]
-                # Close the JSON object
-                truncated = truncated.rstrip() + "\n}"
-                recovered = json.loads(truncated)
-                print(f"✓ Recovered partial JSON with {len(recovered)} fields", file=sys.stderr)
-                # Add a note about incomplete data
-                recovered["_recovery_note"] = f"JSON was truncated due to parsing error at position {e.pos}"
-                return recovered
-        except Exception as recovery_error:
-            print(f"Recovery failed: {recovery_error}", file=sys.stderr)
-        
-        print(f"\nTip: Gemini generated invalid JSON. Check {error_file} for full output.", file=sys.stderr)
-        print(f"Consider simplifying the prompt or reducing output size.", file=sys.stderr)
-        print(f"Common issues: unescaped quotes, unescaped newlines in string values, trailing commas.", file=sys.stderr)
-        raise
+    # Parse response with automatic error recovery
+    return parse_json_with_recovery(
+        response.text,
+        error_prefix="design_agent_error"
+    )
 
 
 def main():

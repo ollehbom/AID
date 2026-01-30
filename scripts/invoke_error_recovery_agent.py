@@ -10,6 +10,7 @@ import json
 import re
 from pathlib import Path
 from dotenv import load_dotenv
+from json_fixer import parse_json_with_recovery
 
 # Load environment variables
 load_dotenv()
@@ -54,7 +55,10 @@ def _invoke_openai(system_prompt, user_prompt):
         response_format={"type": "json_object"}
     )
     
-    return response.choices[0].message.content
+    return parse_json_with_recovery(
+        response.choices[0].message.content,
+        error_prefix="error_recovery_agent_error"
+    )
 
 
 def _invoke_gemini(system_prompt, user_prompt):
@@ -72,7 +76,10 @@ def _invoke_gemini(system_prompt, user_prompt):
     )
     
     response = model.generate_content(user_prompt)
-    return response.text
+    return parse_json_with_recovery(
+        response.text,
+        error_prefix="error_recovery_agent_error"
+    )
 
 
 def extract_error_from_issue(issue_body):
@@ -152,11 +159,9 @@ Include all required keys: analysis, fix, validation, issue_update, pr_descripti
         print(f"🤖 Analyzing error with {AI_PROVIDER.upper()} ({MODEL})...")
         
         if AI_PROVIDER == "gemini":
-            result_json = _invoke_gemini(system_prompt, user_prompt)
+            result = _invoke_gemini(system_prompt, user_prompt)
         else:
-            result_json = _invoke_openai(system_prompt, user_prompt)
-        
-        result = json.loads(result_json)
+            result = _invoke_openai(system_prompt, user_prompt)
         
         # Save outputs
         output_dir = REPO_ROOT / ".ai" / "error-fixes"

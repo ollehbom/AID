@@ -11,6 +11,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
+from json_fixer import parse_json_with_recovery
 
 # Load environment variables from .env file
 load_dotenv()
@@ -289,7 +290,10 @@ def _invoke_openai(system_prompt, user_prompt):
         response_format={"type": "json_object"}
     )
     
-    return json.loads(response.choices[0].message.content)
+    return parse_json_with_recovery(
+        response.choices[0].message.content,
+        error_prefix="dev_iteration_error"
+    )
 
 
 def _invoke_gemini(system_prompt, user_prompt):
@@ -331,22 +335,11 @@ def _invoke_gemini(system_prompt, user_prompt):
             else:
                 raise
     
-    # Parse response
-    response_text = response.text.strip()
-    
-    if response_text.startswith("```"):
-        lines = response_text.split('\n')
-        response_text = '\n'.join(lines[1:-1]) if len(lines) > 2 else response_text
-    
-    try:
-        return json.loads(response_text)
-    except json.JSONDecodeError as e:
-        # Save error
-        error_file = f"dev_iteration_error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-        with open(error_file, 'w', encoding='utf-8') as f:
-            f.write(response_text)
-        print(f"JSON parse error. Saved to {error_file}", file=sys.stderr)
-        raise
+    # Parse response with automatic error recovery
+    return parse_json_with_recovery(
+        response.text,
+        error_prefix="dev_iteration_error"
+    )
 
 
 def main():
