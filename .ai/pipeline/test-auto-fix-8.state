@@ -1,9 +1,9 @@
 feature: test-auto-fix-8
-status: product_complete
-needs_design: true
+status: design_complete
+needs_design: ✓
 stages:
   product: ✓
-  design: pending
+  design: ✓
   architect: pending
   dev: pending
   qa: pending

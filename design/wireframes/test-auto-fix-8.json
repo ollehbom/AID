@@ -1,0 +1,135 @@
+{
+  "name": "AppContainer",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "children": [
+    {
+      "name": "LoginScreen",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "FILL",
+      "children": [
+        {
+          "name": "WelcomeHeader",
+          "type": "TEXT",
+          "characters": "Welcome",
+          "fontSize": 32,
+          "fontWeight": "BOLD",
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER",
+          "marginTop": 120
+        },
+        {
+          "name": "SignInPrompt",
+          "type": "TEXT",
+          "characters": "To get started, please sign in.",
+          "fontSize": 16,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER",
+          "marginTop": 20
+        },
+        {
+          "name": "GoogleSignInButton",
+          "type": "BUTTON",
+          "characters": "Sign in with Google",
+          "backgroundColor": "#4285F4",
+          "textColor": "#FFFFFF",
+          "cornerRadius": 4,
+          "width": 250,
+          "height": 48,
+          "marginTop": 40,
+          "alignSelf": "CENTER"
+        },
+        {
+          "name": "ErrorMessage",
+          "type": "TEXT",
+          "characters": "Login failed. Please try again.",
+          "fontSize": 14,
+          "textColor": "#FF0000",
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER",
+          "marginTop": 20,
+          "isVisible": false
+        }
+      ]
+    },
+    {
+      "name": "DashboardScreen",
+      "type": "FRAME",
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "FILL",
+      "isVisible": false,
+      "children": [
+        {
+          "name": "DashboardHeader",
+          "type": "TEXT",
+          "characters": "Dashboard",
+          "fontSize": 28,
+          "fontWeight": "BOLD",
+          "width": "FILL",
+          "height": "HUG",
+          "marginTop": 60,
+          "paddingLeft": 20
+        },
+        {
+          "name": "GreetingText",
+          "type": "TEXT",
+          "characters": "Hello, [User Name]!",
+          "fontSize": 18,
+          "width": "FILL",
+          "height": "HUG",
+          "marginTop": 10,
+          "paddingLeft": 20
+        },
+        {
+          "name": "OverviewCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "marginTop": 30,
+          "padding": 20,
+          "marginLeft": 20,
+          "marginRight": 20,
+          "children": [
+            {
+              "name": "CardTitle",
+              "type": "TEXT",
+              "characters": "Your Overview",
+              "fontSize": 20,
+              "fontWeight": "BOLD",
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "CardBodyText",
+              "type": "TEXT",
+              "characters": "Welcome to your dashboard. This is where your key information and quick actions will appear.",
+              "fontSize": 14,
+              "marginTop": 10,
+              "width": "FILL",
+              "height": "HUG"
+            }
+          ]
+        },
+        {
+          "name": "LoadingIndicator",
+          "type": "TEXT",
+          "characters": "Loading your dashboard...",
+          "fontSize": 16,
+          "textColor": "#666666",
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER",
+          "marginTop": 50,
+          "isVisible": false
+        }
+      ]
+    }
+  ]
+}
