@@ -23,19 +23,23 @@ jobs:
           git checkout -b ${{ inputs.feature_id }}-dev-stage
           git push -u origin ${{ inputs.feature_id }}-dev-stage
 
-      - name: Run Dev Agent
-        run: |
-          echo "💻 Dev Agent implementing feature..."
-          echo "TODO: Invoke Dev Agent"
-          echo "Reads: design/architecture/ADR-*-${{ inputs.feature_id }}.md"
-          echo "       design/technical-specs/${{ inputs.feature_id }}.md"
-          echo "       design/specs/${{ inputs.feature_id }}.md (if exists)"
-          echo "Writes: Code changes"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-      - name: Update pipeline state
+      - name: Install dependencies
         run: |
-          sed -i 's/status:.*/status: dev_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/dev: pending/dev: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
+          pip install openai google-genai python-dotenv
+
+      - name: Run Dev Agent
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          MODEL: ${{ vars.MODEL }}
+        run: |
+          python scripts/invoke_dev_agent.py "${{ inputs.feature_id }}"
 
       - name: Commit outputs
         run: |

@@ -23,17 +23,23 @@ jobs:
           git checkout -b ${{ inputs.feature_id }}-ops-stage
           git push -u origin ${{ inputs.feature_id }}-ops-stage
 
-      - name: Run Ops Agent
-        run: |
-          echo "🚀 Ops Agent deploying feature..."
-          echo "TODO: Invoke Ops Agent"
-          echo "Reads: design/validations/${{ inputs.feature_id }}.md"
-          echo "Writes: Deployment logs, monitoring config"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-      - name: Update pipeline state
+      - name: Install dependencies
         run: |
-          sed -i 's/status:.*/status: ops_awaiting_approval/' .ai/pipeline/${{ inputs.feature_id }}.state
-          sed -i 's/ops: pending/ops: in-progress/' .ai/pipeline/${{ inputs.feature_id }}.state
+          pip install openai google-genai python-dotenv
+
+      - name: Run Ops Agent
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          MODEL: ${{ vars.MODEL }}
+        run: |
+          python scripts/invoke_ops_agent.py "${{ inputs.feature_id }}"
 
       - name: Commit outputs
         run: |

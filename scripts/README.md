@@ -2,6 +2,34 @@
 
 This directory contains scripts for invoking AI agents in the pipeline.
 
+## Overview
+
+The AID pipeline uses multiple specialized agents:
+
+- **Product Agent**: Analyzes feedback and creates product decisions
+- **Design Agent**: Creates UX/UI specifications and wireframes
+- **Architect Agent**: Reviews architecture and creates technical specs
+- **Dev Agent**: Implements code based on specifications
+- **Ops Agent**: Creates deployment and CI/CD configurations
+
+## Configuration
+
+All agents support both OpenAI and Google Gemini:
+
+```bash
+# Install dependencies
+pip install openai google-genai python-dotenv
+
+# Set API keys in .env
+OPENAI_API_KEY="your-openai-api-key"
+GOOGLE_API_KEY="your-google-api-key"
+
+# Configure provider and model
+AI_PROVIDER="gemini"  # or "openai"
+MODEL="gemini-2.5-flash"  # or "gpt-4.1"
+TEMPERATURE="0.7"
+```
+
 ## Product Agent
 
 **Script**: `invoke_product_agent.py`
@@ -119,6 +147,128 @@ python scripts/invoke_design_agent.py onboarding-v2 "Focus on mobile-first desig
 - `design/specs/<feature-id>.md` - Flow, states, copy, error handling
 - `design/wireframes/<feature-id>.json` - Wireframe structure for dev agent
 - `design/validations/<feature-id>.md` - Validation findings
+
+## Architect Agent
+
+**Script**: `invoke_architect_agent.py`
+
+Invokes the Architect Agent to review architecture and create technical specifications.
+
+### Usage
+
+```bash
+python scripts/invoke_architect_agent.py feature-name
+```
+
+### What It Does
+
+1. Reads Architect Agent instructions from `.ai/agents/architect.md`
+2. Loads context files:
+   - Product decision
+   - Design specs (if available)
+   - Engineering standards
+3. Generates Architecture Decision Records (ADRs)
+4. Creates technical specifications
+5. Updates pipeline state
+
+### Output Files
+
+- `design/architecture/ADR-<number>-<feature-id>.md` - Architecture decisions
+- `design/technical-specs/<feature-id>.md` - Technical implementation guide
+
+## Dev Agent
+
+**Script**: `invoke_dev_agent.py`
+
+Invokes the Dev Agent to implement production-ready code based on specifications.
+Based on Software Engineer Agent v1 principles.
+
+### Usage
+
+```bash
+python scripts/invoke_dev_agent.py feature-name
+```
+
+### What It Does
+
+1. Reads technical specs and ADRs
+2. Implements production-ready code following SOLID principles
+3. Creates comprehensive test suite
+4. Generates documentation
+5. Validates quality gates
+
+### Engineering Standards
+
+- **SOLID principles** applied
+- **Clean Code**: DRY, YAGNI, KISS
+- **Testing**: Unit, integration, E2E tests
+- **Security**: Secure-by-design
+- **Documentation**: "Why" comments, API docs
+
+### Output Files
+
+- Implementation files (location based on technical spec)
+- Test files
+- Documentation updates
+- Quality checklist report
+
+## Ops Agent
+
+**Script**: `invoke_ops_agent.py`
+
+Invokes the Ops Agent to create deployment configurations and CI/CD updates.
+Based on SE GitOps/CI Specialist principles.
+
+### Usage
+
+```bash
+python scripts/invoke_ops_agent.py feature-name
+```
+
+### What It Does
+
+1. Reads technical specs and implementation
+2. Creates CI/CD pipeline configurations
+3. Sets up monitoring and alerting
+4. Generates deployment runbooks
+5. Configures security and secrets management
+
+### Operations Focus
+
+- **Reliability**: Safe, predictable deployments
+- **Automation**: Eliminate manual steps
+- **Monitoring**: Health checks and alerts
+- **Recovery**: Rollback procedures ready
+
+### Output Files
+
+- `.github/workflows/*.yml` - CI/CD pipeline updates
+- `.env.example` - Environment variable template
+- `docs/deployment.md` - Deployment runbook
+- Monitoring configuration
+- Security documentation
+
+## Error Handling
+
+All agents include robust error handling:
+
+- JSON parsing errors save full response to timestamped files
+- Context around errors shown for debugging
+- Gemini responses automatically cleaned of markdown wrapping
+- Detailed error messages for troubleshooting
+
+## Pipeline Integration
+
+These scripts are invoked by GitHub Actions workflows:
+
+- `product-agent.yml` → `invoke_product_agent.py`
+- `design-agent.yml` → `invoke_design_agent.py`
+- `architect-agent.yml` → `invoke_architect_agent.py`
+- `dev-agent.yml` → `invoke_dev_agent.py`
+- `ops-agent.yml` → `invoke_ops_agent.py`
+
+See [PIPELINE-WORKFLOW.md](../PIPELINE-WORKFLOW.md) for complete pipeline documentation.
+
 - `.ai/pipeline/<feature-id>.state` - Updated pipeline state
 
 ### Environment Variables

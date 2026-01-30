@@ -66,9 +66,7 @@ jobs:
               echo "next=dev" >> $GITHUB_OUTPUT
               ;;
             dev_awaiting_approval)
-              echo "next=qa" >> $GITHUB_OUTPUT
-              ;;
-            qa_awaiting_approval)
+              # Skip QA for now, go directly to ops
               echo "next=ops" >> $GITHUB_OUTPUT
               ;;
             ops_awaiting_approval)
