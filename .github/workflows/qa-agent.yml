@@ -45,3 +45,12 @@ jobs:
         run: |
           echo "🚀 Triggering Ops Agent..."
           gh workflow run ops-agent.yml -f feature_id=${{ inputs.feature_id }}
+
+      - name: Handle failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ERROR_ID="error-$(date +%Y%m%d-%H%M%S)"
+          echo "🔴 Workflow failed - triggering auto-fix: $ERROR_ID"
+          gh workflow run error-fix.yml -f error_id="$ERROR_ID" -f workflow_name="QA Agent"

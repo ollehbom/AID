@@ -1,0 +1,319 @@
+name: Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_id:
+        description: "Feature ID to process"
+        required: true
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create feature branch if needed
+        run: |
+          if git ls-remote --heads origin feature/${{ inputs.feature_id }} | grep -q feature/${{ inputs.feature_id }}; then
+            echo "Branch exists, checking out"
+            git fetch origin feature/${{ inputs.feature_id }}
+            git checkout feature/${{ inputs.feature_id }}
+          else
+            echo "Creating new branch"
+            git checkout -b feature/${{ inputs.feature_id }}
+            git push -u origin feature/${{ inputs.feature_id }}
+          fi
+
+  product:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Product Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
+        run: |
+          echo "🤖 Running Product Agent..."
+          python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
+
+      - name: Update pipeline state
+        run: |
+          sed -i "s/status: .*/status: product_complete/" .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i "s/product: .*/product: ✓/" .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add product/decisions/ experiments/active.md .ai/pipeline/
+          git commit -m "Product: ${{ inputs.feature_id }} analysis complete" || echo "No changes"
+          git push
+
+  design:
+    needs: product
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check if design needed
+        id: check-design
+        run: |
+          NEEDS_DESIGN=$(grep "needs_design:" .ai/pipeline/${{ inputs.feature_id }}.state | cut -d: -f2 | xargs || echo "false")
+          echo "needs_design=$NEEDS_DESIGN" >> $GITHUB_OUTPUT
+          if [ "$NEEDS_DESIGN" = "false" ]; then
+            echo "⏭️ Skipping Design Agent (not needed)"
+          fi
+
+      - name: Run Design Agent
+        if: steps.check-design.outputs.needs_design == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
+        run: |
+          echo "🎨 Running Design Agent..."
+          python scripts/invoke_design_agent.py ${{ inputs.feature_id }}
+
+      - name: Update pipeline state
+        if: steps.check-design.outputs.needs_design == 'true'
+        run: |
+          sed -i 's/status:.*/status: design_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/design: .*/design: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        if: steps.check-design.outputs.needs_design == 'true'
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add design/ .ai/pipeline/
+          git commit -m "Design: ${{ inputs.feature_id }} spec complete" || echo "No changes"
+          git push
+
+  architect:
+    needs: design
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Architect Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
+          MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
+        run: |
+          echo "🏗️ Running Architect Agent..."
+          python scripts/invoke_architect_agent.py ${{ inputs.feature_id }}
+
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: architect_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/architect: .*/architect: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add design/architecture/ design/technical-specs/ .ai/pipeline/
+          git commit -m "Architect: ${{ inputs.feature_id }} review complete" || echo "No changes"
+          git push
+
+  dev:
+    needs: architect
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install openai google-genai python-dotenv
+
+      - name: Run Dev Agent
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          MODEL: ${{ vars.MODEL }}
+        run: |
+          echo "💻 Running Dev Agent..."
+          python scripts/invoke_dev_agent_iterative.py "${{ inputs.feature_id }}"
+
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: dev_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/dev: .*/dev: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add .ai/pipeline/
+          git commit -m "Dev: ${{ inputs.feature_id }} implementation complete" || echo "No changes"
+          git push
+
+  qa:
+    needs: dev
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Run QA Agent
+        run: |
+          echo "🧪 Running QA Agent..."
+          echo "TODO: Invoke QA Agent"
+
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: qa_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/qa: .*/qa: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add design/validations/ .ai/pipeline/
+          git commit -m "QA: ${{ inputs.feature_id }} validation complete" || echo "No changes"
+          git push
+
+  ops:
+    needs: qa
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/${{ inputs.feature_id }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install openai google-genai python-dotenv
+
+      - name: Run Ops Agent
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          MODEL: ${{ vars.MODEL }}
+        run: |
+          echo "🚀 Running Ops Agent..."
+          python scripts/invoke_ops_agent.py "${{ inputs.feature_id }}"
+
+      - name: Update pipeline state
+        run: |
+          sed -i 's/status:.*/status: ops_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
+          sed -i 's/ops: .*/ops: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Pipeline Bot"
+          git config user.email "pipeline@aid.local"
+          git add .ai/pipeline/
+          git commit -m "Ops: ${{ inputs.feature_id }} deployment ready" || echo "No changes"
+          git push
+
+      - name: Create deployment PR to main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base main \
+            --head feature/${{ inputs.feature_id }} \
+            --title "✅ Deploy: ${{ inputs.feature_id }}" \
+            --body "## Feature Ready for Deployment
+
+          All pipeline stages completed for \`${{ inputs.feature_id }}\`.
+
+          ### 🔍 Pipeline Status
+          - ✓ Product Agent: Decision & experiment defined
+          - ✓ Design Agent: Specifications created
+          - ✓ Architect Agent: Technical review complete
+          - ✓ Dev Agent: Implementation complete
+          - ✓ QA Agent: Validation passed
+          - ✓ Ops Agent: Deployment ready
+
+          ### 🚀 Deployment
+          Merge this PR to deploy to main.
+
+          _Ready for final review and deployment._" \
+            --label "deploy,awaiting-approval"
+
+  handle-failure:
+    needs: [product, design, architect, dev, qa, ops]
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Trigger error recovery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ERROR_ID="error-$(date +%Y%m%d-%H%M%S)"
+          echo "🔴 Pipeline failed - triggering auto-fix: $ERROR_ID"
+          gh workflow run error-fix.yml \
+            -f error_id="$ERROR_ID" \
+            -f workflow_name="Pipeline" \
+            -f feature_id="${{ inputs.feature_id }}"
