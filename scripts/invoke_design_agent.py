@@ -89,7 +89,8 @@ Your task is to translate product decisions into interaction designs with clear 
 ### Current Beliefs
 {beliefs}
 
-{f"### Additional Context\n{design_context}\n" if design_context else ""}
+{"### Additional Context" if design_context else ""}
+{design_context if design_context else ""}
 
 ---
 

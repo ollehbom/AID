@@ -107,10 +107,10 @@ jobs:
 
           if [ "$NEXT_STAGE" = "ops" ]; then
             gh pr create \
-            --base main \
-            --head feature/$FEATURE_ID \
-            --title "🚀 Deploy: $FEATURE_ID" \
-            --body "## Ready for Deployment
+              --base main \
+              --head feature/$FEATURE_ID \
+              --title "🚀 Deploy: $FEATURE_ID" \
+              --body "## Ready for Deployment
 
           All pipeline stages have been completed and approved for \`$FEATURE_ID\`.
 
@@ -129,7 +129,8 @@ jobs:
           Merging this PR will deploy the feature to production.
 
           _Review and merge to deploy to main._" \
-            --label "deployment,ready-to-merge"
+              --label "deployment,ready-to-merge"
+          fi
 
       - name: Post status comment
         env:
