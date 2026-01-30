@@ -39,7 +39,7 @@ jobs:
           AI_PROVIDER: ${{ vars.AI_PROVIDER }}
           MODEL: ${{ vars.MODEL }}
         run: |
-          python scripts/invoke_dev_agent.py "${{ inputs.feature_id }}"
+          python scripts/invoke_dev_agent_iterative.py "${{ inputs.feature_id }}"
 
       - name: Commit outputs
         run: |
