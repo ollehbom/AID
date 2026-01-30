@@ -21,7 +21,7 @@ on:
 
 jobs:
   create-error-issue:
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: github.event.workflow_run.conclusion == 'failure'
     runs-on: ubuntu-latest
     permissions:
       issues: write
