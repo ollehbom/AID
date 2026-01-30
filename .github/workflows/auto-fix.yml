@@ -17,6 +17,7 @@ on:
         "Stage Router",
       ]
     types: [completed]
+    branches: [main]
 
 jobs:
   create-error-issue:
