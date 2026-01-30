@@ -1,0 +1,129 @@
+{
+  "name": "LoginAndDashboard",
+  "type": "CONTAINER",
+  "children": [
+    {
+      "name": "LoginScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "layoutMode": "VERTICAL",
+      "primaryAxisAlignItems": "CENTER",
+      "counterAxisAlignItems": "CENTER",
+      "padding": 24,
+      "gap": 32,
+      "children": [
+        {
+          "name": "WelcomeHeader",
+          "type": "TEXT",
+          "characters": "Welcome!",
+          "fontSize": 32,
+          "fontWeight": "BOLD",
+          "width": "HUG",
+          "height": "HUG"
+        },
+        {
+          "name": "GoogleSignInButton",
+          "type": "BUTTON",
+          "characters": "Sign in with Google",
+          "width": 280,
+          "height": 48,
+          "backgroundColor": "#4285F4",
+          "textColor": "#FFFFFF",
+          "cornerRadius": 4,
+          "fontSize": 16,
+          "icon": "GoogleLogo"
+        },
+        {
+          "name": "LoadingIndicator",
+          "type": "TEXT",
+          "characters": "Logging in...",
+          "fontSize": 14,
+          "isVisible": false
+        },
+        {
+          "name": "ErrorMessage",
+          "type": "TEXT",
+          "characters": "Login failed. Please try again.",
+          "fontSize": 14,
+          "textColor": "#E04343",
+          "isVisible": false
+        }
+      ]
+    },
+    {
+      "name": "DashboardScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "layoutMode": "VERTICAL",
+      "primaryAxisAlignItems": "START",
+      "counterAxisAlignItems": "STRETCH",
+      "padding": 24,
+      "gap": 24,
+      "children": [
+        {
+          "name": "DashboardTitle",
+          "type": "TEXT",
+          "characters": "Dashboard",
+          "fontSize": 28,
+          "fontWeight": "BOLD",
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "WelcomeMessage",
+          "type": "TEXT",
+          "characters": "Welcome, [User Name]!",
+          "fontSize": 18,
+          "textColor": "#333333",
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "GettingStartedCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F9F9F9",
+          "cornerRadius": 8,
+          "padding": 16,
+          "layoutMode": "VERTICAL",
+          "gap": 8,
+          "children": [
+            {
+              "name": "CardTitle",
+              "type": "TEXT",
+              "characters": "Getting Started",
+              "fontSize": 18,
+              "fontWeight": "MEDIUM",
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "CardBody",
+              "type": "TEXT",
+              "characters": "This is your personalized dashboard. Future features and critical updates will appear here.",
+              "fontSize": 14,
+              "textColor": "#555555",
+              "width": "FILL",
+              "height": "HUG"
+            }
+          ]
+        },
+        {
+          "name": "EmptyStateMessage",
+          "type": "TEXT",
+          "characters": "No items to display yet. As you use the product, your important information will appear here.",
+          "fontSize": 14,
+          "textColor": "#777777",
+          "width": "FILL",
+          "height": "HUG",
+          "isVisible": false,
+          "alignSelf": "CENTER",
+          "textAlignHorizontal": "CENTER"
+        }
+      ]
+    }
+  ]
+}
