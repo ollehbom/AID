@@ -1,0 +1,5 @@
+-   **Predictability:** A new user should immediately understand the purpose of the login screen and the expected action (Google sign-in).
+-   **Explanation:** The UI matches the intent. The Google sign-in button clearly signals the authentication method.
+-   **Friction:** Minimal friction. The flow is straightforward.
+-   **Concerns:** Ensure the loading state is clear and doesn't cause confusion. Confirm the dashboard loads quickly after successful authentication.
+-   **Areas for Clarification:** The placeholder content in the dashboard should be replaced with meaningful information quickly.
