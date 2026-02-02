@@ -258,7 +258,7 @@ def _invoke_openai(system_prompt, user_prompt):
             {"role": "user", "content": user_prompt}
         ],
         temperature=float(os.getenv("TEMPERATURE", "0.7")),
-        max_tokens=2000,  # Smaller tokens per iteration
+        max_tokens=8192,  # Increased to accommodate full design specifications
         response_format={"type": "json_object"}
     )
     
@@ -284,7 +284,7 @@ def _invoke_gemini(system_prompt, user_prompt):
         contents=combined_prompt,
         config={
             "temperature": float(os.getenv("TEMPERATURE", "0.7")),
-            "max_output_tokens": 2048,  # Smaller tokens per iteration
+            "max_output_tokens": 8192,  # Increased to accommodate full design specifications
             "response_mime_type": "application/json"
         }
     )
