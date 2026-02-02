@@ -194,7 +194,7 @@ def _invoke_openai(system_prompt, user_prompt):
             {"role": "user", "content": user_prompt}
         ],
         temperature=float(os.getenv("TEMPERATURE", "0.7")),
-        max_tokens=4000,
+        max_tokens=8192,
         response_format={"type": "json_object"}
     )
     

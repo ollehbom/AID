@@ -43,9 +43,18 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           AI_PROVIDER: ${{ vars.AI_PROVIDER || 'gemini' }}
           MODEL: ${{ vars.MODEL || 'gemini-2.5-flash' }}
+          SAVE_JSON_ARTIFACTS: "true"
         run: |
           echo "🔍 Analyzing error: ${{ inputs.error_id }}"
           python scripts/invoke_error_recovery_agent.py ${{ inputs.error_id }} issue_body.txt
+
+      - name: Upload JSON artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-recovery-json-artifacts-${{ inputs.error_id }}
+          path: json_artifacts/
+          if-no-files-found: ignore
 
       - name: Create fix branch
         run: |

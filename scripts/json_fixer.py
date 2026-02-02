@@ -8,7 +8,39 @@ Can be imported and used by all agent scripts.
 import json
 import re
 import sys
+import os
 from datetime import datetime
+from pathlib import Path
+
+
+def _save_json_response(json_string, prefix="response", success=False):
+    """
+    Save JSON response to artifact directory for debugging.
+    Only saves if SAVE_JSON_ARTIFACTS environment variable is set.
+    
+    Args:
+        json_string: The raw JSON response from the model
+        prefix: Prefix for the filename
+        success: Whether parsing was successful
+    """
+    if not os.getenv("SAVE_JSON_ARTIFACTS"):
+        return
+    
+    try:
+        artifact_dir = Path("json_artifacts")
+        artifact_dir.mkdir(exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        status = "success" if success else "error"
+        filename = f"{prefix}_{status}_{timestamp}.json"
+        
+        filepath = artifact_dir / filename
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(json_string)
+        
+        print(f"📝 Saved JSON artifact: {filename}", file=sys.stderr)
+    except Exception as e:
+        print(f"Warning: Could not save JSON artifact: {e}", file=sys.stderr)
 
 
 def _escape_newlines_in_string_values(json_string):
@@ -199,12 +231,17 @@ def parse_json_with_recovery(json_string, save_error_file=True, error_prefix="js
     """
     original_string = json_string
     
+    # Save raw response as artifact (if enabled)
+    _save_json_response(original_string, prefix=error_prefix, success=False)
+    
     # First attempt: Fix common issues
     try:
         fixed_string, was_fixed = fix_json_string(json_string)
         if was_fixed:
             print(f"✓ Applied automatic JSON fixes", file=sys.stderr)
         result = json.loads(fixed_string)
+        # Save successful parse
+        _save_json_response(fixed_string, prefix=error_prefix, success=True)
         return result
     except json.JSONDecodeError as e:
         print(f"⚠ JSON parsing failed after auto-fix: {e}", file=sys.stderr)
@@ -337,6 +374,22 @@ def _fix_missing_commas(json_string, error):
     
     # Try multiple comma fix strategies
     attempts = []
+    
+    # Strategy 0: Most common case - quote followed by whitespace then quote
+    # Pattern: "value"\n  "key" (missing comma after first quote)
+    if pos > 2:
+        # Look back to find the pattern of: " followed by whitespace followed by current position
+        look_back = pos - 1
+        while look_back >= 0 and json_string[look_back] in ' \t\n\r':
+            look_back -= 1
+        
+        # Check if we found a closing quote
+        if look_back >= 0 and json_string[look_back] == '"':
+            # Check if current position starts a new key (opening quote)
+            if pos < len(json_string) and json_string[pos] == '"':
+                # Insert comma after the closing quote
+                attempt = json_string[:look_back+1] + ',' + json_string[look_back+1:]
+                attempts.append(("Insert comma after quote before new property", attempt))
     
     # Strategy 1: Insert comma before the error position
     # Common case: }{ or ][ without comma

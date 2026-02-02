@@ -51,9 +51,18 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
           MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
+          SAVE_JSON_ARTIFACTS: "true"
         run: |
           echo "🤖 Running Product Agent..."
           python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
+
+      - name: Upload JSON artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: product-json-artifacts-${{ inputs.feature_id }}
+          path: json_artifacts/
+          if-no-files-found: ignore
 
       - name: Update pipeline state
         run: |
@@ -102,9 +111,18 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
           MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
+          SAVE_JSON_ARTIFACTS: "true"
         run: |
           echo "🎨 Running Design Agent (Iterative Mode)..."
           python scripts/invoke_design_agent_iterative.py ${{ inputs.feature_id }}
+
+      - name: Upload JSON artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-json-artifacts-${{ inputs.feature_id }}
+          path: json_artifacts/
+          if-no-files-found: ignore
 
       - name: Update pipeline state
         if: steps.check-design.outputs.needs_design == 'true'
@@ -145,9 +163,18 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           AI_PROVIDER: ${{ vars.AI_PROVIDER || 'openai' }}
           MODEL: ${{ vars.MODEL || 'gpt-4.1' }}
+          SAVE_JSON_ARTIFACTS: "true"
         run: |
           echo "🏗️ Running Architect Agent..."
           python scripts/invoke_architect_agent.py ${{ inputs.feature_id }}
+
+      - name: Upload JSON artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: architect-json-artifacts-${{ inputs.feature_id }}
+          path: json_artifacts/
+          if-no-files-found: ignore
 
       - name: Update pipeline state
         run: |
@@ -186,9 +213,18 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           AI_PROVIDER: ${{ vars.AI_PROVIDER }}
           MODEL: ${{ vars.MODEL }}
+          SAVE_JSON_ARTIFACTS: "true"
         run: |
           echo "💻 Running Dev Agent..."
           python scripts/invoke_dev_agent_iterative.py "${{ inputs.feature_id }}"
+
+      - name: Upload JSON artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-json-artifacts-${{ inputs.feature_id }}
+          path: json_artifacts/
+          if-no-files-found: ignore
 
       - name: Update pipeline state
         run: |
