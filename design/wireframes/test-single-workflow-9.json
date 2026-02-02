@@ -1,0 +1,23 @@
+{
+  "name": "Test Workflow 9 Screen",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "children": [
+    {
+      "type": "TEXT",
+      "content": "Test Workflow 9",
+      "fontSize": 24
+    },
+    {
+      "type": "TEXT",
+      "content": "This screen outlines the details for Test Workflow 9. Review the information and proceed.",
+      "fontSize": 16
+    },
+    {
+      "type": "BUTTON",
+      "label": "Start Workflow",
+      "variant": "primary"
+    }
+  ]
+}
