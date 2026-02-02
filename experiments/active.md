@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-test-single-workflow-9
+- **Belief**: A modern, consistent, and intuitive UI foundation is critical for early user engagement and successful validation of core product features.
+- **Change**: Implement a foundational React UI with Google login, basic dashboard, and shadcn-based design system.
+- **Owner**: Product Agent (definition), Design Agent (UX/UI), Engineering (implementation).
+- **Status**: active
+- **Success Signal**: Successful login and dashboard access for test users, positive qualitative feedback on UI, reduced time for subsequent UI features.
