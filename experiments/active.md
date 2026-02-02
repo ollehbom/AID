@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-TEST_SINGLE_WORKFLOW_11
+- **Belief**: A modern, consistent UI/UX with robust authentication is critical for initial user trust and developer productivity.
+- **Change**: Implement minimal React app with `shadcn/ui` design system, Google login, and basic dashboard.
+- **Owner**: Product Agent (definition), Engineering (implementation)
+- **Status**: Defined
+- **Success Signal**: 100% internal login success, new screen scaffolding <1hr, 5+ core `shadcn/ui` components integrated.
+- **Decision Record**: `product/decisions/test-single-workflow-11.md`
