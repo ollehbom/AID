@@ -1,0 +1,24 @@
+{
+  "analysis": {
+    "error_type": "Unknown - Insufficient log details",
+    "root_cause": "The provided error log is a high-level pipeline failure notification and does not contain specific error details (e.g., traceback, error message, file, line number). To identify the root cause, detailed logs from the GitHub Actions run are required.",
+    "affected_files": [],
+    "line_numbers": []
+  },
+  "fix": {
+    "description": "Cannot implement a fix without specific error details. The provided log is a high-level pipeline failure notification.",
+    "files_to_modify": [],
+    "additional_actions": [
+      "Please provide the detailed error log from the GitHub Actions run (https://github.com/ollehbom/AID/actions/runs/21576745627) to enable specific error analysis and fix implementation."
+    ]
+  },
+  "validation": {
+    "tests_to_run": [],
+    "expected_outcome": "N/A - No fix implemented due to insufficient information.",
+    "verification_steps": [
+      "N/A - No fix implemented."
+    ]
+  },
+  "issue_update": "## Analysis Complete\n\n### Root Cause\n\nThe provided error log indicates a general pipeline failure but lacks specific details such as a traceback, error message, affected file, or line number. The log points to the GitHub Actions run: [https://github.com/ollehbom/AID/actions/runs/21576745627](https://github.com/ollehbom/AID/actions/runs/21576745627).\n\nWithout the detailed logs from the failed workflow run, the Error Recovery Agent cannot identify the exact error type or root cause to implement a targeted fix.\n\n### Error Type\n\nUnknown - Insufficient log details.\n\n### Fix Applied\n\nNo fix has been applied automatically.\n\n### Files Modified\n\nNone.\n\n### Validation\n\nCannot validate without a specific fix.\n\n---\n**Action Required:** Please retrieve the detailed error logs from the linked GitHub Actions run and provide them to the Error Recovery Agent. This will enable a precise analysis and the implementation of a minimal fix.\n\n**Tags:** `needs-human-review`",
+  "pr_description": "**Error Recovery Agent: Cannot Auto-Fix - Insufficient Error Details**\n\nThis pull request is a placeholder as the Error Recovery Agent was unable to automatically fix the pipeline failure `error-20260202-035521`.\n\n**Reason:**\nThe provided error log was a high-level pipeline failure notification and did not contain specific error details (e.g., traceback, error message, affected file, line number). To identify the root cause and implement a fix, detailed logs from the GitHub Actions run are required.\n\n**Next Steps:**\nPlease refer to the associated GitHub issue for more details and instructions on how to proceed. The issue has been tagged `needs-human-review`."
+}
