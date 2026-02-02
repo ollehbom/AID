@@ -125,8 +125,8 @@ jobs:
             The automated fix has been validated and a PR has been created.
             The pipeline should now run successfully."
             
-            # Add success label
-            gh issue edit ${{ inputs.issue_number }} --add-label "fix-validated"
+            # Add success label (optional - don't fail if label doesn't exist)
+            gh issue edit ${{ inputs.issue_number }} --add-label "fix-validated" 2>/dev/null || true
           else
             gh issue comment ${{ inputs.issue_number }} --body "⚠️ **Validation Incomplete**
 
