@@ -1,0 +1,39 @@
+{
+  "name": "LoginScreen",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "children": [
+    {
+      "name": "WelcomeTitle",
+      "type": "TEXT",
+      "characters": "Welcome",
+      "fontSize": 32,
+      "width": "FILL",
+      "height": "HUG"
+    },
+    {
+      "name": "SignInPrompt",
+      "type": "TEXT",
+      "characters": "Sign in to continue",
+      "fontSize": 16,
+      "width": "FILL",
+      "height": "HUG"
+    },
+    {
+      "name": "GoogleSignInButton",
+      "type": "BUTTON",
+      "label": "Sign in with Google",
+      "width": 280,
+      "height": 48
+    },
+    {
+      "name": "TermsLink",
+      "type": "TEXT",
+      "characters": "By signing in, you agree to our Terms",
+      "fontSize": 12,
+      "width": "FILL",
+      "height": "HUG"
+    }
+  ]
+}
