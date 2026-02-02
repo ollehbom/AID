@@ -1,0 +1,23 @@
+{
+  "name": "Login Screen",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "children": [
+    {
+      "type": "TEXT",
+      "content": "Welcome",
+      "fontSize": 28
+    },
+    {
+      "type": "TEXT",
+      "content": "Sign in to access your dashboard.",
+      "fontSize": 16
+    },
+    {
+      "type": "BUTTON",
+      "label": "Sign in with Google",
+      "variant": "primary"
+    }
+  ]
+}
