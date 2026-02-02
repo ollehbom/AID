@@ -85,8 +85,10 @@ jobs:
             --title "🔧 Auto-fix: ${{ inputs.error_id }}" \
             --body "$PR_BODY" \
             --base main \
-            --head fix/${{ inputs.error_id }} \
-            --label "auto-fix,pipeline-error"
+            --head fix/${{ inputs.error_id }}
+
+          # Try to add labels (optional - don't fail if labels don't exist)
+          gh pr edit fix/${{ inputs.error_id }} --add-label "auto-fix,pipeline-error" 2>/dev/null || true
 
       - name: Update Issue with Analysis
         env:
