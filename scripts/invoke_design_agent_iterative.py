@@ -184,7 +184,17 @@ Provide response as JSON with the wireframe object directly (not as a string).
 """
     
     wireframe_result = _invoke_ai(base_system_prompt, wireframe_prompt)
-    wireframe_json = wireframe_result.get("wireframe", {})
+    
+    # Handle both dict and list responses
+    if isinstance(wireframe_result, list):
+        # If it's a list, use the first item or wrap it
+        wireframe_json = wireframe_result[0] if wireframe_result else {}
+    elif isinstance(wireframe_result, dict):
+        # If it's a dict, get the wireframe key or use the whole dict
+        wireframe_json = wireframe_result.get("wireframe", wireframe_result)
+    else:
+        wireframe_json = {}
+    
     print(f"   ✓ Wireframe created ({len(json.dumps(wireframe_json))} chars)", file=sys.stderr)
     
     # Iteration 4: Validation
