@@ -63,19 +63,25 @@ def _invoke_openai(system_prompt, user_prompt):
 
 def _invoke_gemini(system_prompt, user_prompt):
     """Invoke Google Gemini API."""
-    import google.generativeai as genai
+    from google import genai
     
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-    model = genai.GenerativeModel(
-        model_name=MODEL,
-        system_instruction=system_prompt,
-        generation_config={
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("GOOGLE_API_KEY not found")
+    
+    client = genai.Client(api_key=api_key)
+    
+    combined_prompt = f"{system_prompt}\n\n---\n\n{user_prompt}"
+    
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=combined_prompt,
+        config={
             "temperature": 0.3,
             "response_mime_type": "application/json"
         }
     )
     
-    response = model.generate_content(user_prompt)
     return parse_json_with_recovery(
         response.text,
         error_prefix="error_recovery_agent_error"
