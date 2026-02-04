@@ -1,0 +1,31 @@
+{
+  "design_intent": "The primary intent for feature 'gh-vs-4' is to establish a secure, intuitive, and visually consistent entry point into the application for technical users. It aims to validate the core product belief that the application must feel 'obvious without documentation' and to test the 'onboarding flow is intuitive without guidance' by providing a straightforward Google login experience leading to a functional, albeit basic, dashboard. The design should instill confidence and familiarity, setting a strong foundation for future interactions and development.",
+  "design_spec": "# Design Specification: gh-vs-4 (Google Login & Basic Dashboard)\n\n**Challenges:** Ensure the onboarding flow is intuitive without guidance, and the product feels obvious without documentation.\n\n## 1. User Flow\n\n### 1.1 Initial Access (Unauthenticated User)\n1.  **User arrives at the application URL.**\n2.  **System displays the Login Screen.**\n\n### 1.2 Google Login\n1.  **User clicks the 'Sign in with Google' button.**\n2.  **System initiates the Google OAuth flow (external to application UI).**\n3.  **Upon successful authentication, Google redirects the user back to the application.**\n4.  **System displays the Dashboard Screen.**\n\n### 1.3 Error Handling (Login)\n1.  **If Google OAuth fails (e.g., user cancels, network error), system redirects back to the Login Screen.**\n2.  **An ephemeral error message (e.g., toast or inline text) should briefly appear, stating 'Login failed. Please try again.'**\n\n## 2. Screens & States\n\n### 2.1 Login Screen\n*   **Title:** 'Welcome'\n*   **Subtitle:** 'Sign in to continue'\n*   **Primary Action:** Button: 'Sign in with Google' (prominently displayed)\n*   **Loading State (after button click):** Button changes to 'Signing in...' with a spinner; button is disabled.\n*   **Error State:** Display error message (e.g., 'Login failed. Please try again.') if previous attempt was unsuccessful.\n\n### 2.2 Dashboard Screen\n*   **Header:** 'Dashboard' (or 'Welcome, [User Name]' if user data is immediately available)\n*   **Main Content:** Placeholder text: 'Your journey starts here. Explore your projects.'\n*   **Visual Placeholder:** A grey rectangle or simple card to represent future content areas.\n\n## 3. Copy\n*   **Login Screen Title:** Welcome\n*   **Login Screen Subtitle:** Sign in to continue\n*   **Login Button:** Sign in with Google\n*   **Login Error Message:** Login failed. Please try again.\n*   **Dashboard Header:** Dashboard\n*   **Dashboard Content:** Your journey starts here. Explore your projects.\n\n## 4. Visuals & Components (Shadcn UI)\n*   All buttons, text, and layout elements should adhere to Shadcn UI components and styling for consistency and ease of development. This includes button styles, typography, and basic container layouts.\n*   Focus on minimal design, prioritizing functionality and clarity.",
+  "wireframe_json": {
+    "name": "Login Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "WelcomeHeader",
+        "type": "TEXT",
+        "content": "Welcome",
+        "fontSize": 28
+      },
+      {
+        "name": "Subtitle",
+        "type": "TEXT",
+        "content": "Sign in to continue",
+        "fontSize": 16
+      },
+      {
+        "name": "GoogleLoginButton",
+        "type": "BUTTON",
+        "label": "Sign in with Google"
+      }
+    ]
+  },
+  "validation_checklist": "1.  **Can a new user predict what happens next?**\n    *   Is the 'Sign in with Google' button clearly the primary action for entry?\n    *   After clicking, is the expectation of an external Google prompt clear (even if not explicitly shown in this wireframe, the action implies it)?\n    *   Is the transition to the Dashboard screen after successful login a logical and expected next step?\n2.  **Is anything explained too late?**\n    *   Are there any ambiguous elements on the Login screen that require prior knowledge?\n    *   Is the purpose of the Dashboard immediately understandable, or does it require additional context?\n3.  **Does the UI match the intent?**\n    *   Does the Login screen feel simple, direct, and secure, aligning with the goal of an intuitive entry point?\n    *   Does the visual consistency (implied Shadcn usage) contribute to the feeling of a robust and 'obvious' product foundation?\n    *   Does the overall flow support the belief that the 'product must feel obvious without documentation' and the 'onboarding flow is intuitive without guidance'?",
+  "summary": "The design for 'gh-vs-4' establishes the foundational user experience, focusing on a clear and secure Google login pathway to a basic dashboard. The design intent is to provide an intuitive entry point, validating the core belief of an 'obvious without documentation' product and testing the intuitiveness of the onboarding flow. The wireframe provides a simple Login Screen, emphasizing the 'Sign in with Google' action. The design specification details the user flow, screen states, and copy, ensuring consistency with Shadcn UI. A comprehensive validation checklist ensures the design aligns with product intent, focusing on predictability, timely explanations, and UI-intent matching. This design is ready for the Dev Agent to implement, providing a robust starting point for the application."
+}
