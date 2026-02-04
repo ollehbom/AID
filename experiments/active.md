@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-gh-vs-2
+- **Belief**: A modern, functional application foundation is crucial for rapid product validation and a consistent user experience.
+- **Change**: Build a basic React application with Google login and a placeholder dashboard, styled with shadcn/ui.
+- **Owner**: Product Agent (definition), Engineering (implementation)
+- **Status**: Active
+- **Success Signal**: Deployable application with functional Google login, basic dashboard, and consistent shadcn/ui styling.
