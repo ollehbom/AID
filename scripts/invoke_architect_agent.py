@@ -22,6 +22,15 @@ if sys.platform == 'win32':
 # Load environment variables from .env file
 load_dotenv()
 
+# Pydantic Model for Schema Validation
+class ArchitectAgentResponse(BaseModel):
+    """Type-safe response structure for Architect Agent."""
+    adr_content: str
+    technical_spec: str
+    complexity: str
+    primary_concerns: List[str]
+    summary: str
+
 # Configuration
 MODEL = os.getenv("MODEL", "gpt-4.1")
 AI_PROVIDER = os.getenv("AI_PROVIDER", "openai")  # "openai" or "gemini"

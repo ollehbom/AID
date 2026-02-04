@@ -11,9 +11,21 @@ import re
 from pathlib import Path
 from dotenv import load_dotenv
 from json_fixer import parse_json_with_recovery
+from pydantic import BaseModel
+from typing import List, Dict, Optional
 
 # Load environment variables
 load_dotenv()
+
+# Pydantic Model for Schema Validation
+class ErrorRecoveryResponse(BaseModel):
+    """Type-safe response structure for Error Recovery Agent."""
+    error_analysis: str
+    root_cause: str
+    fix_strategy: str
+    file_fixes: Dict[str, str]  # {filename: fixed_content}
+    confidence: str  # "high", "medium", "low"
+    requires_human_review: bool
 
 # Configuration
 MODEL = os.getenv("MODEL", "gpt-4.1")
@@ -62,8 +74,9 @@ def _invoke_openai(system_prompt, user_prompt):
 
 
 def _invoke_gemini(system_prompt, user_prompt):
-    """Invoke Google Gemini API."""
+    """Invoke Google Gemini API with schema validation."""
     from google import genai
+    from google.genai import types
     
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -73,19 +86,34 @@ def _invoke_gemini(system_prompt, user_prompt):
     
     combined_prompt = f"{system_prompt}\n\n---\n\n{user_prompt}"
     
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=combined_prompt,
-        config={
-            "temperature": 0.3,
-            "response_mime_type": "application/json"
+    try:
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=combined_prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.3,  # Lower temperature for deterministic fixes
+                response_mime_type='application/json',
+                response_schema=ErrorRecoveryResponse  # ✨ Schema validation!
+            )
+        )
+        
+        # Use validated, parsed response
+        parsed = response.parsed
+        return {
+            "error_analysis": parsed.error_analysis,
+            "root_cause": parsed.root_cause,
+            "fix_strategy": parsed.fix_strategy,
+            "file_fixes": parsed.file_fixes,
+            "confidence": parsed.confidence,
+            "requires_human_review": parsed.requires_human_review
         }
-    )
     
-    return parse_json_with_recovery(
-        response.text,
-        error_prefix="error_recovery_agent_error"
-    )
+    except Exception as e:
+        print(f"⚠️  Schema validation failed, using fallback parser: {e}")
+        return parse_json_with_recovery(
+            response.text,
+            error_prefix="error_recovery_agent_error"
+        )
 
 
 def extract_error_from_issue(issue_body):

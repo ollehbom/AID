@@ -11,9 +11,20 @@ from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 from json_fixer import parse_json_with_recovery
+from pydantic import BaseModel
+from typing import Any, Dict
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Pydantic Model for Schema Validation
+class DesignAgentResponse(BaseModel):
+    """Type-safe response structure for Design Agent."""
+    design_intent: str
+    design_spec: str
+    wireframe_json: Dict[str, Any]
+    validation_checklist: str
+    summary: str
 
 # Configuration
 MODEL = os.getenv("MODEL", "gpt-4.1")
@@ -196,12 +207,14 @@ def _invoke_openai(system_prompt, user_prompt):
 
 
 def _invoke_gemini(system_prompt, user_prompt):
-    """Invoke Google Gemini API."""
+    """Invoke Google Gemini API with schema validation."""
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("GOOGLE_API_KEY not found in environment. Create a .env file with your API key.")
     
     from google import genai
+    from google.genai import types
+    
     client = genai.Client(api_key=api_key)
     
     # Combine system and user prompts for Gemini
@@ -211,21 +224,34 @@ def _invoke_gemini(system_prompt, user_prompt):
 
 {user_prompt}"""
     
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=combined_prompt,
-        config={
-            "temperature": float(os.getenv("TEMPERATURE", "0.7")),
-            "max_output_tokens": 8192,
-            "response_mime_type": "application/json"
+    try:
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=combined_prompt,
+            config=types.GenerateContentConfig(
+                temperature=float(os.getenv("TEMPERATURE", "0.7")),
+                max_output_tokens=8192,
+                response_mime_type='application/json',
+                response_schema=DesignAgentResponse  # ✨ Schema validation!
+            )
+        )
+        
+        # Use validated, parsed response
+        parsed = response.parsed
+        return {
+            "design_intent": parsed.design_intent,
+            "design_spec": parsed.design_spec,
+            "wireframe_json": parsed.wireframe_json,
+            "validation_checklist": parsed.validation_checklist,
+            "summary": parsed.summary
         }
-    )
     
-    # Parse response with automatic error recovery
-    return parse_json_with_recovery(
-        response.text,
-        error_prefix="design_agent_error"
-    )
+    except Exception as e:
+        print(f"⚠️  Schema validation failed, using fallback parser: {e}")
+        return parse_json_with_recovery(
+            response.text,
+            error_prefix="design_agent_error"
+        )
 
 
 def main():

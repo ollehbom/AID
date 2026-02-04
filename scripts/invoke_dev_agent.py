@@ -12,9 +12,20 @@ from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 from json_fixer import parse_json_with_recovery
+from pydantic import BaseModel
+from typing import List, Dict, Any
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Pydantic Model for Schema Validation
+class DevAgentResponse(BaseModel):
+    """Type-safe response structure for Dev Agent."""
+    implementation_files: Dict[str, str]  # {filename: content}
+    test_files: Dict[str, str]  # {filename: content}
+    implementation_summary: str
+    testing_summary: str
+    next_steps: List[str]
 
 # Configuration
 MODEL = os.getenv("MODEL", "gpt-4.1")
@@ -246,12 +257,14 @@ def _invoke_openai(system_prompt, user_prompt):
 
 
 def _invoke_gemini(system_prompt, user_prompt):
-    """Invoke Google Gemini API."""
+    """Invoke Google Gemini API with schema validation."""
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("GOOGLE_API_KEY not found in environment. Create a .env file with your API key.")
     
     from google import genai
+    from google.genai import types
+    
     client = genai.Client(api_key=api_key)
     
     # Combine system and user prompts for Gemini
@@ -261,21 +274,34 @@ def _invoke_gemini(system_prompt, user_prompt):
 
 {user_prompt}"""
     
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=combined_prompt,
-        config={
-            "temperature": float(os.getenv("TEMPERATURE", "0.7")),
-            "max_output_tokens": 8192,
-            "response_mime_type": "application/json"
+    try:
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=combined_prompt,
+            config=types.GenerateContentConfig(
+                temperature=float(os.getenv("TEMPERATURE", "0.7")),
+                max_output_tokens=8192,
+                response_mime_type='application/json',
+                response_schema=DevAgentResponse  # ✨ Schema validation!
+            )
+        )
+        
+        # Use validated, parsed response
+        parsed = response.parsed
+        return {
+            "implementation_files": parsed.implementation_files,
+            "test_files": parsed.test_files,
+            "implementation_summary": parsed.implementation_summary,
+            "testing_summary": parsed.testing_summary,
+            "next_steps": parsed.next_steps
         }
-    )
     
-    # Parse response with automatic error recovery
-    return parse_json_with_recovery(
-        response.text,
-        error_prefix="dev_agent_error"
-    )
+    except Exception as e:
+        print(f"⚠️  Schema validation failed, using fallback parser: {e}")
+        return parse_json_with_recovery(
+            response.text,
+            error_prefix="dev_agent_error"
+        )
 
 
 def main():

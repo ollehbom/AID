@@ -11,9 +11,21 @@ from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 from json_fixer import parse_json_with_recovery
+from pydantic import BaseModel
+from typing import Optional
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Pydantic Model for Schema Validation
+class ProductAgentResponse(BaseModel):
+    """Type-safe response structure for Product Agent."""
+    decision_record: str
+    experiment_update: str
+    github_issue: str
+    belief_update: str
+    needs_design: bool
+    summary: str
 
 # Configuration
 MODEL = os.getenv("MODEL", "gpt-4.1")
@@ -182,6 +194,8 @@ def _invoke_gemini(system_prompt, user_prompt):
         raise ValueError("GOOGLE_API_KEY not found in environment. Create a .env file with your API key.")
     
     from google import genai
+    from google.genai import types
+    
     client = genai.Client(api_key=api_key)
     
     # Combine system and user prompts for Gemini
@@ -191,21 +205,36 @@ def _invoke_gemini(system_prompt, user_prompt):
 
 {user_prompt}"""
     
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=combined_prompt,
-        config={
-            "temperature": float(os.getenv("TEMPERATURE", "0.7")),
-            "max_output_tokens": 8192,
-            "response_mime_type": "application/json"
+    try:
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=combined_prompt,
+            config=types.GenerateContentConfig(
+                temperature=float(os.getenv("TEMPERATURE", "0.7")),
+                max_output_tokens=8192,
+                response_mime_type='application/json',
+                response_schema=ProductAgentResponse  # ✨ Schema validation!
+            )
+        )
+        
+        # Use validated, parsed response
+        parsed = response.parsed
+        return {
+            "decision_record": parsed.decision_record,
+            "experiment_update": parsed.experiment_update,
+            "github_issue": parsed.github_issue,
+            "belief_update": parsed.belief_update,
+            "needs_design": parsed.needs_design,
+            "summary": parsed.summary
         }
-    )
     
-    # Parse response with automatic error recovery
-    return parse_json_with_recovery(
-        response.text,
-        error_prefix="product_agent_error"
-    )
+    except Exception as e:
+        print(f"⚠️  Schema validation failed, using fallback parser: {e}")
+        # Fallback to json_fixer for edge cases
+        return parse_json_with_recovery(
+            response.text,
+            error_prefix="product_agent_error"
+        )
 
 
 def main():
