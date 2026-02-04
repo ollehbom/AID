@@ -1,0 +1,31 @@
+{
+  "design_intent": "This feature exists to establish the foundational frontend for the product, providing a stable, intuitive, and modern platform for user interaction and future development. It addresses the critical need for a user interface to engage with the product, demonstrate functionality, and validate core beliefs. The design intent is to ensure the product feels obvious without documentation, offering a professional and frictionless initial experience for technically competent users.",
+  "design_spec": "## Design Specification: gh-vs-3 - Foundational Frontend### 1. OverviewThis specification details the design for the initial React frontend, including user authentication via Google and a basic dashboard. The goal is a stable, intuitive, and modern platform, aligning with the belief: 'The product must feel obvious without documentation'.### 2. User Flow1. **Initial Access**: User lands on the application.2. **Authentication Check**: System checks if the user is authenticated.3. **Login Screen (if unauthenticated)**:    - Displays a clear welcome message.    - Provides a prominent 'Sign in with Google' button.    - No other complex navigation or options.4. **Google Authentication**: User clicks 'Sign in with Google', which initiates the OAuth flow.5. **Dashboard (if authenticated/after successful login)**:    - Displays a simple dashboard header (e.g., 'Dashboard').    - Includes mock content (e.g., 'Welcome, [User Name]!').    - Placeholder for future features or navigation elements.### 3. States- **Logged Out**: Displays the Login Screen.- **Logging In**: Visual feedback (e.g., spinner, disabled button) during Google OAuth process.- **Logged In**: Displays the Dashboard.- **Error State (Login)**: If Google login fails, a clear, concise error message is displayed (e.g., 'Login failed. Please try again.').### 4. Copy- **Login Screen Header**: 'Welcome to [Product Name]' or 'Sign In'- **Login Button**: 'Sign in with Google'- **Dashboard Header**: 'Dashboard'- **Dashboard Content (Mock)**: 'Welcome, [User Name]!', 'Your journey begins here.'- **Error Message**: 'Login failed. Please try again.'### 5. Error Handling- **Google Login Failure**: Display a temporary, non-intrusive alert or message on the login screen.- **Network Issues**: Generic message 'A network error occurred. Please check your connection.' (for future consideration, not critical for MVP).### 6. Accessibility Notes- Ensure sufficient contrast for text and buttons.- Buttons should be keyboard navigable.### 7. Visual Elements (Shadcn/ui)- Buttons: Use primary button style for 'Sign in with Google'.- Input Fields: (Not applicable for MVP login, but for future forms).- Layout: Simple, centered content for login; basic header/content for dashboard.",
+  "wireframe_json": {
+    "wireframe": {
+      "name": "Login Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "type": "TEXT",
+          "content": "Welcome",
+          "fontSize": 32
+        },
+        {
+          "type": "TEXT",
+          "content": "Sign in to continue",
+          "fontSize": 16
+        },
+        {
+          "type": "BUTTON",
+          "label": "Sign in with Google",
+          "variant": "primary"
+        }
+      ]
+    }
+  },
+  "validation_checklist": "Validation Checklist for Foundational Frontend (gh-vs-3):1.  **Predictability for New Users**:    *   Can a new user clearly understand that clicking 'Sign in with Google' will authenticate them and lead to a dashboard?    *   Is the purpose of the initial screen (login) immediately obvious?2.  **Timeliness of Information**:    *   Is the 'Sign in with Google' button presented early enough in the flow?    *   Are any necessary instructions or context explained before they are needed? (e.g., no hidden steps)3.  **UI-Intent Match**:    *   Does the minimalist UI for login and dashboard align with the intent of a 'stable and intuitive platform' for 'technically competent users'?    *   Does the visual design (using shadcn/ui) convey a 'polished, modern' feel?    *   Does the simple login flow reduce friction and align with the belief 'The product must feel obvious without documentation'?4.  **Friction Identification**:    *   Are there any unnecessary steps or cognitive load in the login process?    *   Is the dashboard layout simple enough to avoid overwhelming a new user?5.  **Ambiguity Check**:    *   Is it clear what happens after successful login?    *   Is it clear what happens if login fails?",
+  "summary": "The design for the foundational frontend (gh-vs-3) focuses on a clear and intuitive user experience for technically competent users. It includes a simple login flow via Google and a basic dashboard, designed to feel modern and obvious without documentation. The wireframe outlines a login screen with a prominent 'Sign in with Google' button. Validation will focus on predictability, timeliness of information, and ensuring the UI aligns with the intent of a stable, frictionless, and polished platform."
+}
