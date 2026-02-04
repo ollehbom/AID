@@ -1,0 +1,103 @@
+{
+  "design_intent": "This design intent outlines the creation of the product's foundational UI (feature ID: gh-vs-7), focusing on establishing a clear, intuitive, and robust user experience from the outset. The primary goal is to provide a seamless Google login process and a simple, accessible dashboard, serving as the bedrock for all future features. This design directly supports the core product beliefs that 'The product must feel obvious without documentation' and 'Users value speed over configurability' by prioritizing immediate usability and a consistent design system (shadcn/ui) that accelerates development and user comprehension. The intent is to minimize friction for technically competent users to get started and immediately access a functional workspace.",
+  "design_spec": "## Design Specification for Feature: gh-vs-7 (Foundational UI)### 1. User Flow: Google Login & Dashboard AccessObjective: Enable new and returning users to securely log in via Google and access a basic dashboard.1. **Initial State (Login Screen)**: Display application title and a prominent 'Sign in with Google' button. No other actions available.2. **Login Action**: User clicks 'Sign in with Google'. Triggers Google OAuth flow.3. **Loading State**: A temporary loading indicator (e.g., 'Loading...') is shown while authentication is in progress.4. **Success State (Dashboard)**: Upon successful authentication, the user is redirected to the Dashboard. The dashboard will feature a prominent header ('Dashboard'), a personalized welcome message ('Hello, [User Name]!'), and a main content area placeholder.5. **Error State**: If Google login fails (e.g., network error, Google authentication issue), a concise error message ('Login failed. Please try again.') is displayed on the login screen, and the 'Sign in with Google' button becomes active again.### 2. UI Elements & Interaction- **Login Button**: 'Sign in with Google', primary action. Visually distinct.- **Dashboard Layout**: Simple, clear hierarchy. Header, personalized greeting, and a main content block.- **Responsiveness**: Basic mobile-first layout (width 375px) as per wireframe. Further responsiveness to be handled by shadcn/ui.### 3. Copy- **Login Screen Title**: 'Welcome to the App'- **Login Button**: 'Sign in with Google'- **Loading**: 'Loading...'- **Error Message**: 'Login failed. Please try again.'- **Dashboard Header**: 'Dashboard'- **Welcome Message**: 'Hello, [User Name]!'- **Dashboard Placeholder**: 'Your content will appear here.'### 4. States- **Pre-login**: Login screen with button.- **Authenticating**: Login screen with loading indicator, button disabled.- **Authenticated**: Dashboard screen displayed.- **Login Error**: Login screen with error message, button enabled.",
+  "wireframe_json": {
+    "name": "LoginAndDashboardFlow",
+    "type": "GROUP",
+    "children": [
+      {
+        "name": "LoginScreen",
+        "type": "FRAME",
+        "width": 375,
+        "height": 812,
+        "children": [
+          {
+            "name": "AppTitle",
+            "type": "TEXT",
+            "characters": "Welcome to the App",
+            "fontSize": 28,
+            "width": "FILL",
+            "height": "HUG",
+            "textAlignHorizontal": "CENTER"
+          },
+          {
+            "name": "GoogleSignInButton",
+            "type": "BUTTON",
+            "characters": "Sign in with Google",
+            "fontSize": 16,
+            "width": 200,
+            "height": 48,
+            "backgroundColor": "#4285F4",
+            "textColor": "#FFFFFF",
+            "cornerRadius": 4
+          },
+          {
+            "name": "LoadingIndicator",
+            "type": "TEXT",
+            "characters": "Loading...",
+            "fontSize": 14,
+            "isHidden": true,
+            "width": "HUG",
+            "height": "HUG"
+          },
+          {
+            "name": "ErrorMessage",
+            "type": "TEXT",
+            "characters": "Login failed. Please try again.",
+            "fontSize": 14,
+            "textColor": "#FF0000",
+            "isHidden": true,
+            "width": "HUG",
+            "height": "HUG"
+          }
+        ]
+      },
+      {
+        "name": "DashboardScreen",
+        "type": "FRAME",
+        "width": 375,
+        "height": 812,
+        "children": [
+          {
+            "name": "Header",
+            "type": "TEXT",
+            "characters": "Dashboard",
+            "fontSize": 24,
+            "width": "FILL",
+            "height": "HUG",
+            "textAlignHorizontal": "CENTER"
+          },
+          {
+            "name": "WelcomeMessage",
+            "type": "TEXT",
+            "characters": "Hello, [User Name]!",
+            "fontSize": 18,
+            "width": "FILL",
+            "height": "HUG",
+            "textAlignHorizontal": "CENTER"
+          },
+          {
+            "name": "ContentArea",
+            "type": "RECTANGLE",
+            "width": "FILL",
+            "height": 300,
+            "backgroundColor": "#F0F0F0",
+            "cornerRadius": 8,
+            "children": [
+              {
+                "name": "PlaceholderText",
+                "type": "TEXT",
+                "characters": "Your content will appear here.",
+                "fontSize": 14,
+                "textAlignHorizontal": "CENTER",
+                "textAlignVertical": "CENTER"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "validation_checklist": "## Validation Checklist for Foundational UI (gh-vs-7)### 1. Predictability & Intuition- **Can a new user predict what happens next?** Yes, the single 'Sign in with Google' button clearly indicates the next action. After login, a dashboard is the expected destination.- **Is anything explained too late?** No. The login screen is minimal and self-explanatory. The dashboard content is placeholder, implying future features, which is acceptable for a foundational MVP.- **Does the UI match the intent?** Yes. The simple login flow and basic dashboard directly align with the intent to provide a 'robust and modern design system upfront' and a 'rapid foundation for feature development'.### 2. Adherence to Product Beliefs- **The product must feel obvious without documentation**: The login and dashboard flow is standard and requires no special instructions, validating this belief.- **Users value speed over configurability**: The direct Google login and immediate access to a dashboard prioritizes speed of access over complex setup or options, supporting this belief.- **The primary user is technically competent**: The expectation of using a Google account for login aligns with a technically competent user base.### 3. Friction & Mismatch Identification- **Ambiguity**: Minimal. The UI is very direct.- **Friction**: The Google login process itself might introduce minor friction depending on user's existing Google session, but the UI itself minimizes additional steps.- **Mismatch**: No significant mismatches identified between the UI and its stated purpose. The design is intentionally lean to serve as a foundation.",
+  "summary": "The design for the Foundational UI (gh-vs-7) successfully translates the product's need for a robust and intuitive entry point into a clear interaction flow. The design intent focuses on simplicity, speed, and consistency, directly supporting core product beliefs. The proposed wireframe provides a straightforward Google login screen and a basic dashboard structure, ready for development. The validation confirms that the user experience is predictable, the UI matches the intent, and key product beliefs are addressed. This design is ready for handoff to the Dev Agent for implementation."
+}
