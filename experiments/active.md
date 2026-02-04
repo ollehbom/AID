@@ -31,3 +31,12 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### Active Experiments
+
+- **ID**: EXP-2026-01-29-GH-VS-4
+  - **Belief**: The product must feel obvious without documentation; Onboarding flow is intuitive without guidance.
+  - **Change**: Implement core React app with Shadcn UI, Google login, and a basic mock dashboard.
+  - **Owner**: (Pending assignment)
+  - **Status**: Active
+  - **Success Signal**: Successful Google logins, consistent UI, positive founder feedback on intuitiveness and aesthetics.
