@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+EXP-2026-01-29-GH-VS-5:
+  belief: Establishing a modern, consistent design system (like `shadcn/ui`) will accelerate development and provide a solid foundation for future user-facing features, aligning with our belief that users value speed and intuitive interfaces.
+  change: Implement core React app with `shadcn/ui`, Google login, basic dashboard, and foundational design system.
+  owner: Frontend Team / Product Agent
+  status: active
+  success_signal: Initial setup completed within 5 working days; successful Google login; consistent UI across login/dashboard.
