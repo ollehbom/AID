@@ -1,0 +1,7 @@
+{
+  "install": "npm install",
+  "build": "npm run build",
+  "test": "echo \"No tests configured yet for this iteration.\"",
+  "dev": "npm run dev",
+  "working_dir": "./"
+}

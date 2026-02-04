@@ -1,11 +1,11 @@
 feature: gh-vs-9
-status: architect_complete
+status: dev_complete
 needs_design: ✓
 stages:
   product: ✓
   design: ✓
   architect: ✓
-  dev: pending
+  dev: ✓
   qa: pending
   ops: pending
 architecture:
