@@ -1,12 +1,12 @@
 feature: gh-vs-9
-status: dev_complete
+status: qa_complete
 needs_design: ✓
 stages:
   product: ✓
   design: ✓
   architect: ✓
   dev: ✓
-  qa: pending
+  qa: ✓
   ops: pending
 architecture:
   adr_number: ADR-002
