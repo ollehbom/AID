@@ -1,5 +1,5 @@
 feature: gh-vs-8
-status: qa_complete
+status: ops_complete
 needs_design: ✓
 stages:
   product: ✓
@@ -7,7 +7,7 @@ stages:
   architect: ✓
   dev: ✓
   qa: ✓
-  ops: pending
+  ops: ✓
 architecture:
   adr_number: ADR-002
   complexity: moderate
