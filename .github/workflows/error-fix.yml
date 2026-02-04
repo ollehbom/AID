@@ -224,7 +224,8 @@ jobs:
             The automated fix has been merged to main.
             The pipeline will now be re-triggered to verify the fix."
             
-            gh issue edit ${{ inputs.issue_number }} --add-label "fix-merged"
+            # Try to add label if it exists (ignore if not)
+            gh issue edit ${{ inputs.issue_number }} --add-label "fix-merged" 2>/dev/null || echo "Note: Label not added (may not exist in repo)"
           else
             echo "❌ Some checks failed, skipping auto-merge"
             echo "merged=false" >> $GITHUB_OUTPUT
