@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### Active Experiments
+- **ID**: EXP-2026-01-29-gh-vs-7
+- **Belief**: The product must feel obvious without documentation
+- **Change**: Establish foundational React app with shadcn/ui, Google login, and basic dashboard with a design system.
+- **Owner**: Product Agent (or assigned Dev Lead)
+- **Status**: active
+- **Success Signal**: Functional React app deployed, successful Google login, basic dashboard loads, design system established.
