@@ -23,7 +23,7 @@ class DesignAgentResponse(BaseModel):
     """Type-safe response structure for Design Agent."""
     design_intent: str
     design_spec: str
-    wireframe_json: Dict[str, Any]
+    wireframe_json: str  # JSON as string to avoid additionalProperties
     validation_checklist: str
     summary: str
 
@@ -316,20 +316,40 @@ def _invoke_gemini(system_prompt, user_prompt):
         
         # Use validated, parsed response
         parsed = response.parsed
+        # Parse wireframe JSON string into object
+        try:
+            wireframe_obj = json.loads(parsed.wireframe_json)
+        except json.JSONDecodeError:
+            wireframe_obj = {}  # Fallback to empty object
+        
         return {
             "design_intent": parsed.design_intent,
             "design_spec": parsed.design_spec,
-            "wireframe_json": parsed.wireframe_json,
+            "wireframe_json": wireframe_obj,
             "validation_checklist": parsed.validation_checklist,
             "summary": parsed.summary
         }
     
     except Exception as e:
-        print(f"⚠️  Schema validation failed, using fallback parser: {e}")
-        return parse_json_with_recovery(
-            response.text,
-            error_prefix="design_iteration_error"
-        )
+        print(f"⚠️  Schema validation failed: {e}")
+        # Try without schema validation as fallback
+        try:
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=combined_prompt,
+                config=types.GenerateContentConfig(
+                    temperature=float(os.getenv("TEMPERATURE", "0.7")),
+                    max_output_tokens=8192,
+                    response_mime_type='application/json'
+                    # No schema validation
+                )
+            )
+            return parse_json_with_recovery(
+                response.text,
+                error_prefix="design_iteration_error"
+            )
+        except Exception as fallback_error:
+            raise Exception(f"Both schema validation and fallback failed: {e}, {fallback_error}")
 
 
 def main():
