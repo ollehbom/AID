@@ -368,8 +368,8 @@ def _fix_missing_commas(json_string, error):
     
     # Get context around the error
     pos = error.pos
-    start = max(0, pos - 100)
-    end = min(len(json_string), pos + 100)
+    start = max(0, pos - 200)
+    end = min(len(json_string), pos + 200)
     context = json_string[start:end]
     
     # Try multiple comma fix strategies
@@ -377,7 +377,8 @@ def _fix_missing_commas(json_string, error):
     
     # Strategy 0: Most common case - quote followed by whitespace then quote
     # Pattern: "value"\n  "key" (missing comma after first quote)
-    if pos > 2:
+    # This is the MOST COMMON issue with Gemini's JSON output
+    if pos >= 0 and pos < len(json_string):
         # Look back to find the pattern of: " followed by whitespace followed by current position
         look_back = pos - 1
         while look_back >= 0 and json_string[look_back] in ' \t\n\r':
@@ -385,11 +386,20 @@ def _fix_missing_commas(json_string, error):
         
         # Check if we found a closing quote
         if look_back >= 0 and json_string[look_back] == '"':
-            # Check if current position starts a new key (opening quote)
-            if pos < len(json_string) and json_string[pos] == '"':
-                # Insert comma after the closing quote
-                attempt = json_string[:look_back+1] + ',' + json_string[look_back+1:]
-                attempts.append(("Insert comma after quote before new property", attempt))
+            # Verify this is not an escaped quote
+            num_backslashes = 0
+            check_pos = look_back - 1
+            while check_pos >= 0 and json_string[check_pos] == '\\':
+                num_backslashes += 1
+                check_pos -= 1
+            
+            # If even number of backslashes (or 0), the quote is not escaped
+            if num_backslashes % 2 == 0:
+                # Check if current position starts a new key (opening quote)
+                if pos < len(json_string) and json_string[pos] == '"':
+                    # Insert comma after the closing quote
+                    attempt = json_string[:look_back+1] + ',' + json_string[look_back+1:]
+                    attempts.append(("Insert comma after quote before new property", attempt))
     
     # Strategy 1: Insert comma before the error position
     # Common case: }{ or ][ without comma
@@ -430,9 +440,11 @@ def _fix_missing_commas(json_string, error):
     
     # Strategy 2: Look for common patterns like }} or ]] that might need comma
     # Search backwards from error position for property boundaries
-    if pos > 10:
+    # Expanded search range to handle longer content
+    if pos > 0:
         # Find the last complete property before error
-        search_start = max(0, pos - 500)
+        # Search up to 2000 characters back to handle long string values
+        search_start = max(0, pos - 2000)
         substring = json_string[search_start:pos]
         
         # Look for patterns like: "value"\n\s*"key" (missing comma)
@@ -446,6 +458,25 @@ def _fix_missing_commas(json_string, error):
             abs_pos = search_start + last_match.start() + len(last_match.group(1))
             attempt = json_string[:abs_pos] + ',' + json_string[abs_pos:]
             attempts.append(("Insert comma between elements (pattern match)", attempt))
+    
+    # Strategy 3: Advanced pattern - find property key patterns
+    # Look for: "some_key": "value or object" followed by whitespace and then "another_key"
+    if pos > 20:
+        search_start = max(0, pos - 3000)
+        substring = json_string[search_start:pos]
+        
+        # Pattern: closing quote or brace, whitespace, then opening quote (likely a new property)
+        # This catches: "value"\n  "key": or }\n  "key":
+        pattern = r'(["\}])\s+\"[^"]+\":'
+        matches = list(re.finditer(pattern, substring))
+        
+        if matches:
+            # Take the last match
+            last_match = matches[-1]
+            # Insert comma after the first captured group (closing quote or brace)
+            abs_pos = search_start + last_match.start() + len(last_match.group(1))
+            attempt = json_string[:abs_pos] + ',' + json_string[abs_pos:]
+            attempts.append(("Insert comma before property (key pattern match)", attempt))
     
     # Strategy 3: Try removing extra characters around the error position
     # Sometimes there's a stray character causing issues

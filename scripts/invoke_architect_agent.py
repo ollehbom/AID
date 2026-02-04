@@ -13,6 +13,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 from json_fixer import parse_json_with_recovery
 
+# Fix Windows console encoding issues
+if sys.platform == 'win32':
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -245,29 +251,29 @@ def main():
     
     feature_id = sys.argv[1]
     
-    print(f"🏗️ Invoking Architect Agent for feature: {feature_id}")
-    print(f"📅 Date: {datetime.now().strftime('%Y-%m-%d')}")
-    print(f"🤖 Provider: {AI_PROVIDER.upper()}")
-    print(f"🤖 Model: {MODEL}")
+    print(f"Running Architect Agent for feature: {feature_id}")
+    print(f"Date: {datetime.now().strftime('%Y-%m-%d')}")
+    print(f"Provider: {AI_PROVIDER.upper()}")
+    print(f"Model: {MODEL}")
     print()
     
     # Invoke the agent
     try:
         result = invoke_architect_agent(feature_id)
     except Exception as e:
-        print(f"❌ Failed to invoke Architect Agent: {e}")
+        print(f"ERROR: Failed to invoke Architect Agent: {e}")
         sys.exit(1)
     
     # Save ADR
     adr_number = result["adr_number"]
     adr_path = ARCHITECTURE_DIR / f"ADR-{adr_number:03d}-{feature_id}.md"
     save_file(adr_path, result["adr_content"])
-    print(f"✅ Created ADR: {adr_path.relative_to(REPO_ROOT)}")
+    print(f"SUCCESS: Created ADR: {adr_path.relative_to(REPO_ROOT)}")
     
     # Save technical spec
     tech_spec_path = TECHNICAL_SPECS_DIR / f"{feature_id}.md"
     save_file(tech_spec_path, result["technical_spec"])
-    print(f"✅ Created technical spec: {tech_spec_path.relative_to(REPO_ROOT)}")
+    print(f"SUCCESS: Created technical spec: {tech_spec_path.relative_to(REPO_ROOT)}")
     
     # Update pipeline state
     state_path = REPO_ROOT / f".ai/pipeline/{feature_id}.state"
@@ -289,19 +295,19 @@ def main():
             state_content = state_content.rstrip() + "\n" + arch_section
         
         save_file(state_path, state_content)
-        print(f"✅ Updated pipeline state: {state_path.relative_to(REPO_ROOT)}")
+        print(f"SUCCESS: Updated pipeline state: {state_path.relative_to(REPO_ROOT)}")
     
     # Print summary
     print()
-    print("📋 Summary:")
+    print("Summary:")
     print(result["summary"])
     print()
-    print(f"🏗️ Complexity: {result['complexity']}")
-    print(f"🎯 Primary Concerns: {', '.join(result.get('primary_concerns', []))}")
-    print(f"📝 ADR Number: ADR-{adr_number:03d}")
+    print(f"Complexity: {result['complexity']}")
+    print(f"Primary Concerns: {', '.join(result.get('primary_concerns', []))}")
+    print(f"ADR Number: ADR-{adr_number:03d}")
     print()
-    print("✅ Architect Agent execution complete!")
-    print("👉 Next: Dev Agent will implement according to architectural guidelines")
+    print("SUCCESS: Architect Agent execution complete!")
+    print("Next: Dev Agent will implement according to architectural guidelines")
 
 
 if __name__ == "__main__":
