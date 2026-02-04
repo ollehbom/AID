@@ -31,3 +31,14 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+## Active Experiments
+
+- **ID**: EXP-2026-01-29-GHVS6
+- **Belief**: The product must feel obvious without documentation
+- **Change**: Implement foundational React app with Google login, basic dashboard, and shadcn-based design system.
+- **Owner**: Product Agent (initial definition), then Frontend Team.
+- **Status**: Active
+- **Success Signal**: Functional Google login and dashboard, reusable design system components, positive internal feedback on intuitiveness.
+- **Decision Record**: product/decisions/gh-vs-6.md
+- **GitHub Issue**: #GHVS6 (to be created)
