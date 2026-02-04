@@ -31,3 +31,11 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-gh-vs-8
+
+- **Belief**: A modern, extensible UI foundation enables rapid iteration and consistent user experience.
+- **Change**: Implement core React app with shadcn/ui, Google login, basic dashboard, and foundational design system.
+- **Owner**: Development Team
+- **Status**: Active
+- **Success Signal**: Functional React app with Google login, basic dashboard, and positive developer feedback on design system's utility for new components.
