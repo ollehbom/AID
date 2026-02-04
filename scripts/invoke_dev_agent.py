@@ -23,6 +23,7 @@ class DevAgentResponse(BaseModel):
     """Type-safe response structure for Dev Agent."""
     implementation_files: str  # JSON string to avoid additionalProperties
     test_files: str  # JSON string to avoid additionalProperties
+    build_commands: str  # JSON string with install/build/test commands
     implementation_summary: str
     testing_summary: str
     next_steps: List[str]
@@ -195,6 +196,13 @@ Provide your response in JSON format with these keys. CRITICAL: All code content
   "documentation_updates": [
     {{"path": "relative/path/to/doc.md", "description": "Documentation added/updated", "content": "Full content"}}
   ],
+  "build_commands": {{
+    "install": "Command to install dependencies (e.g., 'npm install' or 'pip install -r requirements.txt')",
+    "build": "Command to build the project (e.g., 'npm run build' or 'go build', or empty string if no build needed)",
+    "test": "Command to run tests (e.g., 'npm test' or 'pytest')",
+    "dev": "Command to run in development mode (e.g., 'npm run dev' or 'python app.py')",
+    "working_dir": "Directory to run commands from (e.g., './' or 'client/' for monorepos)"
+  }},
   "quality_checklist": {{
     "style_guidelines": true,
     "tests_passing": true,
@@ -297,10 +305,15 @@ def _invoke_gemini(system_prompt, user_prompt):
             test_files = json.loads(parsed.test_files)
         except json.JSONDecodeError:
             test_files = {}
+        try:
+            build_cmds = json.loads(parsed.build_commands)
+        except json.JSONDecodeError:
+            build_cmds = {}
         
         return {
             "implementation_files": impl_files,
             "test_files": test_files,
+            "build_commands": build_cmds,
             "implementation_summary": parsed.implementation_summary,
             "testing_summary": parsed.testing_summary,
             "next_steps": parsed.next_steps
@@ -395,6 +408,12 @@ def main():
         save_file(filepath, doc_info['content'])
         print(f"  ✓ Updated docs: {doc_info['path']}")
     
+    # Save build commands for pipeline automation
+    if result.get('build_commands'):
+        build_file = REPO_ROOT / ".ai/pipeline" / f"{feature_id}.build.json"
+        save_file(build_file, json.dumps(result['build_commands'], indent=2))
+        print(f"  ✓ Saved build commands: {build_file.relative_to(REPO_ROOT)}")
+    
     # Update pipeline state
     state_file = REPO_ROOT / ".ai/pipeline" / f"{feature_id}.state"
     if state_file.exists():
@@ -413,7 +432,13 @@ def main():
     if result.get('technical_debt'):
         print(f"\n⚠️  Technical Debt Noted:")
         for debt in result['technical_debt']:
-            print(f"  - [{debt['priority'].upper()}] {debt['description']}")
+            # Handle both dict and string formats (from json_fixer fallback)
+            if isinstance(debt, dict):
+                priority = debt.get('priority', 'medium')
+                description = debt.get('description', str(debt))
+                print(f"  - [{priority.upper()}] {description}")
+            else:
+                print(f"  - {debt}")
     
     print(f"\n🔜 Next Steps for QA:")
     print(f"  {result.get('next_steps', 'Standard QA testing')}")

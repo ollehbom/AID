@@ -23,6 +23,7 @@ class DevAgentResponse(BaseModel):
     """Type-safe response structure for Dev Agent."""
     implementation_files: str  # JSON string to avoid additionalProperties
     test_files: str  # JSON string to avoid additionalProperties
+    build_commands: str  # JSON string with install/build/test commands
     implementation_summary: str
     testing_summary: str
     next_steps: List[str]
@@ -110,6 +111,7 @@ def invoke_dev_agent_iterative(feature_id):
         "files_created": [],
         "tests_created": [],
         "documentation_updates": [],
+        "build_commands": {},
         "quality_checklist": {},
         "technical_debt": [],
         "next_steps": ""
@@ -152,6 +154,10 @@ def invoke_dev_agent_iterative(feature_id):
             combined_result["files_created"].extend(result.get("files_created", []))
             combined_result["tests_created"].extend(result.get("tests_created", []))
             combined_result["documentation_updates"].extend(result.get("documentation_updates", []))
+            
+            # Merge build commands (first iteration usually has them)
+            if result.get("build_commands") and not combined_result["build_commands"]:
+                combined_result["build_commands"] = result["build_commands"]
             
             # Update checklist and debt from last iteration
             if result.get("quality_checklist"):
@@ -348,10 +354,15 @@ def _invoke_gemini(system_prompt, user_prompt):
                 test_files = json.loads(parsed.test_files)
             except json.JSONDecodeError:
                 test_files = {}
+            try:
+                build_cmds = json.loads(parsed.build_commands)
+            except json.JSONDecodeError:
+                build_cmds = {}
             
             return {
                 "implementation_files": impl_files,
                 "test_files": test_files,
+                "build_commands": build_cmds,
                 "implementation_summary": parsed.implementation_summary,
                 "testing_summary": parsed.testing_summary,
                 "next_steps": parsed.next_steps
@@ -443,6 +454,12 @@ def main():
         save_file(filepath, doc_info['content'])
         print(f"  ✓ Updated docs: {doc_info['path']}")
     
+    # Save build commands for pipeline automation
+    if result.get('build_commands'):
+        build_file = REPO_ROOT / ".ai/pipeline" / f"{feature_id}.build.json"
+        save_file(build_file, json.dumps(result['build_commands'], indent=2))
+        print(f"  ✓ Saved build commands: {build_file.relative_to(REPO_ROOT)}")
+    
     # Update pipeline state
     state_file = REPO_ROOT / ".ai/pipeline" / f"{feature_id}.state"
     if state_file.exists():
@@ -461,7 +478,13 @@ def main():
     if result.get('technical_debt'):
         print(f"\n⚠️  Technical Debt:")
         for debt in result['technical_debt']:
-            print(f"  - [{debt['priority'].upper()}] {debt['description']}")
+            # Handle both dict and string formats (from json_fixer fallback)
+            if isinstance(debt, dict):
+                priority = debt.get('priority', 'medium')
+                description = debt.get('description', str(debt))
+                print(f"  - [{priority.upper()}] {description}")
+            else:
+                print(f"  - {debt}")
     
     print(f"\n🔜 Next Steps:")
     print(f"  {result.get('next_steps', 'Standard QA testing')}")
