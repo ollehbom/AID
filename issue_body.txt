@@ -1,9 +1,9 @@
 ## Pipeline Failure
 
-**Feature ID:** `test-single-workflow-12`  
-**Error ID:** `error-20260202-040914`  
+**Feature ID:** `gh-vs-1`  
+**Error ID:** `error-20260204-213811`  
 **Workflow:** Pipeline  
-**Run:** https://github.com/ollehbom/AID/actions/runs/21576975471
+**Run:** https://github.com/ollehbom/AID/actions/runs/21689285658
 
 ### Failed Stage
 One or more pipeline stages failed. Check the workflow run for details.
