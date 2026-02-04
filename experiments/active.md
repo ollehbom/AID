@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-gh-vs-9: Foundational React App with Shadcn UI
+- **Belief**: The product must feel obvious without documentation; Users value speed over configurability.
+- **Change**: Implement a foundational React application with `shadcn/ui`, Google login, and a basic dashboard.
+- **Owner**: [Assignee TBD]
+- **Status**: Active
+- **Success Signal**: Positive internal team feedback on development experience and perceived intuitiveness of the initial app; readiness for subsequent feature development.
