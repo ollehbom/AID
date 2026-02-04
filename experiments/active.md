@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+- ID: EXP-2026-01-29-GHVS3
+  Belief: Enables future belief testing, aligns with "The product must feel obvious without documentation"
+  Change: Implement foundational React app with shadcn/ui, Google login, and basic dashboard.
+  Owner: Dev Team
+  Status: Active
+  Success Signal: Functional React app, Google login, basic dashboard rendering, shadcn/ui integrated.
