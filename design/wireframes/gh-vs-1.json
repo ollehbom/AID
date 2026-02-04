@@ -1,0 +1,26 @@
+{
+  "name": "Login Screen (gh-vs-1)",
+  "type": "FRAME",
+  "width": 375,
+  "height": 812,
+  "children": [
+    {
+      "name": "WelcomeText",
+      "type": "TEXT",
+      "content": "Welcome",
+      "fontSize": 32
+    },
+    {
+      "name": "SignInPrompt",
+      "type": "TEXT",
+      "content": "Sign in to your account",
+      "fontSize": 16
+    },
+    {
+      "name": "GoogleSignInButton",
+      "type": "BUTTON",
+      "label": "Sign in with Google",
+      "variant": "primary"
+    }
+  ]
+}
