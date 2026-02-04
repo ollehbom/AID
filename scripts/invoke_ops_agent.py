@@ -21,8 +21,8 @@ load_dotenv()
 # Pydantic Model for Schema Validation
 class OpsAgentResponse(BaseModel):
     """Type-safe response structure for Ops Agent."""
-    deployment_configs: Dict[str, str]  # {filename: content}
-    ci_updates: Dict[str, str]  # {filename: content}
+    deployment_configs: str  # JSON string to avoid additionalProperties
+    ci_updates: str  # JSON string to avoid additionalProperties
     monitoring_setup: str
     deployment_summary: str
     rollback_plan: str
@@ -300,20 +300,44 @@ def _invoke_gemini(system_prompt, user_prompt):
         
         # Use validated, parsed response
         parsed = response.parsed
+        # Parse JSON strings into objects
+        try:
+            deployment_configs = json.loads(parsed.deployment_configs)
+        except json.JSONDecodeError:
+            deployment_configs = {}
+        try:
+            ci_updates = json.loads(parsed.ci_updates)
+        except json.JSONDecodeError:
+            ci_updates = {}
+        
         return {
-            "deployment_configs": parsed.deployment_configs,
-            "ci_updates": parsed.ci_updates,
+            "deployment_configs": deployment_configs,
+            "ci_updates": ci_updates,
             "monitoring_setup": parsed.monitoring_setup,
             "deployment_summary": parsed.deployment_summary,
             "rollback_plan": parsed.rollback_plan
         }
     
     except Exception as e:
-        print(f"⚠️  Schema validation failed, using fallback parser: {e}")
-        return parse_json_with_recovery(
-            response.text,
-            error_prefix="ops_agent_error"
-        )
+        print(f"⚠️  Schema validation failed: {e}")
+        # Try without schema validation as fallback
+        try:
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=combined_prompt,
+                config=types.GenerateContentConfig(
+                    temperature=float(os.getenv("TEMPERATURE", "0.7")),
+                    max_output_tokens=8192,
+                    response_mime_type='application/json'
+                    # No schema validation
+                )
+            )
+            return parse_json_with_recovery(
+                response.text,
+                error_prefix="ops_agent_error"
+            )
+        except Exception as fallback_error:
+            raise Exception(f"Both schema validation and fallback failed: {e}, {fallback_error}")
 
 
 def main():

@@ -23,7 +23,7 @@ class ErrorRecoveryResponse(BaseModel):
     error_analysis: str
     root_cause: str
     fix_strategy: str
-    file_fixes: Dict[str, str]  # {filename: fixed_content}
+    file_fixes: str  # JSON string to avoid additionalProperties
     confidence: str  # "high", "medium", "low"
     requires_human_review: bool
 
@@ -99,21 +99,40 @@ def _invoke_gemini(system_prompt, user_prompt):
         
         # Use validated, parsed response
         parsed = response.parsed
+        # Parse JSON string into object
+        try:
+            file_fixes = json.loads(parsed.file_fixes)
+        except json.JSONDecodeError:
+            file_fixes = {}
+        
         return {
             "error_analysis": parsed.error_analysis,
             "root_cause": parsed.root_cause,
             "fix_strategy": parsed.fix_strategy,
-            "file_fixes": parsed.file_fixes,
+            "file_fixes": file_fixes,
             "confidence": parsed.confidence,
             "requires_human_review": parsed.requires_human_review
         }
     
     except Exception as e:
-        print(f"⚠️  Schema validation failed, using fallback parser: {e}")
-        return parse_json_with_recovery(
-            response.text,
-            error_prefix="error_recovery_agent_error"
-        )
+        print(f"⚠️  Schema validation failed: {e}")
+        # Try without schema validation as fallback
+        try:
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=combined_prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.3,
+                    response_mime_type='application/json'
+                    # No schema validation
+                )
+            )
+            return parse_json_with_recovery(
+                response.text,
+                error_prefix="error_recovery_agent_error"
+            )
+        except Exception as fallback_error:
+            raise Exception(f"Both schema validation and fallback failed: {e}, {fallback_error}")
 
 
 def extract_error_from_issue(issue_body):
