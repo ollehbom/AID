@@ -1,0 +1,86 @@
+{
+  "design_intent": "The primary intent for this foundational React application is to establish an intuitive and obvious entry point for new users. This involves implementing a clear Google login flow and a basic, consistent dashboard using a modern design system (shadcn/ui). The core goal is to validate the product belief that 'the product must feel obvious without documentation' by ensuring a predictable and frictionless initial user experience, laying a robust and extensible groundwork for future features.",
+  "design_spec": "## Feature: Foundational React Application (Login & Dashboard)\n\n### 1. User Flow\n1.  **Initial Access**: User navigates to the application URL.\n2.  **Login Presentation**: If not logged in, the user is presented with a 'Welcome!' screen featuring a prominent 'Sign in with Google' button.\n3.  **Authentication Initiation**: User clicks 'Sign in with Google', triggering the standard Google OAuth authentication flow.\n4.  **Dashboard Redirection**: Upon successful authentication, the user is automatically redirected to the Dashboard page.\n5.  **Dashboard Display**: The Dashboard page displays a personalized 'Welcome, [User Name]!' header and a simple content card titled 'Your Dashboard' with a placeholder message.\n\n### 2. States\n*   **Login Screen**:\n    *   **Initial**: Displays 'Welcome!' header and 'Sign in with Google' button.\n    *   **Loading**: (Implicit during OAuth redirect) UI might show a spinner or be momentarily blank.\n    *   **Error**: Displays an error message (e.g., 'Login failed. Please try again.') below the login button if authentication fails.\n*   **Dashboard Screen**:\n    *   **Initial**: Displays header and basic content card.\n    *   **Loading**: (If dynamic content is fetched) Placeholder content or spinner within the card.\n\n### 3. Copy\n*   **Login Screen**:\n    *   Header: 'Welcome!'\n    *   Button: 'Sign in with Google'\n    *   Error Message: 'Login failed. Please try again.'\n*   **Dashboard Screen**:\n    *   Header: 'Welcome, [User Name]!'\n    *   Card Title: 'Your Dashboard'\n    *   Card Body: 'This is where your important information will appear.'\n\n### 4. Error Handling\n*   **Google Login Failure**: If the Google OAuth process fails or is cancelled, the user is returned to the login screen with an error message: 'Login failed. Please try again.'\n*   **Network Issues**: (Implicit) Standard browser/application network error handling.",
+  "wireframe_json": [
+    {
+      "name": "Login Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "WelcomeHeader",
+          "type": "TEXT",
+          "characters": "Welcome!",
+          "fontSize": 32,
+          "width": 300,
+          "height": 40
+        },
+        {
+          "name": "GoogleSignInButton",
+          "type": "FRAME",
+          "width": 200,
+          "height": 48,
+          "backgroundColor": "#4285F4",
+          "cornerRadius": 4,
+          "children": [
+            {
+              "name": "ButtonText",
+              "type": "TEXT",
+              "characters": "Sign in with Google",
+              "fontSize": 16,
+              "color": "#FFFFFF",
+              "width": 180,
+              "height": 24
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dashboard Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "DashboardHeader",
+          "type": "TEXT",
+          "characters": "Welcome, [User Name]!",
+          "fontSize": 24,
+          "width": 300,
+          "height": 30
+        },
+        {
+          "name": "ContentCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "name": "CardTitle",
+              "type": "TEXT",
+              "characters": "Your Dashboard",
+              "fontSize": 18,
+              "fontWeight": "BOLD",
+              "width": 200,
+              "height": 24
+            },
+            {
+              "name": "CardBodyText",
+              "type": "TEXT",
+              "characters": "This is where your important information will appear.",
+              "fontSize": 14,
+              "width": 300,
+              "height": 40
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "## Design Validation Checklist\n\n**Against Design Agent's Rules:**\n*   **Predictability**: Can a new user predict what happens next? (Yes, the 'Sign in with Google' button is a standard pattern, and a subsequent dashboard is expected post-login.)\n*   **Timeliness of Explanation**: Is anything explained too late? (No, the login screen clearly states 'Welcome!' and the dashboard immediately provides 'Your Dashboard' context.)\n*   **UI-Intent Match**: Does the UI match the intent? (Yes, the minimal, clear UI with standard components directly supports the intent of an 'intuitive and obvious entry point'.)\n\n**Against Product Acceptance Criteria:**\n*   **Google login functionality implemented and tested**: The design specifies a clear 'Sign in with Google' button and outlines the expected flow.\n*   **Basic dashboard page with mock content renders successfully**: The design includes a header and a simple content card with placeholder text for the dashboard.\n*   **shadcn/ui integrated and a foundational design system established with at least 3 reusable components**: The design implicitly relies on a clean, modern aesthetic consistent with shadcn/ui for components like buttons and cards.\n*   **Basic routing for login and dashboard pages**: The design defines distinct wireframes and user flows for both a Login Screen and a Dashboard Screen, necessitating basic routing.\n\n**Against Core Beliefs:**\n*   **The product must feel obvious without documentation**: The design prioritizes clarity, standard interaction patterns, and minimal UI elements to ensure the initial experience is self-explanatory.",
+  "summary": "The design for the foundational React application, feature gh-vs-6, focuses on creating an intuitive and obvious entry point via Google login and a simple, consistent dashboard. The design intent is to validate the core product belief that 'the product must feel obvious without documentation'. The design specification details the user flow, states, copy, and error handling for both the login and dashboard screens. Wireframes for these two screens have been provided in a structured JSON format to guide development. The validation checklist confirms that the design aligns with the stated product intent, acceptance criteria, and core product beliefs, ensuring a predictable and frictionless initial user experience. This output provides a clear and actionable design foundation for the Dev Agent."
+}
