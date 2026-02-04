@@ -222,12 +222,14 @@ def _invoke_openai(system_prompt, user_prompt):
 
 
 def _invoke_gemini(system_prompt, user_prompt):
-    """Invoke Google Gemini API."""
+    """Invoke Google Gemini API with schema validation."""
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("GOOGLE_API_KEY not found in environment. Create a .env file with your API key.")
     
     from google import genai
+    from google.genai import types
+    
     client = genai.Client(api_key=api_key)
     
     # Combine system and user prompts for Gemini
@@ -237,21 +239,48 @@ def _invoke_gemini(system_prompt, user_prompt):
 
 {user_prompt}"""
     
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=combined_prompt,
-        config={
-            "temperature": float(os.getenv("TEMPERATURE", "0.7")),
-            "max_output_tokens": 8192,
-            "response_mime_type": "application/json"
+    try:
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=combined_prompt,
+            config=types.GenerateContentConfig(
+                temperature=float(os.getenv("TEMPERATURE", "0.7")),
+                max_output_tokens=8192,
+                response_mime_type='application/json',
+                response_schema=ArchitectAgentResponse  # ✨ Schema validation!
+            )
+        )
+        
+        # Use validated, parsed response
+        parsed = response.parsed
+        return {
+            "adr_content": parsed.adr_content,
+            "technical_spec": parsed.technical_spec,
+            "complexity": parsed.complexity,
+            "primary_concerns": parsed.primary_concerns,
+            "summary": parsed.summary
         }
-    )
     
-    # Parse response with automatic error recovery
-    return parse_json_with_recovery(
-        response.text,
-        error_prefix="architect_agent_error"
-    )
+    except Exception as e:
+        print(f"⚠️  Schema validation failed: {e}")
+        # Try without schema validation as fallback
+        try:
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=combined_prompt,
+                config=types.GenerateContentConfig(
+                    temperature=float(os.getenv("TEMPERATURE", "0.7")),
+                    max_output_tokens=8192,
+                    response_mime_type='application/json'
+                    # No schema validation
+                )
+            )
+            return parse_json_with_recovery(
+                response.text,
+                error_prefix="architect_agent_error"
+            )
+        except Exception as fallback_error:
+            raise Exception(f"Both schema validation and fallback failed: {e}, {fallback_error}")
 
 
 def main():
