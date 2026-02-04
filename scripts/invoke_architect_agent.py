@@ -12,6 +12,8 @@ from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 from json_fixer import parse_json_with_recovery
+from pydantic import BaseModel
+from typing import List
 
 # Fix Windows console encoding issues
 if sys.platform == 'win32':
