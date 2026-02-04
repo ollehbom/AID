@@ -31,3 +31,12 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+# Active Experiments
+
+- ID: EXP-2026-01-29-gh-vs-1
+  Belief: The product must feel obvious without documentation, Users value speed over configurability.
+  Change: Initial React app build with Google Auth, basic dashboard, and `shadcn/ui` design system.
+  Owner: Product Agent (definition), Engineering (implementation)
+  Status: defined
+  Success Signal: Successful Google login, basic dashboard display, consistent `shadcn/ui` application, positive founder feedback on UI/UX.
