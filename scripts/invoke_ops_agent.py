@@ -18,11 +18,17 @@ from typing import List, Dict, Any
 # Load environment variables from .env file
 load_dotenv()
 
-# Pydantic Model for Schema Validation
+# Pydantic Models for Schema Validation
+class FileInfo(BaseModel):
+    """Single file information."""
+    path: str
+    content: str
+    description: str
+
 class OpsAgentResponse(BaseModel):
     """Type-safe response structure for Ops Agent."""
-    deployment_configs: str  # JSON string to avoid additionalProperties
-    ci_updates: str  # JSON string to avoid additionalProperties
+    deployment_configs: List[FileInfo]
+    ci_updates: List[FileInfo]
     monitoring_setup: str
     deployment_summary: str
     rollback_plan: str
@@ -300,15 +306,19 @@ def _invoke_gemini(system_prompt, user_prompt):
         
         # Use validated, parsed response
         parsed = response.parsed
-        # Parse JSON strings into objects
-        try:
-            deployment_configs = json.loads(parsed.deployment_configs)
-        except json.JSONDecodeError:
-            deployment_configs = {}
-        try:
-            ci_updates = json.loads(parsed.ci_updates)
-        except json.JSONDecodeError:
-            ci_updates = {}
+        
+        # Convert Pydantic models to dicts
+        deployment_configs = [{
+            "path": f.path,
+            "content": f.content,
+            "description": f.description
+        } for f in parsed.deployment_configs]
+        
+        ci_updates = [{
+            "path": f.path,
+            "content": f.content,
+            "description": f.description
+        } for f in parsed.ci_updates]
         
         return {
             "deployment_configs": deployment_configs,

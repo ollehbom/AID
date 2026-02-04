@@ -18,12 +18,26 @@ from typing import List, Dict, Any
 # Load environment variables from .env file
 load_dotenv()
 
-# Pydantic Model for Schema Validation (same as regular dev agent)
+# Pydantic Models for Schema Validation
+class FileInfo(BaseModel):
+    """Single file information."""
+    path: str
+    content: str
+    description: str
+
+class BuildCommands(BaseModel):
+    """Build commands for the project."""
+    install: str
+    build: str
+    test: str
+    dev: str
+    working_dir: str
+
 class DevAgentResponse(BaseModel):
     """Type-safe response structure for Dev Agent."""
-    implementation_files: str  # JSON string to avoid additionalProperties
-    test_files: str  # JSON string to avoid additionalProperties
-    build_commands: str  # JSON string with install/build/test commands
+    implementation_files: List[FileInfo]
+    test_files: List[FileInfo]
+    build_commands: BuildCommands
     implementation_summary: str
     testing_summary: str
     next_steps: List[str]
@@ -345,23 +359,31 @@ def _invoke_gemini(system_prompt, user_prompt):
             
             # Use validated, parsed response
             parsed = response.parsed
-            # Parse JSON strings into objects
-            try:
-                impl_files = json.loads(parsed.implementation_files)
-            except json.JSONDecodeError:
-                impl_files = {}
-            try:
-                test_files = json.loads(parsed.test_files)
-            except json.JSONDecodeError:
-                test_files = {}
-            try:
-                build_cmds = json.loads(parsed.build_commands)
-            except json.JSONDecodeError:
-                build_cmds = {}
+            
+            # Convert Pydantic models to dicts
+            impl_files = [{
+                "path": f.path,
+                "content": f.content,
+                "description": f.description
+            } for f in parsed.implementation_files]
+            
+            test_files = [{
+                "path": f.path,
+                "content": f.content,
+                "description": f.description
+            } for f in parsed.test_files]
+            
+            build_cmds = {
+                "install": parsed.build_commands.install,
+                "build": parsed.build_commands.build,
+                "test": parsed.build_commands.test,
+                "dev": parsed.build_commands.dev,
+                "working_dir": parsed.build_commands.working_dir
+            }
             
             return {
-                "implementation_files": impl_files,
-                "test_files": test_files,
+                "files_created": impl_files,
+                "tests_created": test_files,
                 "build_commands": build_cmds,
                 "implementation_summary": parsed.implementation_summary,
                 "testing_summary": parsed.testing_summary,

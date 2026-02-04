@@ -17,13 +17,18 @@ from typing import List, Dict, Optional
 # Load environment variables
 load_dotenv()
 
-# Pydantic Model for Schema Validation
+# Pydantic Models for Schema Validation
+class FileInfo(BaseModel):
+    """Single file information."""
+    path: str
+    content: str
+
 class ErrorRecoveryResponse(BaseModel):
     """Type-safe response structure for Error Recovery Agent."""
     error_analysis: str
     root_cause: str
     fix_strategy: str
-    file_fixes: str  # JSON string to avoid additionalProperties
+    file_fixes: List[FileInfo]
     confidence: str  # "high", "medium", "low"
     requires_human_review: bool
 
@@ -99,11 +104,12 @@ def _invoke_gemini(system_prompt, user_prompt):
         
         # Use validated, parsed response
         parsed = response.parsed
-        # Parse JSON string into object
-        try:
-            file_fixes = json.loads(parsed.file_fixes)
-        except json.JSONDecodeError:
-            file_fixes = {}
+        
+        # Convert Pydantic models to dicts
+        file_fixes = [{
+            "path": f.path,
+            "content": f.content
+        } for f in parsed.file_fixes]
         
         return {
             "error_analysis": parsed.error_analysis,

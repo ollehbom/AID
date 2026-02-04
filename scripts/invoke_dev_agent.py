@@ -18,12 +18,26 @@ from typing import List, Dict, Any
 # Load environment variables from .env file
 load_dotenv()
 
-# Pydantic Model for Schema Validation
+# Pydantic Models for Schema Validation
+class FileInfo(BaseModel):
+    """Single file information."""
+    path: str
+    content: str
+    description: str
+
+class BuildCommands(BaseModel):
+    """Build commands for the project."""
+    install: str
+    build: str
+    test: str
+    dev: str
+    working_dir: str
+
 class DevAgentResponse(BaseModel):
     """Type-safe response structure for Dev Agent."""
-    implementation_files: str  # JSON string to avoid additionalProperties
-    test_files: str  # JSON string to avoid additionalProperties
-    build_commands: str  # JSON string with install/build/test commands
+    implementation_files: List[FileInfo]
+    test_files: List[FileInfo]
+    build_commands: BuildCommands
     implementation_summary: str
     testing_summary: str
     next_steps: List[str]
@@ -182,37 +196,34 @@ Create:
 
 ## Output Format
 
-Provide your response in JSON format with these keys. CRITICAL: All code content must have special characters properly escaped (backslashes as \\\\, quotes as \\", newlines as \\n).
+Provide your response in JSON format with these keys:
 
 ```json
 {{
   "implementation_summary": "Brief overview of what was implemented and key decisions made",
-  "files_created": [
-    {{"path": "relative/path/to/file.py", "description": "Purpose of this file", "content": "Full file content with proper JSON escaping"}}
+  "implementation_files": [
+    {{
+      "path": "relative/path/to/file.py",
+      "description": "Purpose of this file",
+      "content": "Full file content"
+    }}
   ],
-  "tests_created": [
-    {{"path": "relative/path/to/test.py", "description": "What this test validates", "content": "Full test content"}}
-  ],
-  "documentation_updates": [
-    {{"path": "relative/path/to/doc.md", "description": "Documentation added/updated", "content": "Full content"}}
+  "test_files": [
+    {{
+      "path": "relative/path/to/test.py",
+      "description": "What this test validates",
+      "content": "Full test content"
+    }}
   ],
   "build_commands": {{
     "install": "Command to install dependencies (e.g., 'npm install' or 'pip install -r requirements.txt')",
-    "build": "Command to build the project (e.g., 'npm run build' or 'go build', or empty string if no build needed)",
+    "build": "Command to build the project (e.g., 'npm run build' or empty string if no build needed)",
     "test": "Command to run tests (e.g., 'npm test' or 'pytest')",
     "dev": "Command to run in development mode (e.g., 'npm run dev' or 'python app.py')",
     "working_dir": "Directory to run commands from (e.g., './' or 'client/' for monorepos)"
   }},
-  "quality_checklist": {{
-    "style_guidelines": true,
-    "tests_passing": true,
-    "security_reviewed": true,
-    "performance_validated": true
-  }},
-  "technical_debt": [
-    {{"description": "Any known limitations or future improvements", "priority": "low|medium|high"}}
-  ],
-  "next_steps": "What the QA agent should focus on when testing"
+  "testing_summary": "Brief overview of test strategy and coverage",
+  "next_steps": ["Step 1 for QA", "Step 2 for QA"]
 }}
 ```
 
@@ -296,23 +307,31 @@ def _invoke_gemini(system_prompt, user_prompt):
         
         # Use validated, parsed response
         parsed = response.parsed
-        # Parse JSON strings into objects
-        try:
-            impl_files = json.loads(parsed.implementation_files)
-        except json.JSONDecodeError:
-            impl_files = {}
-        try:
-            test_files = json.loads(parsed.test_files)
-        except json.JSONDecodeError:
-            test_files = {}
-        try:
-            build_cmds = json.loads(parsed.build_commands)
-        except json.JSONDecodeError:
-            build_cmds = {}
+        
+        # Convert Pydantic models to dicts
+        impl_files = [{
+            "path": f.path,
+            "content": f.content,
+            "description": f.description
+        } for f in parsed.implementation_files]
+        
+        test_files = [{
+            "path": f.path,
+            "content": f.content,
+            "description": f.description
+        } for f in parsed.test_files]
+        
+        build_cmds = {
+            "install": parsed.build_commands.install,
+            "build": parsed.build_commands.build,
+            "test": parsed.build_commands.test,
+            "dev": parsed.build_commands.dev,
+            "working_dir": parsed.build_commands.working_dir
+        }
         
         return {
-            "implementation_files": impl_files,
-            "test_files": test_files,
+            "files_created": impl_files,
+            "tests_created": test_files,
             "build_commands": build_cmds,
             "implementation_summary": parsed.implementation_summary,
             "testing_summary": parsed.testing_summary,
