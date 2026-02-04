@@ -238,19 +238,22 @@ Include all required keys: analysis, fix, validation, issue_update, pr_descripti
             save_file(output_dir / f"{error_id}-pr-description.md", result["pr_description"])
         
         # Apply file fixes
-        if "fix" in result and "files_to_modify" in result["fix"]:
-            for file_fix in result["fix"]["files_to_modify"]:
+        if result.get("file_fixes"):
+            for file_fix in result["file_fixes"]:
                 file_path = REPO_ROOT / file_fix["path"]
-                if "new_content" in file_fix:
-                    print(f"✏️  Applying fix to {file_fix['path']}")
-                    save_file(file_path, file_fix["new_content"])
+                print(f"✏️  Applying fix to {file_fix['path']}")
+                save_file(file_path, file_fix["content"])
         
         print("✅ Error analysis and fix complete!")
-        print(f"\nError Type: {result['analysis']['error_type']}")
-        print(f"Root Cause: {result['analysis']['root_cause']}")
-        print(f"\nFixed Files:")
-        for file_fix in result.get("fix", {}).get("files_to_modify", []):
-            print(f"  - {file_fix['path']}")
+        print(f"\nError Analysis: {result.get('error_analysis', 'N/A')}")
+        print(f"Root Cause: {result.get('root_cause', 'N/A')}")
+        print(f"Fix Strategy: {result.get('fix_strategy', 'N/A')}")
+        print(f"Confidence: {result.get('confidence', 'N/A')}")
+        
+        if result.get("file_fixes"):
+            print(f"\nFixed Files:")
+            for file_fix in result["file_fixes"]:
+                print(f"  - {file_fix['path']}")
         
         return result
         
