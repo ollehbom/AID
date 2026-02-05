@@ -32,10 +32,30 @@ jobs:
           pip install -r requirements.txt
 
       - name: Fetch issue details
+        id: issue_info
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh issue view ${{ inputs.issue_number }} --json body -q .body > issue_body.txt
+
+          # Extract feature_id from issue body
+          FEATURE_ID=$(grep -oP '(?<=\*\*Feature ID:\*\* `)' issue_body.txt || echo "")
+
+          if [ -z "$FEATURE_ID" ]; then
+            echo "⚠️  No feature_id found in issue, will use main branch"
+            FEATURE_BRANCH="main"
+          else
+            echo "Found feature_id: $FEATURE_ID"
+            FEATURE_BRANCH="feature/$FEATURE_ID"
+          fi
+
+          echo "feature_id=$FEATURE_ID" >> $GITHUB_OUTPUT
+          echo "feature_branch=$FEATURE_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Checkout feature branch
+        run: |
+          git fetch origin ${{ steps.issue_info.outputs.feature_branch }}
+          git checkout ${{ steps.issue_info.outputs.feature_branch }}
 
       - name: Run Error Recovery Agent
         env:
@@ -93,7 +113,7 @@ jobs:
           gh pr create \
             --title "🔧 Auto-fix: ${{ inputs.error_id }}" \
             --body "$PR_BODY" \
-            --base main \
+            --base ${{ steps.issue_info.outputs.feature_branch }} \
             --head fix/${{ inputs.error_id }}
 
           # Try to add labels (optional - don't fail if labels don't exist)
@@ -214,14 +234,14 @@ jobs:
           FAILED_CHECKS=$(gh pr view $PR_NUMBER --json statusCheckRollup -q '.statusCheckRollup[] | select(.conclusion == "FAILURE") | .conclusion' | wc -l)
 
           if [ "$FAILED_CHECKS" == "0" ]; then
-            echo "✅ All checks passed, auto-merging to main..."
+            echo "✅ All checks passed, auto-merging to ${{ steps.issue_info.outputs.feature_branch }}..."
             gh pr merge $PR_NUMBER --merge --delete-branch
             
             echo "merged=true" >> $GITHUB_OUTPUT
             
             gh issue comment ${{ inputs.issue_number }} --body "✅ **Auto-Fix Merged Successfully**
 
-            The automated fix has been merged to main.
+            The automated fix has been merged to \`${{ steps.issue_info.outputs.feature_branch }}\`.
             The pipeline will now be re-triggered to verify the fix."
             
             # Try to add label if it exists (ignore if not)
@@ -276,12 +296,12 @@ jobs:
             "Stage Router")
               WORKFLOW_FILE="stage-router.yml"
               ;;
-            "Pipeline Orchestrator")
-              WORKFLOW_FILE="pipeline-orchestrator.yml"
+            "Pipeline Orchestrator"|"Pipeline")
+              WORKFLOW_FILE="pipeline.yml"
               ;;
             *)
               # Default to full pipeline
-              WORKFLOW_FILE="pipeline-orchestrator.yml"
+              WORKFLOW_FILE="pipeline.yml"
               ;;
           esac
 
@@ -293,15 +313,27 @@ jobs:
         with:
           script: |
             const workflowFile = '${{ steps.determine-workflow.outputs.workflow_file }}';
+            const featureId = '${{ steps.issue_info.outputs.feature_id }}';
+            const featureBranch = '${{ steps.issue_info.outputs.feature_branch }}';
 
             console.log(`Re-triggering workflow: ${workflowFile}`);
+            console.log(`Feature ID: ${featureId}`);
+            console.log(`Branch: ${featureBranch}`);
 
             try {
+              const inputs = {};
+              
+              // Add feature_id if available
+              if (featureId) {
+                inputs.feature_id = featureId;
+              }
+              
               await github.rest.actions.createWorkflowDispatch({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: workflowFile,
-                ref: 'main'
+                ref: featureBranch || 'main',
+                inputs: inputs
               });
               
               console.log('✅ Workflow triggered successfully');
@@ -313,7 +345,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: ${{ inputs.issue_number }},
-                body: `⚠️ **Workflow Re-trigger Failed**\n\nCould not automatically re-trigger ${workflowFile}.\nPlease trigger it manually.\n\nError: ${error.message}`
+                body: `⚠️ **Workflow Re-trigger Failed**\n\nCould not automatically re-trigger ${workflowFile}.\nPlease trigger it manually with feature_id: ${featureId}\n\nError: ${error.message}`
               });
             }
 
@@ -321,9 +353,27 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh issue comment ${{ inputs.issue_number }} --body "🔄 **Pipeline Re-triggered**
+          FEATURE_ID="${{ steps.issue_info.outputs.feature_id }}"
+          FEATURE_BRANCH="${{ steps.issue_info.outputs.feature_branch }}"
+          WORKFLOW_FILE="${{ steps.determine-workflow.outputs.workflow_file }}"
+
+          if [ -n "$FEATURE_ID" ]; then
+            MESSAGE="🔄 **Pipeline Re-triggered**
 
           The workflow has been automatically re-triggered to verify the fix.
-          Workflow: ${{ steps.determine-workflow.outputs.workflow_file }}
+
+          - Workflow: \`$WORKFLOW_FILE\`
+          - Feature: \`$FEATURE_ID\`
+          - Branch: \`$FEATURE_BRANCH\`
 
           If the pipeline succeeds, this issue can be closed."
+          else
+            MESSAGE="🔄 **Pipeline Re-triggered**
+
+          The workflow has been automatically re-triggered to verify the fix.
+          Workflow: \`$WORKFLOW_FILE\`
+
+          If the pipeline succeeds, this issue can be closed."
+          fi
+
+          gh issue comment ${{ inputs.issue_number }} --body "$MESSAGE"
