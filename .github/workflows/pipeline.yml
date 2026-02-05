@@ -37,15 +37,30 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
+      - name: Check if stage already complete
+        id: check_status
+        run: |
+          if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
+            if grep -q "product: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
+              echo "Stage already complete, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
       - name: Set up Python
+        if: steps.check_status.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        if: steps.check_status.outputs.skip != 'true'
         run: pip install -r requirements.txt
 
       - name: Run Product Agent
+        if: steps.check_status.outputs.skip != 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
@@ -57,7 +72,7 @@ jobs:
           python scripts/invoke_product_agent.py ${{ inputs.feature_id }}
 
       - name: Upload JSON artifacts
-        if: always()
+        if: always() && steps.check_status.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: product-json-artifacts-${{ inputs.feature_id }}
@@ -65,11 +80,13 @@ jobs:
           if-no-files-found: ignore
 
       - name: Update pipeline state
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           sed -i "s/status: .*/status: product_complete/" .ai/pipeline/${{ inputs.feature_id }}.state
           sed -i "s/product: .*/product: ✓/" .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
@@ -87,15 +104,30 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
+      - name: Check if stage already complete
+        id: check_status
+        run: |
+          if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
+            if grep -q "design: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
+              echo "Stage already complete, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
       - name: Set up Python
+        if: steps.check_status.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        if: steps.check_status.outputs.skip != 'true'
         run: pip install -r requirements.txt
 
       - name: Check if design needed
+        if: steps.check_status.outputs.skip != 'true'
         id: check-design
         run: |
           NEEDS_DESIGN=$(grep "needs_design:" .ai/pipeline/${{ inputs.feature_id }}.state | cut -d: -f2 | xargs || echo "false")
@@ -105,7 +137,7 @@ jobs:
           fi
 
       - name: Run Design Agent
-        if: steps.check-design.outputs.needs_design == 'true'
+        if: steps.check_status.outputs.skip != 'true' && steps.check-design.outputs.needs_design == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
@@ -117,7 +149,7 @@ jobs:
           python scripts/invoke_design_agent_iterative.py ${{ inputs.feature_id }}
 
       - name: Upload JSON artifacts
-        if: always()
+        if: always() && steps.check_status.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: design-json-artifacts-${{ inputs.feature_id }}
@@ -125,13 +157,13 @@ jobs:
           if-no-files-found: ignore
 
       - name: Update pipeline state
-        if: steps.check-design.outputs.needs_design == 'true'
+        if: steps.check_status.outputs.skip != 'true' && steps.check-design.outputs.needs_design == 'true'
         run: |
           sed -i 's/status:.*/status: design_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
           sed -i 's/design: .*/design: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
-        if: steps.check-design.outputs.needs_design == 'true'
+        if: steps.check_status.outputs.skip != 'true' && steps.check-design.outputs.needs_design == 'true'
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
@@ -149,15 +181,30 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
+      - name: Check if stage already complete
+        id: check_status
+        run: |
+          if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
+            if grep -q "architect: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
+              echo "Stage already complete, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
       - name: Set up Python
+        if: steps.check_status.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        if: steps.check_status.outputs.skip != 'true'
         run: pip install -r requirements.txt
 
       - name: Run Architect Agent
+        if: steps.check_status.outputs.skip != 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
@@ -169,7 +216,7 @@ jobs:
           python scripts/invoke_architect_agent.py ${{ inputs.feature_id }}
 
       - name: Upload JSON artifacts
-        if: always()
+        if: always() && steps.check_status.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: architect-json-artifacts-${{ inputs.feature_id }}
@@ -177,11 +224,13 @@ jobs:
           if-no-files-found: ignore
 
       - name: Update pipeline state
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           sed -i 's/status:.*/status: architect_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
           sed -i 's/architect: .*/architect: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
@@ -199,15 +248,30 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
+      - name: Check if stage already complete
+        id: check_status
+        run: |
+          if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
+            if grep -q "dev: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
+              echo "Stage already complete, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
       - name: Set up Python
+        if: steps.check_status.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        if: steps.check_status.outputs.skip != 'true'
         run: pip install openai google-genai python-dotenv
 
       - name: Run Dev Agent
+        if: steps.check_status.outputs.skip != 'true'
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -219,7 +283,7 @@ jobs:
           python scripts/invoke_dev_agent_iterative.py "${{ inputs.feature_id }}"
 
       - name: Upload JSON artifacts
-        if: always()
+        if: always() && steps.check_status.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: dev-json-artifacts-${{ inputs.feature_id }}
@@ -227,11 +291,13 @@ jobs:
           if-no-files-found: ignore
 
       - name: Update pipeline state
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           sed -i 's/status:.*/status: dev_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
           sed -i 's/dev: .*/dev: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
@@ -278,15 +344,30 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
+      - name: Check if stage already complete
+        id: check_status
+        run: |
+          if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
+            if grep -q "ops: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
+              echo "Stage already complete, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
       - name: Set up Python
+        if: steps.check_status.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        if: steps.check_status.outputs.skip != 'true'
         run: pip install openai google-genai python-dotenv
 
       - name: Run Ops Agent
+        if: steps.check_status.outputs.skip != 'true'
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -297,11 +378,13 @@ jobs:
           python scripts/invoke_ops_agent.py "${{ inputs.feature_id }}"
 
       - name: Update pipeline state
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           sed -i 's/status:.*/status: ops_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
           sed -i 's/ops: .*/ops: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
@@ -310,6 +393,7 @@ jobs:
           git push
 
       - name: Create deployment PR to main
+        if: steps.check_status.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

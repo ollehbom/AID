@@ -187,42 +187,27 @@ Provide your response in JSON format with these keys:
 ```json
 {{
   "deployment_summary": "Overview of deployment approach and key decisions",
-  "workflow_files": [
-    {{"path": ".github/workflows/filename.yml", "description": "Purpose", "content": "Full YAML content"}}
+  "deployment_configs": [
+    {{
+      "path": ".github/workflows/deploy.yml",
+      "description": "Deployment workflow description",
+      "content": "Full YAML content for the file"
+    }},
+    {{
+      "path": ".env.example",
+      "description": "Environment variables template",
+      "content": "Full content with all required variables"
+    }}
   ],
-  "config_files": [
-    {{"path": "path/to/config", "description": "Purpose", "content": "Full content"}}
+  "ci_updates": [
+    {{
+      "path": ".github/workflows/ci.yml",
+      "description": "CI workflow updates",
+      "content": "Full updated workflow content"
+    }}
   ],
-  "env_template": {{
-    "path": ".env.example",
-    "variables": [
-      {{"name": "VAR_NAME", "description": "What this variable is for", "example": "example_value"}}
-    ]
-  }},
-  "monitoring": {{
-    "health_checks": [
-      {{"endpoint": "/health", "expected_status": 200, "timeout_ms": 5000}}
-    ],
-    "metrics": [
-      {{"name": "response_time_p95", "threshold": "500ms", "alert": "slack"}}
-    ],
-    "alerts": [
-      {{"severity": "critical", "condition": "error_rate > 1%", "channel": "pagerduty"}}
-    ]
-  }},
-  "documentation": [
-    {{"path": "docs/deployment.md", "title": "Deployment Runbook", "content": "Full markdown content"}}
-  ],
-  "security_checklist": {{
-    "secrets_managed": true,
-    "env_vars_documented": true,
-    "security_scanning": true,
-    "branch_protection": true
-  }},
-  "rollback_procedure": "Step-by-step rollback instructions",
-  "known_risks": [
-    {{"risk": "Description", "mitigation": "How to handle it", "severity": "low|medium|high"}}
-  ]
+  "monitoring_setup": "Markdown documentation for monitoring, health checks, metrics, and alerts",
+  "rollback_plan": "Step-by-step rollback instructions in markdown format"
 }}
 ```
 
@@ -375,33 +360,29 @@ def main():
     print(f"\nDeployment Summary:")
     print(result.get('deployment_summary', 'No summary provided'))
     
-    # Create workflow files
-    for file_info in result.get('workflow_files', []):
+    # Create deployment config files
+    for file_info in result.get('deployment_configs', []):
         filepath = REPO_ROOT / file_info['path']
         save_file(filepath, file_info['content'])
-        print(f"  ✓ Created workflow: {file_info['path']}")
+        print(f"  ✓ Created: {file_info['path']}")
     
-    # Create config files
-    for config_info in result.get('config_files', []):
-        filepath = REPO_ROOT / config_info['path']
-        save_file(filepath, config_info['content'])
-        print(f"  ✓ Created config: {config_info['path']}")
+    # Create/update CI workflow files
+    for file_info in result.get('ci_updates', []):
+        filepath = REPO_ROOT / file_info['path']
+        save_file(filepath, file_info['content'])
+        print(f"  ✓ Updated CI: {file_info['path']}")
     
-    # Create .env.example
-    if 'env_template' in result:
-        env_content = "# Environment Variables\n\n"
-        for var in result['env_template']['variables']:
-            env_content += f"# {var['description']}\n"
-            env_content += f"{var['name']}={var['example']}\n\n"
-        filepath = REPO_ROOT / result['env_template']['path']
-        save_file(filepath, env_content)
-        print(f"  ✓ Created: {result['env_template']['path']}")
+    # Save monitoring setup documentation
+    if result.get('monitoring_setup'):
+        monitoring_path = REPO_ROOT / "docs" / f"monitoring-{feature_id}.md"
+        save_file(monitoring_path, result['monitoring_setup'])
+        print(f"  ✓ Created monitoring docs: {monitoring_path.relative_to(REPO_ROOT)}")
     
-    # Create documentation
-    for doc_info in result.get('documentation', []):
-        filepath = REPO_ROOT / doc_info['path']
-        save_file(filepath, doc_info['content'])
-        print(f"  ✓ Created docs: {doc_info['path']}")
+    # Save rollback plan
+    if result.get('rollback_plan'):
+        rollback_path = REPO_ROOT / "docs" / f"rollback-{feature_id}.md"
+        save_file(rollback_path, result['rollback_plan'])
+        print(f"  ✓ Created rollback plan: {rollback_path.relative_to(REPO_ROOT)}")
     
     # Update pipeline state
     state_file = REPO_ROOT / ".ai/pipeline" / f"{feature_id}.state"
@@ -412,26 +393,12 @@ def main():
         save_file(state_file, state_content)
         print(f"  ✓ Updated pipeline state")
     
-    print(f"\n📊 Monitoring Configuration:")
-    monitoring = result.get('monitoring', {})
-    if monitoring.get('health_checks'):
-        print(f"  Health Checks: {len(monitoring['health_checks'])} configured")
-    if monitoring.get('metrics'):
-        print(f"  Metrics: {len(monitoring['metrics'])} tracked")
-    if monitoring.get('alerts'):
-        print(f"  Alerts: {len(monitoring['alerts'])} configured")
-    
-    print(f"\n🔒 Security Checklist:")
-    checklist = result.get('security_checklist', {})
-    for check, passed in checklist.items():
-        status = "✓" if passed else "✗"
-        print(f"  {status} {check.replace('_', ' ').title()}")
-    
-    if result.get('known_risks'):
-        print(f"\n⚠️  Known Risks:")
-        for risk in result['known_risks']:
-            print(f"  - [{risk['severity'].upper()}] {risk['risk']}")
-            print(f"    Mitigation: {risk['mitigation']}")
+    print(f"\n✅ Ops Agent execution complete!")
+    print(f"\n📋 Deliverables:")
+    print(f"  - Deployment configs: {len(result.get('deployment_configs', []))} files")
+    print(f"  - CI updates: {len(result.get('ci_updates', []))} files")
+    print(f"  - Monitoring documentation: {'✓' if result.get('monitoring_setup') else '✗'}")
+    print(f"  - Rollback plan: {'✓' if result.get('rollback_plan') else '✗'}")
     
     print(f"\n🔄 Rollback Procedure:")
     print(f"  {result.get('rollback_procedure', 'Standard rollback via git revert')}")
