@@ -1,10 +1,15 @@
 feature: error-fix-1770311013114
-status: design_complete
+status: architect_complete
 needs_design: ✓
 stages:
   product: ✓
   design: ✓
-  architect: pending
+  architect: ✓
   dev: pending
   qa: pending
   ops: pending
+architecture:
+  adr_number: ADR-002
+  complexity: simple
+  primary_concerns: ['security', 'reliability', 'performance', 'cost']
+  review_date: 2026-02-05
