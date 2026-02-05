@@ -1,9 +1,9 @@
 ## Pipeline Failure
 
-**Feature ID:** `feature-2`  
-**Error ID:** `error-20260205-002418`  
+**Feature ID:** `error-fix-1770311013114`  
+**Error ID:** `error-20260205-171053`  
 **Workflow:** Pipeline  
-**Run:** https://github.com/ollehbom/AID/actions/runs/21693620250
+**Run:** https://github.com/ollehbom/AID/actions/runs/21720865544
 
 ### Failed Stage
 One or more pipeline stages failed. Check the workflow run for details.
