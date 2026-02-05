@@ -1,9 +1,9 @@
 ## Pipeline Failure
 
-**Feature ID:** `gh-vs-9`  
-**Error ID:** `error-20260204-234500`  
+**Feature ID:** `feature-1`  
+**Error ID:** `error-20260205-000958`  
 **Workflow:** Pipeline  
-**Run:** https://github.com/ollehbom/AID/actions/runs/21692638834
+**Run:** https://github.com/ollehbom/AID/actions/runs/21693218960
 
 ### Failed Stage
 One or more pipeline stages failed. Check the workflow run for details.
