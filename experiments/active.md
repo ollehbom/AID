@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2026-01-29-FEATURE-1
+- **Belief**: A modern, consistent UI/UX foundation (React + shadcn + design system) will accelerate future feature development and provide a positive initial user impression.
+- **Change**: Create a React app with shadcn/ui, Google login, basic dashboard, and initial design system.
+- **Owner**: Product Agent (for definition), Engineering Team (for implementation)
+- **Status**: Defined, Awaiting Implementation
+- **Success Signal**: Functional basic application ready for subsequent feature experiments; positive developer feedback on design system and initial app aesthetics.
