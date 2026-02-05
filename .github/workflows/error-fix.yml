@@ -13,6 +13,9 @@ on:
 jobs:
   analyze-and-fix:
     runs-on: ubuntu-latest
+    outputs:
+      feature_id: ${{ steps.issue_info.outputs.feature_id }}
+      feature_branch: ${{ steps.issue_info.outputs.feature_branch }}
     permissions:
       contents: write
       pull-requests: write
@@ -313,8 +316,8 @@ jobs:
         with:
           script: |
             const workflowFile = '${{ steps.determine-workflow.outputs.workflow_file }}';
-            const featureId = '${{ steps.issue_info.outputs.feature_id }}';
-            const featureBranch = '${{ steps.issue_info.outputs.feature_branch }}';
+            const featureId = '${{ needs.analyze-and-fix.outputs.feature_id }}';
+            const featureBranch = '${{ needs.analyze-and-fix.outputs.feature_branch }}';
 
             console.log(`Re-triggering workflow: ${workflowFile}`);
             console.log(`Feature ID: ${featureId}`);
@@ -358,8 +361,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          FEATURE_ID="${{ steps.issue_info.outputs.feature_id }}"
-          FEATURE_BRANCH="${{ steps.issue_info.outputs.feature_branch }}"
+          FEATURE_ID="${{ needs.analyze-and-fix.outputs.feature_id }}"
+          FEATURE_BRANCH="${{ needs.analyze-and-fix.outputs.feature_branch }}"
           WORKFLOW_FILE="${{ steps.determine-workflow.outputs.workflow_file }}"
 
           if [ -n "$FEATURE_ID" ]; then
