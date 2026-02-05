@@ -38,8 +38,8 @@ jobs:
         run: |
           gh issue view ${{ inputs.issue_number }} --json body -q .body > issue_body.txt
 
-          # Extract feature_id from issue body
-          FEATURE_ID=$(grep -oP '(?<=\*\*Feature ID:\*\* `)' issue_body.txt || echo "")
+          # Extract feature_id from issue body (pattern: **Feature ID:** `gh-vs-1`)
+          FEATURE_ID=$(grep -oP '(?<=\*\*Feature ID:\*\* `)([a-zA-Z0-9_-]+)(?=`)' issue_body.txt || echo "")
 
           if [ -z "$FEATURE_ID" ]; then
             echo "⚠️  No feature_id found in issue, will use main branch"
@@ -323,9 +323,14 @@ jobs:
             try {
               const inputs = {};
               
-              // Add feature_id if available
-              if (featureId) {
+              // Add feature_id if available, otherwise use a generated ID
+              if (featureId && featureId.trim() !== '') {
                 inputs.feature_id = featureId;
+              } else {
+                // Generate a unique ID for error fixes without feature context
+                const timestamp = Date.now();
+                inputs.feature_id = `error-fix-${timestamp}`;
+                console.log(`⚠️  No feature_id found, using generated ID: ${inputs.feature_id}`);
               }
               
               await github.rest.actions.createWorkflowDispatch({
