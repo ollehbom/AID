@@ -31,3 +31,12 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### Active Experiments
+
+- **ID**: EXP-2026-01-29-error-fix-1770311013114
+  - **Belief**: "The product must feel obvious without documentation", "Onboarding flow is intuitive without guidance"
+  - **Change**: Implement foundational React app with Shadcn UI, Google login, and a basic dashboard.
+  - **Owner**: [Assigned Dev Team Lead]
+  - **Status**: active
+  - **Success Signal**: Functional Google login, dashboard displaying mock content, positive founder feedback on initial user experience.
