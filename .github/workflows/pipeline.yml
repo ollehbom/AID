@@ -290,11 +290,76 @@ jobs:
           path: json_artifacts/
           if-no-files-found: ignore
 
+      - name: Build and validate generated code
+        if: steps.check_status.outputs.skip != 'true'
+        id: build_validation
+        run: |
+          echo "🔨 Building and validating generated code..."
+
+          BUILD_FILE=".ai/pipeline/${{ inputs.feature_id }}.build.json"
+
+          if [ ! -f "$BUILD_FILE" ]; then
+            echo "⚠️  No build commands found, skipping validation"
+            echo "validation_passed=skipped" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Extract build commands
+          WORKING_DIR=$(jq -r '.working_dir // "."' "$BUILD_FILE")
+          INSTALL_CMD=$(jq -r '.install // ""' "$BUILD_FILE")
+          BUILD_CMD=$(jq -r '.build // ""' "$BUILD_FILE")
+          TEST_CMD=$(jq -r '.test // ""' "$BUILD_FILE")
+
+          echo "Working directory: $WORKING_DIR"
+          cd "$WORKING_DIR" || exit 1
+
+          # Install dependencies
+          if [ -n "$INSTALL_CMD" ] && [ "$INSTALL_CMD" != "null" ]; then
+            echo "📦 Installing dependencies: $INSTALL_CMD"
+            if ! eval "$INSTALL_CMD"; then
+              echo "❌ Dependency installation failed"
+              echo "validation_passed=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          fi
+
+          # Build project
+          if [ -n "$BUILD_CMD" ] && [ "$BUILD_CMD" != "null" ]; then
+            echo "🔨 Building: $BUILD_CMD"
+            if ! eval "$BUILD_CMD"; then
+              echo "❌ Build failed"
+              echo "validation_passed=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          fi
+
+          # Run tests
+          if [ -n "$TEST_CMD" ] && [ "$TEST_CMD" != "null" ]; then
+            echo "🧪 Running tests: $TEST_CMD"
+            if ! eval "$TEST_CMD"; then
+              echo "❌ Tests failed"
+              echo "validation_passed=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          fi
+
+          echo "✅ Build and tests passed!"
+          echo "validation_passed=true" >> $GITHUB_OUTPUT
+
       - name: Update pipeline state
         if: steps.check_status.outputs.skip != 'true'
         run: |
           sed -i 's/status:.*/status: dev_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
           sed -i 's/dev: .*/dev: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
+
+          # Add validation result
+          if [ "${{ steps.build_validation.outputs.validation_passed }}" = "true" ]; then
+            echo "  build_validation: ✓" >> .ai/pipeline/${{ inputs.feature_id }}.state
+          elif [ "${{ steps.build_validation.outputs.validation_passed }}" = "false" ]; then
+            echo "  build_validation: ✗ failed" >> .ai/pipeline/${{ inputs.feature_id }}.state
+          else
+            echo "  build_validation: - skipped" >> .ai/pipeline/${{ inputs.feature_id }}.state
+          fi
 
       - name: Commit outputs
         if: steps.check_status.outputs.skip != 'true'
@@ -315,12 +380,46 @@ jobs:
         with:
           ref: feature/${{ inputs.feature_id }}
 
-      - name: Run QA Agent
+      - name: Check if stage already complete
+        id: check_status
         run: |
-          echo "🧪 Running QA Agent..."
-          echo "TODO: Invoke QA Agent"
+          if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
+            if grep -q "qa: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
+              echo "Stage already complete, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Validate build results
+        if: steps.check_status.outputs.skip != 'true'
+        id: qa_check
+        run: |
+          echo "🧪 Running QA validation..."
+
+          STATE_FILE=".ai/pipeline/${{ inputs.feature_id }}.state"
+
+          # Check if build validation passed
+          if grep -q "build_validation: ✓" "$STATE_FILE"; then
+            echo "✅ Build validation passed"
+            echo "qa_passed=true" >> $GITHUB_OUTPUT
+          elif grep -q "build_validation: ✗" "$STATE_FILE"; then
+            echo "❌ Build validation failed - blocking QA approval"
+            echo "qa_passed=false" >> $GITHUB_OUTPUT
+            exit 1
+          elif grep -q "build_validation: - skipped" "$STATE_FILE"; then
+            echo "⚠️  Build validation was skipped (no build commands)"
+            echo "qa_passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️  No build validation results found, passing with warning"
+            echo "qa_passed=true" >> $GITHUB_OUTPUT
+          fi
+
+          echo "✅ QA checks complete"
 
       - name: Update pipeline state
+        if: steps.check_status.outputs.skip != 'true'
         run: |
           sed -i 's/status:.*/status: qa_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
           sed -i 's/qa: .*/qa: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
