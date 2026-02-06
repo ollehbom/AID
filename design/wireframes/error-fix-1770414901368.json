@@ -1,0 +1,32 @@
+{
+  "design_intent": "The primary intent of this design is to establish a robust, intuitive, and high-performance foundational user interface for the AI Pipeline application. This initial setup, encompassing the login screen and a basic dashboard, aims to enable rapid and consistent UI development using Shadcn UI. The design prioritizes a clear, obvious user experience, aligning with the belief that 'The product must feel obvious without documentation' and 'Users value speed over configurability', catering to a technically competent user base.",
+  "design_spec": "# Design Specification: Core Application Foundation (Login & Dashboard)## Feature ID: error-fix-1770414901368### 1. Design Intent SummaryTo establish a clear, intuitive, and consistent foundational user interface for the AI Pipeline application, prioritizing speed of interaction and development. This design supports the core beliefs of 'The product must feel obvious without documentation' and 'Users value speed over configurability' for technical users.### 2. User Flow#### 2.1 Login Flow1.  **User lands on application**: The user is presented with the Login Screen.2.  **Login Prompt**: The screen displays a clear call to action to log in.3.  **Google OAuth**: User clicks the 'Sign in with Google' button.4.  **Authentication**: The application initiates the Google OAuth flow.5.  **Redirect to Dashboard**: Upon successful authentication, the user is redirected to the Dashboard Screen.#### 2.2 Dashboard Flow1.  **Authenticated User**: User lands on the Dashboard Screen after successful login.2.  **Mock Content**: The dashboard displays placeholder content, indicating a successful setup and providing a basic navigation point.### 3. UI States#### 3.1 Login Screen-   **Initial State**: Displays application title, a login prompt, and a prominent 'Sign in with Google' button.-   **Error State**: If Google OAuth fails, a transient error message 'Login failed. Please try again.' appears on the login screen.#### 3.2 Dashboard Screen-   **Initial State**: Displays a welcome message (e.g., 'Welcome [User Name]') and mock content arranged in a simple layout.### 4. Key UI Elements & Components (Shadcn UI Inspired)-   **Typography**: For titles ('Welcome to AID'), prompts ('Please log in to continue'), and dashboard content.-   **Button**: A primary button for 'Sign in with Google', styled according to Shadcn UI principles.-   **Layout**: Simple, centered layout for the login screen. A basic grid or stack for the dashboard content.### 5. Copy-   **Login Screen**:    -   Title: 'Welcome to AID'    -   Prompt: 'Please log in to continue'    -   Button: 'Sign in with Google'-   **Dashboard Screen**:    -   Welcome: 'Welcome [User Name]' (placeholder)    -   Content: 'Your Dashboard' (with placeholder modules/cards)### 6. Error Handling-   **Login Failure**: A toast notification or inline message on the login screen will inform the user of authentication failure, prompting them to try again.",
+  "wireframe_json": {
+    "name": "LoginScreen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "AppTitle",
+        "type": "TEXT",
+        "content": "Welcome to AID",
+        "fontSize": 28
+      },
+      {
+        "name": "LoginPrompt",
+        "type": "TEXT",
+        "content": "Please log in to continue",
+        "fontSize": 16
+      },
+      {
+        "name": "GoogleLoginButton",
+        "type": "BUTTON",
+        "label": "Sign in with Google",
+        "variant": "primary"
+      }
+    ]
+  },
+  "validation_checklist": "**Validation against Design Agent Rules:**-   **Can a new user predict what happens next?** Yes. The prominent 'Sign in with Google' button on the login screen clearly indicates the next action. Upon successful login, landing on a 'Dashboard' is a widely understood convention, making the next step predictable for a technically competent user.-   **Is anything explained too late?** No. The login screen is self-explanatory, requiring minimal context. For the target technically competent user, the flow is standard and requires no pre-explanation. The dashboard will present content directly, with its purpose being immediately apparent.-   **Does the UI match the intent?** Yes. The simple, direct login screen with a single primary action ('Sign in with Google') strongly aligns with the intent to prioritize speed and an 'obvious without documentation' experience. The use of Shadcn UI for foundational components supports rapid and consistent development, further matching the intent for efficiency and consistency. The design avoids unnecessary complexity, reinforcing the belief that 'Users value speed over configurability'.",
+  "summary": "This design establishes the foundational login and dashboard experience for the AID application. It translates the product intent into a clear, intuitive interaction flow, prioritizing speed of access and consistency through the adoption of Shadcn UI. The login process is streamlined via Google OAuth, leading users directly to a basic dashboard. Validation confirms that the design aligns with core product beliefs, ensuring predictability for new users and matching the intent for an obvious, fast, and consistent user experience for technically competent users."
+}
