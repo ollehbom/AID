@@ -367,11 +367,15 @@ jobs:
                 console.log(`⚠️  No feature_id found, using generated ID: ${inputs.feature_id}`);
               }
               
+              // Ensure we use the feature branch, not main
+              const targetRef = featureBranch && featureBranch.trim() !== '' ? featureBranch : 'main';
+              console.log(`Target ref: ${targetRef}`);
+              
               await github.rest.actions.createWorkflowDispatch({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: workflowFile,
-                ref: featureBranch || 'main',
+                ref: targetRef,
                 inputs: inputs
               });
               
