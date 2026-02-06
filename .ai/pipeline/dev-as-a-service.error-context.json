@@ -1,6 +1,6 @@
 {
-  "error_id": "error-20260206-165644",
-  "issue_number": 73,
+  "error_id": "error-20260206-170232",
+  "issue_number": 75,
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "error_type": "build_validation_failure",
   "fix_applied": true,
