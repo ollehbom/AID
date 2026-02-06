@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  dev-service:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - GITHUB_APP_ID=${GITHUB_APP_ID}
+      - GITHUB_APP_PRIVATE_KEY_PATH=/app/private-key.pem
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+      - GITHUB_REPO_OWNER=${GITHUB_REPO_OWNER}
+      - GITHUB_REPO_NAME=${GITHUB_REPO_NAME}
+      - AI_PROVIDER=${AI_PROVIDER}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MODEL=${MODEL}
+      - WORKSPACE_DIR=/var/dev-workspaces
+      - MAX_BUILD_ATTEMPTS=5
+      - MAX_TEST_ATTEMPTS=3
+    volumes:
+      - ./private-key.pem:/app/private-key.pem:ro
+      - dev-workspaces:/var/dev-workspaces
+    restart: unless-stopped
+
+volumes:
+  dev-workspaces:

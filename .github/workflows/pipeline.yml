@@ -252,7 +252,7 @@ jobs:
         id: check_status
         run: |
           ERROR_CONTEXT_FILE=".ai/pipeline/${{ inputs.feature_id }}.error-context.json"
-          
+
           # Check if there's error context (error-fix ran)
           if [ -f "$ERROR_CONTEXT_FILE" ]; then
             echo "Error context found - dev agent will re-run to validate fixes"
@@ -260,7 +260,7 @@ jobs:
             echo "has_error_context=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           # Normal completion check
           if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
             if grep -q "dev: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
@@ -270,7 +270,7 @@ jobs:
               exit 0
             fi
           fi
-          
+
           echo "skip=false" >> $GITHUB_OUTPUT
           echo "has_error_context=false" >> $GITHUB_OUTPUT
 
@@ -380,7 +380,7 @@ jobs:
           else
             echo "  build_validation: - skipped" >> .ai/pipeline/${{ inputs.feature_id }}.state
           fi
-          
+
           # Clean up error context after successful validation
           if [ "${{ steps.check_status.outputs.has_error_context }}" = "true" ]; then
             if [ "${{ steps.build_validation.outputs.validation_passed }}" = "true" ]; then

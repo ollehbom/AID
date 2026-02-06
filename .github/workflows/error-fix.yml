@@ -59,7 +59,7 @@ jobs:
         run: |
           # Remove temporary files that might conflict
           rm -f issue_body.txt
-          
+
           git fetch origin ${{ steps.issue_info.outputs.feature_branch }}
           git checkout ${{ steps.issue_info.outputs.feature_branch }}
           git pull origin ${{ steps.issue_info.outputs.feature_branch }}
@@ -94,9 +94,9 @@ jobs:
           # Create error context that dev agent can use on retry
           FEATURE_ID="${{ steps.issue_info.outputs.feature_id }}"
           ERROR_CONTEXT_FILE=".ai/pipeline/${FEATURE_ID}.error-context.json"
-          
+
           mkdir -p .ai/pipeline
-          
+
           cat > "$ERROR_CONTEXT_FILE" << 'EOF'
           {
             "error_id": "${{ inputs.error_id }}",
@@ -107,7 +107,7 @@ jobs:
             "message": "Error-fix workflow applied automated fixes. Dev agent should review and refine if needed."
           }
           EOF
-          
+
           # Also clear the dev completion status so it re-runs with context
           if [ -f ".ai/pipeline/${FEATURE_ID}.state" ]; then
             sed -i 's/dev: ✓/dev: error-fix-retry/' ".ai/pipeline/${FEATURE_ID}.state"
@@ -126,7 +126,7 @@ jobs:
 
           Changes applied based on automated error analysis.
           See .ai/error-fixes/${{ inputs.error_id }}-analysis.json for details.
-          
+
           Dev agent will re-run with error context to validate and refine fixes."
 
       - name: Push branch
