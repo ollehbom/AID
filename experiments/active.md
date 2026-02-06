@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-FOUNDATION
+
+- **Belief**: "The product must feel obvious without documentation" (Core), "Onboarding flow is intuitive without guidance" (Open/Unproven)
+- **Change**: Establish the core React application framework including Shadcn styling, Google login, and a basic dashboard.
+- **Owner**: Product Agent (definition), Engineering (implementation)
+- **Status**: DEFINED
+- **Success Signal**: Successful Google logins for test users, intuitive dashboard navigation, consistent UI framework.
