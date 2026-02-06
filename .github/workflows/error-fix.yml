@@ -86,6 +86,31 @@ jobs:
           git config user.email "error-recovery@aid.local"
           git checkout -b fix/${{ inputs.error_id }}
 
+      - name: Create error context for dev agent
+        run: |
+          # Create error context that dev agent can use on retry
+          FEATURE_ID="${{ steps.issue_info.outputs.feature_id }}"
+          ERROR_CONTEXT_FILE=".ai/pipeline/${FEATURE_ID}.error-context.json"
+          
+          mkdir -p .ai/pipeline
+          
+          cat > "$ERROR_CONTEXT_FILE" << 'EOF'
+          {
+            "error_id": "${{ inputs.error_id }}",
+            "issue_number": ${{ inputs.issue_number }},
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "error_type": "build_validation_failure",
+            "fix_applied": true,
+            "message": "Error-fix workflow applied automated fixes. Dev agent should review and refine if needed."
+          }
+          EOF
+          
+          # Also clear the dev completion status so it re-runs with context
+          if [ -f ".ai/pipeline/${FEATURE_ID}.state" ]; then
+            sed -i 's/dev: ✓/dev: error-fix-retry/' ".ai/pipeline/${FEATURE_ID}.state"
+            echo "  error_fix_applied: ✓" >> ".ai/pipeline/${FEATURE_ID}.state"
+          fi
+
       - name: Commit fixes
         run: |
           git add -A
@@ -97,7 +122,9 @@ jobs:
           Error ID: ${{ inputs.error_id }}
 
           Changes applied based on automated error analysis.
-          See .ai/error-fixes/${{ inputs.error_id }}-analysis.json for details."
+          See .ai/error-fixes/${{ inputs.error_id }}-analysis.json for details.
+          
+          Dev agent will re-run with error context to validate and refine fixes."
 
       - name: Push branch
         run: |

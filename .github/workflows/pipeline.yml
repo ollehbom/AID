@@ -251,14 +251,28 @@ jobs:
       - name: Check if stage already complete
         id: check_status
         run: |
+          ERROR_CONTEXT_FILE=".ai/pipeline/${{ inputs.feature_id }}.error-context.json"
+          
+          # Check if there's error context (error-fix ran)
+          if [ -f "$ERROR_CONTEXT_FILE" ]; then
+            echo "Error context found - dev agent will re-run to validate fixes"
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "has_error_context=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Normal completion check
           if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
             if grep -q "dev: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
               echo "Stage already complete, skipping"
               echo "skip=true" >> $GITHUB_OUTPUT
+              echo "has_error_context=false" >> $GITHUB_OUTPUT
               exit 0
             fi
           fi
+          
           echo "skip=false" >> $GITHUB_OUTPUT
+          echo "has_error_context=false" >> $GITHUB_OUTPUT
 
       - name: Set up Python
         if: steps.check_status.outputs.skip != 'true'
@@ -278,8 +292,14 @@ jobs:
           AI_PROVIDER: ${{ vars.AI_PROVIDER }}
           MODEL: ${{ vars.MODEL }}
           SAVE_JSON_ARTIFACTS: "true"
+          ERROR_CONTEXT_FILE: ${{ steps.check_status.outputs.has_error_context == 'true' && format('.ai/pipeline/{0}.error-context.json', inputs.feature_id) || '' }}
         run: |
-          echo "💻 Running Dev Agent..."
+          if [ "${{ steps.check_status.outputs.has_error_context }}" = "true" ]; then
+            echo "💻 Running Dev Agent with error context (validating fixes)..."
+            echo "Error context: $ERROR_CONTEXT_FILE"
+          else
+            echo "💻 Running Dev Agent..."
+          fi
           python scripts/invoke_dev_agent_iterative.py "${{ inputs.feature_id }}"
 
       - name: Upload JSON artifacts
@@ -359,6 +379,14 @@ jobs:
             echo "  build_validation: ✗ failed" >> .ai/pipeline/${{ inputs.feature_id }}.state
           else
             echo "  build_validation: - skipped" >> .ai/pipeline/${{ inputs.feature_id }}.state
+          fi
+          
+          # Clean up error context after successful validation
+          if [ "${{ steps.check_status.outputs.has_error_context }}" = "true" ]; then
+            if [ "${{ steps.build_validation.outputs.validation_passed }}" = "true" ]; then
+              rm -f ".ai/pipeline/${{ inputs.feature_id }}.error-context.json"
+              echo "  error_context_resolved: ✓" >> .ai/pipeline/${{ inputs.feature_id }}.state
+            fi
           fi
 
       - name: Commit outputs
