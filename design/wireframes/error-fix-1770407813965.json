@@ -1,0 +1,127 @@
+{
+  "design_intent": "This feature establishes the core interaction foundation for our product, addressing the critical need for a modern, intuitive, and rapidly developable user interface. The primary intent is to provide a frictionless onboarding experience via Google login and a clear, concise dashboard that immediately conveys value to technical users. It aims to embody the product beliefs that 'Users value speed over configurability' and 'The product must feel obvious without documentation' by offering a streamlined flow and a clean Shadcn UI that feels inherently fast and easy to understand, even for first-time users.",
+  "design_spec": "This design specification outlines the user flow, states, copy, error handling, and transitions for the initial foundational React application, integrating Shadcn UI and Google OAuth. The design prioritizes clarity, simplicity, and speed, catering to technically competent users.User Flow:1. Landing/Login Page: User lands on the application, presented with a clear 'Sign in with Google' option.2. Authentication: User clicks 'Sign in with Google', triggering the Google OAuth flow.3. Dashboard Access: Upon successful authentication, the user is redirected to the main dashboard.States:* Login Page: Initial State: Title, 'Sign in with Google' button. Loading State (during OAuth): Visual indicator (e.g., spinner or button disabled). Error State (OAuth failure): Brief, actionable error message (e.g., 'Google login failed. Please try again.')* Dashboard Page: Initial State: Dashboard title, welcome message, and a placeholder content card. Loading State (for dashboard content): Optional skeleton loader for content card. Empty State (if no data): 'No activity yet' message within the card.Copy:* Login Page Title: 'Welcome to [Product Name]'* Login Button: 'Sign in with Google'* Dashboard Header: 'Dashboard'* Welcome Message: 'Welcome, [User Name]!'* Content Card Title: 'Your Activity'* Content Card Body: 'Overview of recent actions and metrics.'Error Handling:* Google OAuth errors: Display a toast notification or inline message on the login page, prompting retry.* Network errors: Standard browser error messages initially.Transitions:* Login to Dashboard: Immediate redirect upon successful authentication.* Loading states: Subtle, fast transitions to maintain perceived speed.",
+  "wireframe_json": {
+    "name": "Foundational App Wireframes",
+    "type": "PAGE",
+    "children": [
+      {
+        "name": "Login Screen",
+        "type": "FRAME",
+        "width": 375,
+        "height": 812,
+        "children": [
+          {
+            "name": "AppTitle",
+            "type": "TEXT",
+            "characters": "Product Name",
+            "fontSize": 32,
+            "width": "FILL",
+            "height": "HUG",
+            "textAlign": "CENTER",
+            "y": 150
+          },
+          {
+            "name": "SignInPrompt",
+            "type": "TEXT",
+            "characters": "Sign in to continue",
+            "fontSize": 18,
+            "width": "FILL",
+            "height": "HUG",
+            "textAlign": "CENTER",
+            "y": 250
+          },
+          {
+            "name": "GoogleSignInButton",
+            "type": "BUTTON",
+            "label": "Sign in with Google",
+            "variant": "primary",
+            "width": 280,
+            "height": 48,
+            "x": 47,
+            "y": 350
+          }
+        ]
+      },
+      {
+        "name": "Dashboard Screen",
+        "type": "FRAME",
+        "width": 375,
+        "height": 812,
+        "children": [
+          {
+            "name": "Header",
+            "type": "FRAME",
+            "layoutSizingHorizontal": "FILL",
+            "height": 60,
+            "backgroundColor": "#F5F5F5",
+            "children": [
+              {
+                "name": "DashboardTitle",
+                "type": "TEXT",
+                "characters": "Dashboard",
+                "fontSize": 24,
+                "width": "HUG",
+                "height": "HUG",
+                "x": 20,
+                "y": 18
+              },
+              {
+                "name": "UserAvatar",
+                "type": "RECTANGLE",
+                "width": 36,
+                "height": 36,
+                "cornerRadius": 18,
+                "backgroundColor": "#D0D0D0",
+                "x": 319,
+                "y": 12
+              }
+            ]
+          },
+          {
+            "name": "WelcomeMessage",
+            "type": "TEXT",
+            "characters": "Welcome, User!",
+            "fontSize": 20,
+            "width": "FILL",
+            "height": "HUG",
+            "y": 100,
+            "x": 20
+          },
+          {
+            "name": "ContentCard",
+            "type": "FRAME",
+            "layoutSizingHorizontal": "FILL",
+            "layoutSizingVertical": "HUG",
+            "backgroundColor": "#F0F0F0",
+            "cornerRadius": 8,
+            "x": 20,
+            "y": 150,
+            "width": 335,
+            "height": 150,
+            "children": [
+              {
+                "name": "CardTitle",
+                "type": "TEXT",
+                "characters": "Your Activity",
+                "fontSize": 16,
+                "x": 15,
+                "y": 15
+              },
+              {
+                "name": "CardBodyText",
+                "type": "TEXT",
+                "characters": "Overview of recent actions and metrics.",
+                "fontSize": 14,
+                "x": 15,
+                "y": 45
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "validation_checklist": "1. Login Flow Clarity: Is the 'Sign in with Google' button immediately obvious and the primary call to action on the login screen? (Predictability, UI matches intent) Can a new user predict that clicking this button will initiate a sign-in process and lead them to the dashboard? (Predictability, obvious without documentation) Is there any ambiguous text or UI element that might confuse a technically competent user? (Obvious without documentation)2. Dashboard Accessibility & Content: Upon successful login, is the dashboard immediately displayed without additional steps or explanations? (Predictability, obvious without documentation) Is the primary content (e.g., 'Your Activity' card) clearly presented and does it convey a sense of 'speed' and 'overview' as per intent? (UI matches intent for speed, obvious without documentation) Are all essential UI elements (e.g., dashboard title, user indicator) present and easily identifiable? (Predictability)3. Adherence to Beliefs: Does the overall interaction flow prioritize speed and directness over extensive configuration or options? (Users value speed over configurability) Could a technical user understand the purpose and navigation of the app without needing external documentation or tutorials? (The product must feel obvious without documentation) Does the interface design (via Shadcn) feel modern, efficient, and cater to a technically competent user's expectations for a fast application? (The primary user is technically competent, UI matches intent)",
+  "summary": "The design for the foundational React application effectively translates the product intent into a clean, fast, and intuitive user experience. The Google login provides a streamlined entry, while the dashboard offers immediate, digestible information, aligning with the core beliefs of speed, obviousness, and catering to technically competent users. The wireframes provide a clear structural guide for development, and the validation checklist ensures the design remains true to its purpose and user-centric principles."
+}
