@@ -38,3 +38,14 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+## Active Experiments
+
+- **ID**: EXP-2024-05-15-error-fix-1770415257927
+- **Belief**: "The product must feel obvious without documentation" (this foundational work supports it)
+- **Change**: Establish core React app with Shadcn, Google login, and basic dashboard.
+- **Owner**: Engineering Team
+- **Status**: active
+- **Success Signal**: Successful Google login and dashboard rendering; Shadcn components integrated; initial design system applied.
+- **Decision Record**: `product/decisions/error-fix-1770415257927.md`
+- **GitHub Issue**: # [Issue Number will be assigned later]
