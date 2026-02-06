@@ -38,3 +38,12 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+# Active Experiments
+
+## EXP-2026-01-29-error-fix-1770397474567
+- **Belief**: A modern, consistent frontend foundation is required to enable future belief testing and product development, aligning with the belief that "The product must feel obvious without documentation."
+- **Change**: Implement a React application with `shadcn/ui` styling, Google login, and a basic dashboard.
+- **Owner**: Product Agent (definition), Engineering (implementation)
+- **Status**: Active
+- **Success Signal**: Functional React app, working Google login, accessible dashboard, and visible integration of `shadcn/ui` components with an initial design system.
