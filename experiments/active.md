@@ -38,3 +38,12 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### Active Experiments
+
+- **ID**: EXP-2026-01-29-error-fix-1770413879622
+  - **Belief**: A strong foundational user experience, delivered through a modern UI and reliable authentication, reduces cognitive load and accelerates product validation.
+  - **Change**: Implement a basic React application shell with Shadcn UI, Google login, and a mock dashboard.
+  - **Owner**: Product Agent
+  - **Status**: Active
+  - **Success Signal**: Functional Google login, accessible dashboard, and visually consistent Shadcn UI components.
