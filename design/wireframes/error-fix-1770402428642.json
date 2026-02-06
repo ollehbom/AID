@@ -1,0 +1,150 @@
+{
+  "design_intent": "## Design Intent: Frontend Foundation (error-fix-1770402428642)\n\n### Why does this feature exist?\nThis feature establishes the fundamental frontend architecture for the product, including a React application, `shadcn/ui` integration, a Google login screen, and a basic dashboard. Its primary purpose is to create a robust, intuitive, and modern foundation that enables rapid iteration and aligns with our core product beliefs.\n\n### How should it feel?\nThe user experience should feel:\n*   **Obvious**: New users should instinctively know how to log in and navigate the basic dashboard without needing any documentation or guidance.\n*   **Intuitive**: The Google login flow should be straightforward and familiar, leveraging common patterns.\n*   **Consistent**: Utilizing `shadcn/ui` will ensure a cohesive and modern look-and-feel across all initial components.\n*   **Modern**: The overall aesthetic should reflect contemporary UI/UX best practices, contributing to a professional and trustworthy product image.\n*   **Foundational**: It should clearly serve as a stable and extensible canvas for all future feature development.",
+  "design_spec": "## Design Specification: Frontend Foundation (error-fix-1770402428642)\n\nThis document outlines the design for the foundational frontend architecture, including the Google login flow and a basic dashboard. The design prioritizes clarity, simplicity, and adherence to established modern UI patterns to ensure an obvious and intuitive user experience.\n\n### 1. Google Login Screen\n*   **Purpose**: Allow users to authenticate and gain access to the application.\n*   **Flow**: \n    1.  User lands on the login screen.\n    2.  User sees a prominent \"Sign in with Google\" button.\n    3.  User clicks the button, initiating the Google OAuth flow.\n    4.  Upon successful authentication, the user is redirected to the Dashboard Screen.\n    5.  Upon failed authentication, an error message is displayed.\n*   **States**:\n    *   **Initial**: Displays \"Welcome\" header, a prompt \"Sign in to continue\", and the \"Sign in with Google\" button.\n    *   **Loading**: (Implicit during Google OAuth redirection) Button may show a loading spinner if interaction occurs before redirect.\n    *   **Error**: A discreet, temporary toast or message indicating \"Authentication failed. Please try again.\" after a failed Google OAuth attempt.\n*   **Copy**:\n    *   Header: \"Welcome\"\n    *   Prompt: \"Sign in to continue\"\n    *   Button: \"Sign in with Google\"\n    *   Error Message: \"Authentication failed. Please try again.\"\n*   **Components**: `shadcn/ui` Button, custom text elements.\n\n### 2. Basic Dashboard Screen\n*   **Purpose**: Provide a landing page post-login, serving as a placeholder for future features and demonstrating the application's core layout.\n*   **Flow**: Accessible only after successful authentication. Displays basic information and placeholder content.\n*   **States**:\n    *   **Initial**: Displays the dashboard header and mock content cards.\n    *   **Loading**: (Not explicitly designed for this basic version, but can be added for future data fetches).\n*   **Copy**:\n    *   Header: \"Dashboard\"\n    *   Welcome Message: \"Hello, User! Welcome to your dashboard.\"\n    *   Content Card 1 Title: \"Your Activity\"\n    *   Content Card 1 Text: \"Recent actions and updates will appear here.\"\n    *   Content Card 2 Title: \"Quick Links\"\n    *   Content Card 2 Text: \"Links to important sections.\"\n*   **Components**: `shadcn/ui` Card, custom text elements.\n\n### 3. Design System Principles (via `shadcn/ui`)\n*   **Typography**: Utilize `shadcn/ui`'s default typography system, ensuring readability and hierarchical structure.\n*   **Color Palette**: Adopt `shadcn/ui`'s default color scheme, defining primary, secondary, and neutral colors for consistency.\n*   **Spacing**: Implement a consistent spacing system (e.g., multiples of 4px or 8px) for elements and layouts, primarily through `shadcn/ui` utilities.\n*   **Responsiveness**: Basic responsive considerations for mobile-first views will be inherent with `shadcn/ui` components.",
+  "wireframe_json": [
+    {
+      "name": "LoginScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "WelcomeHeader",
+          "type": "TEXT",
+          "characters": "Welcome",
+          "fontSize": 28,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlignHorizontal": "CENTER",
+          "y": 200
+        },
+        {
+          "name": "LoginPrompt",
+          "type": "TEXT",
+          "characters": "Sign in to continue",
+          "fontSize": 16,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlignHorizontal": "CENTER",
+          "y": 250
+        },
+        {
+          "name": "GoogleSignInButton",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "HUG",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#4285F4",
+          "cornerRadius": 4,
+          "width": 280,
+          "height": 48,
+          "x": 47.5,
+          "y": 350,
+          "children": [
+            {
+              "name": "ButtonText",
+              "type": "TEXT",
+              "characters": "Sign in with Google",
+              "fontSize": 16,
+              "textColor": "#FFFFFF",
+              "textAlignHorizontal": "CENTER",
+              "textAlignVertical": "CENTER",
+              "width": "FILL",
+              "height": "FILL"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DashboardScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "Header",
+          "type": "TEXT",
+          "characters": "Dashboard",
+          "fontSize": 24,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlignHorizontal": "CENTER",
+          "y": 60
+        },
+        {
+          "name": "WelcomeMessage",
+          "type": "TEXT",
+          "characters": "Hello, User! Welcome to your dashboard.",
+          "fontSize": 16,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlignHorizontal": "LEFT",
+          "y": 120,
+          "x": 20
+        },
+        {
+          "name": "ContentCard1",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "width": 335,
+          "height": 120,
+          "x": 20,
+          "y": 180,
+          "children": [
+            {
+              "name": "CardTitle1",
+              "type": "TEXT",
+              "characters": "Your Activity",
+              "fontSize": 18,
+              "x": 10,
+              "y": 10
+            },
+            {
+              "name": "CardText1",
+              "type": "TEXT",
+              "characters": "Recent actions and updates will appear here.",
+              "fontSize": 14,
+              "x": 10,
+              "y": 40
+            }
+          ]
+        },
+        {
+          "name": "ContentCard2",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "width": 335,
+          "height": 100,
+          "x": 20,
+          "y": 320,
+          "children": [
+            {
+              "name": "CardTitle2",
+              "type": "TEXT",
+              "characters": "Quick Links",
+              "fontSize": 18,
+              "x": 10,
+              "y": 10
+            },
+            {
+              "name": "CardText2",
+              "type": "TEXT",
+              "characters": "Links to important sections.",
+              "fontSize": 14,
+              "x": 10,
+              "y": 40
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "## Validation Checklist: Frontend Foundation\n\nThis checklist validates the design against stated intent and product beliefs, focusing on clarity, intuitiveness, and consistency.\n\n### General Validation Rules\n*   **Can a new user predict what happens next?**\n    *   [X] **Login Screen**: The \"Sign in with Google\" button clearly indicates the authentication method and subsequent action. The flow is a standard, widely understood pattern.\n    *   [X] **Dashboard Screen**: The ",
+  "summary": "The design for the frontend foundation (error-fix-1770402428642) successfully translates the product intent into a clear and intuitive user experience. The Google login screen is straightforward, leveraging familiar patterns to ensure an obvious onboarding flow. The basic dashboard provides a clean, consistent canvas for future development, adhering to modern design principles established by `shadcn/ui`. Validation confirms that new users should find the experience predictable and that the UI aligns with the intent of an obvious product without documentation. This design provides a robust and intuitive foundation ready for development."
+}
