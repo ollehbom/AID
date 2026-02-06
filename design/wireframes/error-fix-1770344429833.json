@@ -1,0 +1,117 @@
+{
+  "design_intent": "The design intent for the Foundational UI is to establish a modern, intuitive, and fast-to-develop frontend that supports rapid iteration and future feature expansion. By implementing a clean React UI with Shadcn, featuring a straightforward Google login and a basic dashboard, we aim to deliver an 'obvious' user experience that aligns with our belief in speed over configurability and targets technically competent users. This foundational design will resolve the current lack of a consistent UI, setting the stage for subsequent product development.",
+  "design_spec": "## Design Specification: Foundational UI (Google Login & Dashboard)### 1. User FlowA. Initial Access & Authentication1.  User arrives at product URL.2.  System checks authentication status.    *   If authenticated: Redirects directly to Dashboard.    *   If not authenticated: Displays Login Screen.3.  **Login Screen**:    *   **Title**: 'Welcome to [Product Name]' or 'Sign In'.    *   **Call to Action**: 'Sign in with Google' button (primary style).    *   **Subtext (optional)**: 'By signing in, you agree to our Terms and Privacy Policy.'4.  User clicks 'Sign in with Google'.5.  System initiates Google OAuth flow.6.  **Authentication Success**: User is redirected to the Dashboard.7.  **Authentication Failure**: An inline error message 'Authentication failed. Please try again.' is displayed on the Login Screen.B. Dashboard Access1.  **Dashboard Screen**:    *   **Header**: 'Dashboard' (prominent, top left/center).    *   **Welcome Message**: 'Welcome, [User Name]!' or 'Welcome!' if name isn't immediately available.    *   **Content Area**: A placeholder card or section for 'Your recent activity' or 'Quick links'.    *   **Navigation (minimal)**: A logout button (secondary style), possibly in a header or user menu.### 2. States & Error Handling-   **Login Screen**: Default, Loading (after button click), Error (inline message).-   **Dashboard Screen**: Default (displaying content), Loading (for initial data fetch, if applicable).### 3. Copy-   **Login Screen**: 'Welcome!', 'Sign in to [Product Name]', 'Sign in with Google', 'Authentication failed. Please try again.'-   **Dashboard Screen**: 'Dashboard', 'Welcome, User!', 'Your recent activity', 'Logout'.### 4. Visuals & Components-   **Framework**: Shadcn UI for consistent, modern aesthetic.-   **Typography**: Consistent font sizes and weights as per Shadcn defaults (e.g., h1 for screen titles, p for body).-   **Buttons**: Primary style for 'Sign in with Google', secondary for 'Logout'.-   **Layout**: Responsive to mobile width (375px example), centered content where appropriate.",
+  "wireframe_json": [
+    {
+      "name": "Login Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "WelcomeHeader",
+          "type": "TEXT",
+          "characters": "Welcome!",
+          "fontSize": 28,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlignHorizontal": "CENTER",
+          "marginTop": 150
+        },
+        {
+          "name": "SignInInstruction",
+          "type": "TEXT",
+          "characters": "Sign in to continue",
+          "fontSize": 16,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlignHorizontal": "CENTER",
+          "marginTop": 10
+        },
+        {
+          "name": "GoogleSignInButton",
+          "type": "BUTTON",
+          "characters": "Sign in with Google",
+          "variant": "primary",
+          "width": 250,
+          "height": 48,
+          "layoutAlign": "CENTER",
+          "marginTop": 50
+        }
+      ]
+    },
+    {
+      "name": "Dashboard Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "DashboardTitle",
+          "type": "TEXT",
+          "characters": "Dashboard",
+          "fontSize": 28,
+          "width": "FILL",
+          "height": "HUG",
+          "paddingLeft": 20,
+          "paddingTop": 40
+        },
+        {
+          "name": "WelcomeMessage",
+          "type": "TEXT",
+          "characters": "Welcome, User! Your content goes here.",
+          "fontSize": 16,
+          "width": "FILL",
+          "height": "HUG",
+          "paddingLeft": 20,
+          "paddingRight": 20,
+          "marginTop": 20
+        },
+        {
+          "name": "ContentCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "padding": 20,
+          "marginLeft": 20,
+          "marginRight": 20,
+          "marginTop": 20,
+          "children": [
+            {
+              "name": "CardTitle",
+              "type": "TEXT",
+              "characters": "Your Recent Activity",
+              "fontSize": 18,
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "CardBody",
+              "type": "TEXT",
+              "characters": "No activity yet. Get started by...",
+              "fontSize": 14,
+              "width": "FILL",
+              "height": "HUG",
+              "marginTop": 10
+            }
+          ]
+        },
+        {
+          "name": "LogoutButton",
+          "type": "BUTTON",
+          "characters": "Logout",
+          "variant": "secondary",
+          "width": 100,
+          "height": 36,
+          "layoutAlign": "END",
+          "marginRight": 20,
+          "marginTop": 50
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "- **Predictability**:- Is the 'Sign in with Google' button clearly indicating the next action? (Yes)- Is the redirection to the dashboard after successful login predictable? (Yes, standard pattern)- Is the dashboard layout intuitive for a first-time user? (Yes, clear title and content area placeholder).- **Timeliness of Explanation**:- Does the UI require external documentation for basic navigation (login, dashboard)? (No, aligns with 'obvious without documentation' belief).- Are error messages (e.g., login failure) immediate and clear? (Yes, inline error).- **UI-Intent Match**:- Does the clean, minimal design reflect the intent for a 'modern React UI built with Shadcn'? (Yes, simple components).- Does the straightforward flow (login -> dashboard) support 'rapid iteration' and 'fast-to-develop' goals? (Yes, minimal complexity).- Is the design appropriate for 'technically competent' users (e.g., no excessive hand-holding)? (Yes, direct and functional).- **Core Functionality**:- Is the Google login flow clearly represented? (Yes, single button).- Is the basic dashboard structure evident? (Yes, header, content area, logout).",
+  "summary": "The design for the Foundational UI successfully translates the product intent into a clear and intuitive user experience. It provides a straightforward Google login and a basic dashboard, adhering to principles of speed, obviousness, and suitability for technically competent users. The wireframes define the essential structure for both screens, enabling the Dev Agent to implement a modern React application with Shadcn UI. The validation checklist confirms the design's alignment with predictability, timely explanations, and the overarching product beliefs, setting a strong foundation for future development."
+}
