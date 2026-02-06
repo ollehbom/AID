@@ -38,3 +38,13 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+# Active Experiments
+
+## EXP-2026-01-29-error-fix-1770399830153
+
+- **Belief**: A modern, intuitive application foundation built with `shadcn/ui` and React will enable rapid iteration and testing of core product beliefs.
+- **Change**: Implement a basic React application with `shadcn/ui` styling, Google login, and a mock dashboard.
+- **Owner**: Product Agent (handoff to Design and Engineering)
+- **Status**: Proposed (pending design and engineering)
+- **Success Signal**: Successful Google login, dashboard loads, design system components integrated.
