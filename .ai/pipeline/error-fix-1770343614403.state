@@ -8,3 +8,4 @@ stages:
   dev: pending
   qa: pending
   ops: pending
+  error_fix_applied: ✓
