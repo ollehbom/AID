@@ -38,3 +38,15 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+---
+id: EXP-2026-01-29-dev-as-a-service
+belief: |
+  - Users value speed over configurability
+  - The primary user is technically competent
+  - The product must feel obvious without documentation
+change: Establish foundational UI/UX for 'dev-as-a-service' with React, shadcn/ui, Google login, basic dashboard, and foundational design system elements.
+owner: Development Team
+status: active
+success_signal: Positive founder validation of initial setup, aesthetic, and extensibility.
+---
