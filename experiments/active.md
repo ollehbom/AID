@@ -38,3 +38,5 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+---\nID: EXP-2026-01-29-error-fix-1770345349563\nBelief: The product must feel obvious without documentation.\nChange: Establish a foundational React application with shadcn/ui, Google login, and a basic dashboard.\nOwner: Product Agent\nStatus: Active\nSuccess Signal: Functional React app with Google login, shadcn/ui styling, and basic dashboard renders; design system components integrated.
