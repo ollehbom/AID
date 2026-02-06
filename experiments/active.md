@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770408316888: Foundational React App & Design System
+
+- **Belief**: "The product must feel obvious without documentation", "Users value speed over configurability", "Onboarding flow is intuitive without guidance"
+- **Change**: Establish core React app with Shadcn UI, Google login, basic dashboard, and design system.
+- **Owner**: Frontend Team (or founding engineer)
+- **Status**: Active
+- **Success Signal**: Founder approval of initial UI/UX and functional components.
