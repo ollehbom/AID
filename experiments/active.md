@@ -38,3 +38,13 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+
+# Active Experiments
+
+- **ID**: EXP-2024-07-29-error-fix-1770406372044
+  - **Belief**: "The product must feel obvious without documentation", "Users value speed over configurability", "The primary user is technically competent"
+  - **Change**: Establish core UI/UX with React, Shadcn, Google Login, and a basic dashboard.
+  - **Owner**: Product Agent (definition), Engineering (implementation)
+  - **Status**: Active
+  - **Success Signal**: Positive founder feedback on intuitiveness and development speed, functional core UI/UX.
