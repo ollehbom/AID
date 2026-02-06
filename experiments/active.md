@@ -38,3 +38,12 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770346639649: Foundational React App & Design System
+
+- **Belief**: A modern, consistent design system is essential for rapid, high-quality UI development and positive user experience.
+- **Change**: Implement a new React application using shadcn/ui, including a Google login and a basic dashboard, along with defining an initial design system.
+- **Owner**: Product Agent (for tracking) / Frontend Team (for execution)
+- **Status**: Active
+- **Success Signal**: Functional core application, defined design system, positive developer feedback on consistency and ease of use.
+- **Decision Record**: `product/decisions/error-fix-1770346639649.md`
