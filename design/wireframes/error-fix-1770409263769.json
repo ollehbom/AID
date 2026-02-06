@@ -1,0 +1,59 @@
+{
+  "design_intent": "### Design Intent for Foundational UI (Google Login & Dashboard)\n\n#### 1. Why this feature exists:\nThis foundational UI feature exists to establish a modern, robust, and extensible frontend application base. It provides a standardized user interface using shadcn/UI, a clear and secure authentication mechanism via Google Login, and a basic dashboard structure ready for future product development.\n\n#### 2. How it should feel:\nThe application should feel *fast*, *intuitive*, *secure*, and *professional*. Users, especially technically competent ones, should experience confidence in the application's stability and ease of use from their very first interaction. The login process should be straightforward and instantly recognizable, leveraging familiar Google authentication patterns. The dashboard, even in its basic form, should immediately convey readiness for action and a sense of organized utility.\n\n#### 3. Key Product Beliefs Supported:\n- \"Users value speed over configurability\": The lean design prioritizes quick access and a direct path to core functionality.\n- \"The primary user is technically competent\": The interface assumes a level of digital literacy, allowing for a clean, uncluttered design without excessive hand-holding.\n- \"The product must feel obvious without documentation\": The login flow is standard and the dashboard structure is conventional, requiring no prior explanation.\n\n#### 4. Interaction Goal:\nThe primary interaction goal is to provide seamless and secure authentication, followed by immediate and intuitive access to a functional (albeit basic) dashboard. This initial experience is critical for setting a positive and productive tone for the user's journey within the application.",
+  "design_spec": "### Design Specification: Foundational UI (Google Login & Dashboard)\n\n#### 1. Overview\nThis document details the design specification for the foundational React application, integrating Google Login and a basic dashboard, leveraging shadcn/UI for a consistent design system. The primary goal is to provide a modern, extensible UI base that aligns with core product beliefs.\n\n#### 2. User Flow: Google Login & Dashboard Access\n\n**Flow 1: First-time Access / Unauthenticated User**\n1.  **User Action**: User navigates to the application's root URL (e.g., `app.example.com`).\n2.  **System Response**: Application checks authentication status. If unauthenticated, the **Google Login Screen** is displayed.\n3.  **User Action**: User sees \"Sign in with Google\" button and clicks it.\n4.  **System Response**: Application initiates Google's OAuth flow. User is redirected to Google's authentication page.\n5.  **User Action**: User completes authentication on Google's platform (selects account, grants permissions).\n6.  **System Response**: Upon successful authentication, Google redirects the user back to the application's callback URL.\n7.  **System Response**: Application processes the authentication token and establishes a user session. User is then redirected to the **Dashboard Screen**.\n\n**Flow 2: Authenticated User (Subsequent Visits)**\n1.  **User Action**: User navigates to the application's root URL.\n2.  **System Response**: Application checks authentication status. If authenticated, the **Dashboard Screen** is displayed directly.\n\n#### 3. UI States & Components\n\n**A. Google Login Screen (Initial View)**\n*   **Layout**: Centered content, minimal design.\n*   **Components**:\n    *   **App Title**: Prominent text displaying \"Welcome to [App Name]\".\n    *   **\"Sign in with Google\" Button**: A primary call-to-action button. \n        *   **Appearance**: Styled according to Google's brand guidelines or a shadcn/UI equivalent that clearly indicates Google login. \n        *   **Interaction**: On click, initiates the Google OAuth flow.\n    *   **Loading Indicator (optional)**: A small spinner or disabled button state can appear briefly after clicking the button, before redirection to Google.\n    *   **Error Message (Hidden by default)**: A small text area for displaying application-level login errors (e.g., \"Login failed. Please try again.\").\n\n**B. Dashboard Screen (Post-Authentication)**\n*   **Layout**: Simple, clean layout, suitable for expansion.\n*   **Components**:\n    *   **Header**: Displays \"Welcome, [User Name]\" (dynamically populated) and potentially a logout button.\n    *   **Main Content Area**: Placeholder for future dashboard widgets or quick links.\n        *   **Example Placeholders**: \"Your Dashboard\", \"Quick Actions\", \"Recent Activity\", \"Settings\".\n    *   **Navigation (optional)**: Basic sidebar or top navigation, initially minimal (e.g., just 'Dashboard' and 'Settings' placeholders).\n\n#### 4. Copy & Messaging\n*   **Login Screen**:\n    *   App Title: \"Welcome to [App Name]\"\n    *   Button: \"Sign in with Google\"\n    *   Error Message: \"Login failed. Please try again.\"\n*   **Dashboard Screen**:\n    *   Header: \"Welcome, [User Name]\"\n    *   Placeholder Headings: \"Your Dashboard\", \"Quick Actions\", \"Recent Activity\"\n\n#### 5. Error Handling\n*   **Google OAuth Errors**: Google's authentication flow handles most errors (e.g., incorrect password, account not found). The application should gracefully handle the redirect back from Google, even if it signifies an authentication failure.\n*   **Application-Level Login Errors**: If the application fails to process the token or establish a session after Google's successful authentication, a concise error message should be displayed on the Login Screen (e.g., \"Login failed. Please try again.\") without exposing sensitive technical details.",
+  "wireframe_json": {
+    "name": "Login Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "AppTitle",
+        "type": "TEXT",
+        "characters": "Welcome to [App Name]",
+        "fontSize": 28,
+        "width": "FILL",
+        "height": "HUG",
+        "textAlign": "CENTER",
+        "y": 200
+      },
+      {
+        "name": "SignInButton",
+        "type": "FRAME",
+        "layoutSizingHorizontal": "HUG",
+        "layoutSizingVertical": "HUG",
+        "backgroundColor": "#4285F4",
+        "cornerRadius": 4,
+        "padding": [
+          12,
+          24
+        ],
+        "x": "CENTER",
+        "y": 350,
+        "children": [
+          {
+            "name": "ButtonText",
+            "type": "TEXT",
+            "characters": "Sign in with Google",
+            "fontSize": 16,
+            "color": "#FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "ErrorMessage",
+        "type": "TEXT",
+        "characters": "Login failed. Please try again.",
+        "fontSize": 12,
+        "color": "#FF0000",
+        "width": "FILL",
+        "height": "HUG",
+        "textAlign": "CENTER",
+        "y": 420,
+        "isVisible": false
+      }
+    ]
+  },
+  "validation_checklist": "- **Can a new user predict what happens next?** Yes. The prominent \"Sign in with Google\" button clearly indicates the next action and its outcome (authentication via Google).\n- **Is anything explained too late?** No. The purpose of the screen (login) and the primary action are immediately clear. Error messages, if any, appear contextually after an attempt.\n- **Does the UI match the intent?** Yes. The minimal design with a single, clear call-to-action button directly aligns with the intent of providing a fast, obvious, and low-friction authentication experience, supporting the belief that the product must feel obvious without documentation.",
+  "summary": "The foundational UI design, encompassing Google Login and a basic Dashboard, successfully translates the product intent into a clear interaction model. The proposed Google Login screen is straightforward and familiar, directly supporting the core belief that the product must feel obvious without documentation. The design prioritizes clarity and direct action, which significantly reduces friction for technically competent users. The validation process confirms that a new user can easily predict the next steps and that the UI's simplicity and directness align perfectly with the stated product beliefs. This design provides a robust and intuitive starting point for subsequent feature development."
+}
