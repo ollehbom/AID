@@ -1,0 +1,94 @@
+{
+  "design_intent": "This foundational feature establishes the core user-facing application, providing a modern, consistent, and intuitive entry point for users. It directly addresses the critical need for a frontend application, enabling subsequent feature development and belief testing. The primary intent is to provide a seamless Google login experience and an immediate, clear path to a basic dashboard, reinforcing the belief that 'The product must feel obvious without documentation' and laying a robust foundation with `shadcn/ui` for rapid iteration.",
+  "design_spec": "# Design Specification: Core Application Foundation (Login & Dashboard)\n\n## 1. User Flow\n\n### 1.1 Initial Access & Login\n1.  **User navigates to application URL:** User opens the web application in their browser.\n2.  **System checks authentication status:**\n    *   If **unauthenticated**, the user is presented with the **Login Screen**.\n    *   If **authenticated**, the user is automatically redirected to the **Dashboard Screen**.\n3.  **Login Screen Interaction:**\n    *   User sees a 'Sign in with Google' button.\n    *   User clicks 'Sign in with Google' button.\n    *   System initiates Google OAuth flow (handled by backend/auth library).\n    *   **On successful Google login:** User is redirected to the **Dashboard Screen**.\n    *   **On failed Google login:** A transient error message ('Login failed. Please try again.') is displayed on the Login Screen, and the user remains on the Login Screen.\n\n### 1.2 Dashboard Access\n1.  **Authenticated User Access:** Upon successful login or direct access while authenticated, the user lands on the **Dashboard Screen**.\n2.  **Dashboard Screen Interaction:**\n    *   User sees a welcome message (e.g., 'Welcome back, [User Name]!').\n    *   A placeholder content area is present, indicating where future features will reside.\n    *   A 'Logout' button is available, which, when clicked, initiates the logout process and redirects the user to the Login Screen.\n\n## 2. UI Elements & States\n\n### 2.1 Login Screen\n*   **Header:** 'Welcome' (H1/H2 style).\n*   **Subtitle:** 'Sign in to continue' (H3/Body style).\n*   **Google Login Button:** Prominent button with 'Sign in with Google' label and Google branding/icon (if possible with `shadcn/ui`).\n    *   **State:** Default, Hover, Active, Disabled (during login request).\n*   **Error Message (Transient):** 'Login failed. Please try again.' (Red text, briefly visible on failure).\n*   **Styling:** Minimalist, centered layout, utilizing `shadcn/ui` button and typography components.\n\n### 2.2 Dashboard Screen\n*   **Header:** 'Dashboard' (H1/H2 style).\n*   **Welcome Message:** 'Welcome back, [User Name]!' (dynamic, H3/Body style).\n*   **Content Area:** A simple card or frame acting as a placeholder for future widgets/information. Should demonstrate `shadcn/ui` card component usage.\n*   **Logout Button:** Clearly visible, secondary action button.\n    *   **State:** Default, Hover, Active.\n*   **Styling:** Clean, organized layout, demonstrating `shadcn/ui` layout components (e.g., Grid, Flex) and typography.\n\n## 3. General Design Principles\n*   **Consistency:** All components adhere to `shadcn/ui` design system. Consistent typography, spacing, and color palette.\n*   **Responsiveness:** Basic responsiveness for mobile and desktop viewports, ensuring content is legible and interactive.\n*   **Clarity:** Actions are clear, and the purpose of each screen is immediately understandable.\n*   **Accessibility:** Basic accessibility considerations (e.g., button contrast, focus states).\n\n## 4. Error Handling\n*   **Login Failure:** Display a non-intrusive, temporary error message on the login screen. No complex error codes or detailed messages to the user.\n*   **General Application Errors:** Not in scope for this foundational build, but future iterations will include a generic error page or notification system.",
+  "wireframe_json": [
+    {
+      "name": "Login Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "WelcomeHeader",
+          "type": "TEXT",
+          "characters": "Welcome",
+          "fontSize": 28,
+          "width": "FILL",
+          "height": "HUG",
+          "alignment": "CENTER"
+        },
+        {
+          "name": "Subtitle",
+          "type": "TEXT",
+          "characters": "Sign in to continue",
+          "fontSize": 16,
+          "width": "FILL",
+          "height": "HUG",
+          "alignment": "CENTER"
+        },
+        {
+          "name": "GoogleLoginButton",
+          "type": "BUTTON",
+          "characters": "Sign in with Google",
+          "width": 200,
+          "height": 48,
+          "cornerRadius": 4,
+          "backgroundColor": "#4285F4",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "DashboardHeader",
+          "type": "TEXT",
+          "characters": "Dashboard",
+          "fontSize": 24,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "WelcomeMessage",
+          "type": "TEXT",
+          "characters": "Welcome back, User!",
+          "fontSize": 18,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "ContentCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "name": "PlaceholderText",
+              "type": "TEXT",
+              "characters": "Your content will appear here.",
+              "fontSize": 14
+            }
+          ]
+        },
+        {
+          "name": "LogoutButton",
+          "type": "BUTTON",
+          "characters": "Logout",
+          "width": 100,
+          "height": 40,
+          "cornerRadius": 4,
+          "backgroundColor": "#E0E0E0",
+          "textColor": "#333333"
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "1.  **Can a new user predict what happens next?** Yes, the 'Sign in with Google' button clearly indicates the action. Upon successful login, the dashboard is the expected destination. The 'Logout' button's function is also clear. \n2.  **Is anything explained too late?** No, the purpose of the screens is immediately obvious. Login is the first step, dashboard is the next. Error messages are immediate and contextual. \n3.  **Does the UI match the intent?** Yes, the UI is minimal, focused on the Google login, and provides a clear, foundational dashboard. The use of `shadcn/ui` ensures a modern and consistent aesthetic, aligning with the intent of a robust and intuitive frontend foundation. \n4.  **Consistency with 'The product must feel obvious without documentation' belief:** The design prioritizes clear actions and minimal cognitive load, aiming for an intuitive experience.",
+  "summary": "The design establishes a clear and intuitive frontend foundation for the application, focusing on Google login and a basic dashboard. The `design_intent` outlines the goal of a modern, consistent, and obvious user experience. The `design_spec` details the user flow, UI elements, and states for both login and dashboard screens, emphasizing `shadcn/ui` integration. The `wireframe_json` provides a structured representation of these two core screens. The `validation_checklist` confirms that the design aligns with user predictability, timely information, and the core product belief of being obvious without documentation, ensuring a low-friction user journey."
+}
