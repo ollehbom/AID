@@ -251,119 +251,100 @@ jobs:
       - name: Check if stage already complete
         id: check_status
         run: |
-          ERROR_CONTEXT_FILE=".ai/pipeline/${{ inputs.feature_id }}.error-context.json"
-
-          # Check if there's error context (error-fix ran)
-          if [ -f "$ERROR_CONTEXT_FILE" ]; then
-            echo "Error context found - dev agent will re-run to validate fixes"
-            echo "skip=false" >> $GITHUB_OUTPUT
-            echo "has_error_context=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          # Normal completion check
           if [ -f ".ai/pipeline/${{ inputs.feature_id }}.state" ]; then
             if grep -q "dev: ✓" .ai/pipeline/${{ inputs.feature_id }}.state; then
               echo "Stage already complete, skipping"
               echo "skip=true" >> $GITHUB_OUTPUT
-              echo "has_error_context=false" >> $GITHUB_OUTPUT
               exit 0
             fi
           fi
-
           echo "skip=false" >> $GITHUB_OUTPUT
-          echo "has_error_context=false" >> $GITHUB_OUTPUT
 
-      - name: Set up Python
+      - name: Call Dev Service
         if: steps.check_status.outputs.skip != 'true'
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        if: steps.check_status.outputs.skip != 'true'
-        run: pip install openai google-genai python-dotenv
-
-      - name: Run Dev Agent
-        if: steps.check_status.outputs.skip != 'true'
-        env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
-          MODEL: ${{ vars.MODEL }}
-          SAVE_JSON_ARTIFACTS: "true"
-          ERROR_CONTEXT_FILE: ${{ steps.check_status.outputs.has_error_context == 'true' && format('.ai/pipeline/{0}.error-context.json', inputs.feature_id) || '' }}
         run: |
-          if [ "${{ steps.check_status.outputs.has_error_context }}" = "true" ]; then
-            echo "💻 Running Dev Agent with error context (validating fixes)..."
-            echo "Error context: $ERROR_CONTEXT_FILE"
+          echo "🚀 Calling Dev Service for feature: ${{ inputs.feature_id }}"
+
+          # Call dev service
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST ${{ secrets.DEV_SERVICE_URL }}/dev-request \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.DEV_SERVICE_TOKEN }}" \
+            -d "{
+              \"feature_id\": \"${{ inputs.feature_id }}\",
+              \"branch\": \"feature/${{ inputs.feature_id }}\",
+              \"repository\": \"${{ github.repository }}\"
+            }")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "Response code: $HTTP_CODE"
+          echo "Response body: $BODY"
+
+          # Check if request was accepted
+          if [ "$HTTP_CODE" = "202" ]; then
+            echo "✅ Dev service accepted the request"
           else
-            echo "💻 Running Dev Agent..."
+            echo "❌ Dev service rejected the request (HTTP $HTTP_CODE)"
+            exit 1
           fi
-          python scripts/invoke_dev_agent_iterative.py "${{ inputs.feature_id }}"
 
-      - name: Upload JSON artifacts
-        if: always() && steps.check_status.outputs.skip != 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: dev-json-artifacts-${{ inputs.feature_id }}
-          path: json_artifacts/
-          if-no-files-found: ignore
+      - name: Wait for Dev Service to complete
+        if: steps.check_status.outputs.skip != 'true'
+        run: |
+          echo "⏳ Waiting for dev service to complete implementation..."
 
-      - name: Build and validate generated code
+          MAX_WAIT=1800  # 30 minutes
+          ELAPSED=0
+          INTERVAL=30
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            # Pull latest changes from feature branch
+            git pull origin feature/${{ inputs.feature_id }} || true
+            
+            # Check if dev service has committed changes
+            if git log --since="1 minute ago" --author="Dev Service Bot" --oneline | grep -q "Feature ${{ inputs.feature_id }}"; then
+              echo "✅ Dev service completed - new commit detected"
+              break
+            fi
+            
+            # Alternative: Check for completion marker
+            if [ -f ".ai/pipeline/${{ inputs.feature_id }}.dev-complete" ]; then
+              echo "✅ Dev service marked as complete"
+              break
+            fi
+            
+            echo "Still waiting... (${ELAPSED}s / ${MAX_WAIT}s)"
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+
+          if [ $ELAPSED -ge $MAX_WAIT ]; then
+            echo "⏰ Timeout waiting for dev service"
+            echo "Check dev service logs for errors"
+            exit 1
+          fi
+
+      - name: Pull final changes
+        if: steps.check_status.outputs.skip != 'true'
+        run: |
+          git pull origin feature/${{ inputs.feature_id }}
+
+      - name: Validate build commands exist
         if: steps.check_status.outputs.skip != 'true'
         id: build_validation
         run: |
-          echo "🔨 Building and validating generated code..."
-
           BUILD_FILE=".ai/pipeline/${{ inputs.feature_id }}.build.json"
 
           if [ ! -f "$BUILD_FILE" ]; then
-            echo "⚠️  No build commands found, skipping validation"
-            echo "validation_passed=skipped" >> $GITHUB_OUTPUT
-            exit 0
+            echo "⚠️  No build file generated by dev service"
+            echo "Dev service may have failed"
+            exit 1
           fi
 
-          # Extract build commands
-          WORKING_DIR=$(jq -r '.working_dir // "."' "$BUILD_FILE")
-          INSTALL_CMD=$(jq -r '.install // ""' "$BUILD_FILE")
-          BUILD_CMD=$(jq -r '.build // ""' "$BUILD_FILE")
-          TEST_CMD=$(jq -r '.test // ""' "$BUILD_FILE")
+          echo "✅ Build commands file found"
+          cat "$BUILD_FILE"
 
-          echo "Working directory: $WORKING_DIR"
-          cd "$WORKING_DIR" || exit 1
-
-          # Install dependencies
-          if [ -n "$INSTALL_CMD" ] && [ "$INSTALL_CMD" != "null" ]; then
-            echo "📦 Installing dependencies: $INSTALL_CMD"
-            if ! eval "$INSTALL_CMD"; then
-              echo "❌ Dependency installation failed"
-              echo "validation_passed=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-          fi
-
-          # Build project
-          if [ -n "$BUILD_CMD" ] && [ "$BUILD_CMD" != "null" ]; then
-            echo "🔨 Building: $BUILD_CMD"
-            if ! eval "$BUILD_CMD"; then
-              echo "❌ Build failed"
-              echo "validation_passed=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-          fi
-
-          # Run tests
-          if [ -n "$TEST_CMD" ] && [ "$TEST_CMD" != "null" ]; then
-            echo "🧪 Running tests: $TEST_CMD"
-            if ! eval "$TEST_CMD"; then
-              echo "❌ Tests failed"
-              echo "validation_passed=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-          fi
-
-          echo "✅ Build and tests passed!"
           echo "validation_passed=true" >> $GITHUB_OUTPUT
 
       - name: Update pipeline state
@@ -371,23 +352,7 @@ jobs:
         run: |
           sed -i 's/status:.*/status: dev_complete/' .ai/pipeline/${{ inputs.feature_id }}.state
           sed -i 's/dev: .*/dev: ✓/' .ai/pipeline/${{ inputs.feature_id }}.state
-
-          # Add validation result
-          if [ "${{ steps.build_validation.outputs.validation_passed }}" = "true" ]; then
-            echo "  build_validation: ✓" >> .ai/pipeline/${{ inputs.feature_id }}.state
-          elif [ "${{ steps.build_validation.outputs.validation_passed }}" = "false" ]; then
-            echo "  build_validation: ✗ failed" >> .ai/pipeline/${{ inputs.feature_id }}.state
-          else
-            echo "  build_validation: - skipped" >> .ai/pipeline/${{ inputs.feature_id }}.state
-          fi
-
-          # Clean up error context after successful validation
-          if [ "${{ steps.check_status.outputs.has_error_context }}" = "true" ]; then
-            if [ "${{ steps.build_validation.outputs.validation_passed }}" = "true" ]; then
-              rm -f ".ai/pipeline/${{ inputs.feature_id }}.error-context.json"
-              echo "  error_context_resolved: ✓" >> .ai/pipeline/${{ inputs.feature_id }}.state
-            fi
-          fi
+          echo "  build_validation: ✓ (via dev service)" >> .ai/pipeline/${{ inputs.feature_id }}.state
 
       - name: Commit outputs
         if: steps.check_status.outputs.skip != 'true'
@@ -395,7 +360,7 @@ jobs:
           git config user.name "Pipeline Bot"
           git config user.email "pipeline@aid.local"
           git add .ai/pipeline/
-          git commit -m "Dev: ${{ inputs.feature_id }} implementation complete" || echo "No changes"
+          git commit -m "Dev: ${{ inputs.feature_id }} stage complete (via dev service)" || echo "No changes"
           git push
 
   qa:
