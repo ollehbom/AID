@@ -1,0 +1,60 @@
+{
+  "design_intent": "This foundational feature establishes the essential user interface for the product, transitioning it from a backend-only state to a user-facing application. The primary intent is to provide an 'obvious' and intuitive experience from initial access (Google login) through to the primary landing page (dashboard). This design aims to reinforce the core belief that 'The product must feel obvious without documentation' and facilitate validation of the 'Onboarding flow is intuitive without guidance' belief.",
+  "design_spec": "# Design Specification: Core UI Foundation (error-fix-1770407328968)\n\n## 1. Feature Overview\nThis specification details the initial user interface foundation, encompassing a React application with Shadcn UI, Google login, and a basic dashboard. The goal is to provide an obvious and intuitive entry point for users, enabling subsequent feature development and validation.\n\n## 2. User Flows\n### 2.1. Initial Access / Login Flow\n1.  **State: Unauthenticated User Landing Page**\n    *   **Description**: User lands on the application for the first time or is not logged in.\n    *   **UI Elements**: Clear 'Welcome' message, a prominent 'Sign in with Google' button.\n    *   **Action**: User clicks 'Sign in with Google'.\n2.  **State: Google Authentication Redirect**\n    *   **Description**: User is redirected to Google's authentication service.\n    *   **Action**: User completes Google login/authorization.\n3.  **State: Post-Authentication Redirect**\n    *   **Description**: Upon successful authentication, the user is redirected back to the application.\n    *   **Expected Result**: User is automatically navigated to the Dashboard.\n    *   **Error Handling**: If authentication fails, display a generic error message (e.g., 'Login failed. Please try again.') and remain on the login page.\n\n### 2.2. Dashboard Flow\n1.  **State: Authenticated User Dashboard**\n    *   **Description**: The primary landing page for authenticated users.\n    *   **UI Elements**: \n        *   A clear 'Dashboard' header.\n        *   A welcoming message (e.g., 'Welcome to your workspace!').\n        *   A central content card providing placeholder information or a 'Getting Started' section.\n        *   A 'Logout' button, typically in a header or sidebar (not explicitly in wireframe but functionally required).\n    *   **Content**: Initial content will be simple placeholders to demonstrate the UI structure.\n\n## 3. UI Components & Styling\n*   **Framework**: React with Shadcn UI for components and styling.\n*   **Responsiveness**: Basic responsive layout using `FILL` and `HUG` sizing for core elements.\n*   **Visuals**: Clean, modern aesthetic consistent with Shadcn UI principles.\n\n## 4. Error Handling (General)\n*   For foundational elements, error messages should be clear, concise, and guide the user to retry or understand the issue (e.g., 'Login failed. Please try again.').\n\n## 5. Accessibility\n*   Basic accessibility considerations for interactive elements (e.g., button labels).",
+  "wireframe_json": {
+    "name": "DashboardScreen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "Header",
+        "type": "TEXT",
+        "characters": "Dashboard",
+        "fontSize": 24,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "WelcomeMessage",
+        "type": "TEXT",
+        "characters": "Welcome to your new workspace!",
+        "fontSize": 16,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "ContentCard",
+        "type": "FRAME",
+        "layoutSizingHorizontal": "FILL",
+        "layoutSizingVertical": "HUG",
+        "backgroundColor": "#F0F0F0",
+        "cornerRadius": 8,
+        "children": [
+          {
+            "name": "CardTitle",
+            "type": "TEXT",
+            "characters": "Getting Started",
+            "fontSize": 18
+          },
+          {
+            "name": "CardBody",
+            "type": "TEXT",
+            "characters": "This is your basic dashboard. More features coming soon!",
+            "fontSize": 14
+          }
+        ]
+      },
+      {
+        "name": "LogoutButton",
+        "type": "TEXT",
+        "characters": "Logout",
+        "fontSize": 16,
+        "width": "HUG",
+        "height": "HUG"
+      }
+    ]
+  },
+  "validation_checklist": "- **Predictability for New Users**:\n    - Is the 'Sign in with Google' button immediately understandable as the primary action for entry?\n    - Does the transition from login to dashboard feel natural and expected?\n    - Is the dashboard content and layout intuitive enough for a new user to grasp its purpose without prior explanation?\n- **Timeliness of Explanation**:\n    - Are all necessary actions (e.g., how to log in, what the dashboard represents) clear from the moment the user interacts with the UI, or is crucial information provided too late?\n    - Is the purpose of the dashboard evident upon arrival, or does it require additional context?\n- **UI-Intent Match**:\n    - Does the UI's modern aesthetic and simple flow align with the intent of feeling 'obvious without documentation'?\n    - Does the onboarding experience (login to dashboard) genuinely feel intuitive and frictionless, validating the 'Onboarding flow is intuitive without guidance' belief?\n    - Are there any points of ambiguity or friction in the login process or initial dashboard view that contradict the intent of a smooth, intuitive foundation?",
+  "summary": "The design establishes a minimal yet functional UI foundation for the product, comprising a Google login screen and a basic dashboard. The primary goal is to provide an 'obvious' and intuitive user experience from the first interaction, enabling immediate user-facing experimentation. The provided wireframe focuses on the dashboard as the core landing page post-login, featuring a clear header, welcome message, a content card for initial information, and a logout option, all designed for simplicity and clarity in line with the product's core beliefs."
+}
