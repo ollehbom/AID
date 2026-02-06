@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770407813965
+
+- **Belief**: Foundational tech stack (Shadcn UI, React, Google Auth) will enable rapid development and an intuitive, fast-feeling product experience for technically competent users.
+- **Change**: Implement a React app with Shadcn UI, Google login, basic dashboard, and an initial design system.
+- **Owner**: Dev Team
+- **Status**: Active
+- **Success Signal**: Functional foundational application and design system, positive developer velocity.
