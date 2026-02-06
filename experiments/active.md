@@ -38,3 +38,10 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix
+- **Belief**: A modern, well-implemented design system (like shadcn/ui) accelerates feature development and ensures a consistent, intuitive user experience.
+- **Change**: Establish core React frontend with shadcn/ui design system, including Google login and basic dashboard.
+- **Owner**: Product Agent (or assigned Frontend Lead)
+- **Status**: Active
+- **Success Signal**: Successful deployment of basic app, functional Google login, basic dashboard rendering, and positive developer feedback on design system usability and speed of development.
