@@ -1,0 +1,32 @@
+{
+  "design_intent": "This foundational build-out establishes the core technical and user experience framework for our new React application. It integrates essential components like Shadcn UI for a modern aesthetic, enables seamless Google authentication, and provides a clear, functional basic dashboard. The design aims to embody the core product beliefs that \"the product must feel obvious without documentation\" and \"users value speed over configurability.\" It should feel modern, clean, and immediately understandable, minimizing any cognitive load for new users and enabling rapid feature development.",
+  "design_spec": "### Design Specification: Foundational Application Setup (Feature ID: error-fix-1770416759199)\n\n#### 1. Overview\nThis specification details the user experience for the initial foundational build-out of the React application, focusing on the login flow via Google Authentication and the subsequent display of a basic dashboard. The design prioritizes simplicity, speed, and adherence to established design system principles (Shadcn UI).\n\n#### 2. User Flows\n**2.1. Initial Access & Login**\n*   **State**: `LoginScreen` (Initial Load)\n    *   **Description**: User navigates to the application's root URL.\n    *   **UI Elements**:\n        *   Centered application logo/name (e.g., \"Your App\").\n        *   A clear, prominent call-to-action: \"Sign in with Google\" button.\n        *   No other login options or distractions are present.\n    *   **Interactions**:\n        *   User clicks \"Sign in with Google\" button.\n*   **State**: `LoginScreen` (Loading)\n    *   **Description**: After clicking the button, the application initiates Google authentication.\n    *   **UI Elements**:\n        *   \"Sign in with Google\" button becomes disabled.\n        *   A subtle loading indicator (e.g., spinner) appears within or near the button, or a brief full-screen overlay.\n    *   **Interactions**:\n        *   Upon successful authentication, user is automatically redirected to the `DashboardScreen`.\n        *   Upon authentication failure, an error message is displayed briefly (see 2.3).\n*   **State**: `DashboardScreen` (Post-Login)\n    *   **Description**: User successfully logs in and lands on the main dashboard.\n    *   **UI Elements**:\n        *   Simple header (e.g., \"Dashboard\" or \"Welcome\").\n        *   Placeholder content area, potentially featuring one or two basic Shadcn UI `Card` components with mock data (e.g., \"Your Projects,\" \"Quick Actions\").\n        *   Minimal navigation (initially none, or a simple \"Sign Out\" option in a corner).\n    *   **Interactions**:\n        *   (Future) Navigation to other features from dashboard. (Not in scope for this MVP)\n\n**2.2. Design System Application**\n*   All UI elements (buttons, cards, text styles) must adhere to the Shadcn UI framework for consistency and a modern aesthetic.\n*   Typography and spacing should be clean and readable.\n\n**2.3. Error Handling**\n*   **Login Failure**: If Google authentication fails (e.g., network error, Google service issue), a brief, non-intrusive error message should appear, for example, \"Login failed. Please try again.\" The \"Sign in with Google\" button should re-enable.\n\n**2.4. Responsiveness**\n*   The layout should be functional and presentable on common mobile and desktop viewport sizes.",
+  "wireframe_json": {
+    "name": "Login Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "AppTitle",
+        "type": "TEXT",
+        "characters": "Your App",
+        "fontSize": 32,
+        "layoutAlign": "CENTER",
+        "y": 250
+      },
+      {
+        "name": "SignInGoogleButton",
+        "type": "BUTTON",
+        "label": "Sign in with Google",
+        "variant": "primary",
+        "width": 280,
+        "height": 50,
+        "layoutAlign": "CENTER",
+        "y": 400
+      }
+    ]
+  },
+  "validation_checklist": "1.  **Predictability for New Users**:\n    *   Does the \"Sign in with Google\" button clearly indicate the next action? (Yes, standard pattern).\n    *   Is the redirection to the dashboard after successful login immediate and expected? (Yes, common behavior).\n    *   Is the basic dashboard content self-explanatory? (Yes, placeholder content should be simple).\n2.  **Timeliness of Explanations**:\n    *   Are there any critical pieces of information or instructions that are explained too late? (No, the UI is minimal; login is the primary action, dashboard is the result).\n    *   Is the purpose of the app or the available actions clear on the dashboard? (Initially, it's a foundation; future features will add clarity, but the current state should not cause confusion).\n3.  **UI-Intent Match**:\n    *   Does the UI (minimalist login, direct Google button, clean dashboard) align with the intent of \"obvious without documentation\" and \"users value speed\"? (Yes, direct path, no unnecessary steps).\n    *   Does the use of Shadcn UI components contribute to a \"modern and intuitive\" feel? (Yes, by design, Shadcn provides this aesthetic).\n    *   Are there any elements that introduce friction or ambiguity? (No, the design is intentionally sparse to avoid this).",
+  "summary": "The design for the foundational application setup prioritizes a fast, obvious, and modern user experience, directly translating the product belief that users value speed and intuition. The core flow involves a clear \"Sign in with Google\" action leading to a clean, basic dashboard. The wireframe focuses on the essential elements for this initial interaction, ensuring predictability and minimal friction for new users, and laying a solid, consistent design foundation using Shadcn UI."
+}
