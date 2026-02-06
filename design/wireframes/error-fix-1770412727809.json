@@ -1,0 +1,137 @@
+{
+  "design_intent": "This foundational feature exists to establish the core user interface and experience of our product, laying a robust groundwork for all subsequent development. Its primary objective is to embody our core belief that 'the product must feel obvious without documentation' by providing a clean, modern, and intuitive entry point. The Google login aims for secure and effortless access, while the basic dashboard provides immediate value and a clear navigational structure for our technically competent users. The overall design should feel consistent, responsive, and efficient.",
+  "design_spec": "## Design Specification: Foundation UI & Google Login (Feature ID: error-fix-1770412727809)\n\n### 1. Overview\nThis document details the design specifications for establishing the core React application structure, integrating `shadcn/ui` for a modern design system, implementing functional Google login, and presenting a basic dashboard with mock content. The goal is to create a seamless, intuitive initial user experience.\n\n### 2. User Flow\n**2.1. Initial Access & Login**\n1.  **Entry Point**: User navigates to the application URL.\n2.  **Login Screen**: If not authenticated, the user is presented with a dedicated Login Screen.\n    *   **Content**: Welcome message, 'Sign in with Google' button.\n    *   **Action**: User clicks 'Sign in with Google'.\n3.  **Authentication**: The application initiates the Google OAuth 2.0 flow.\n    *   User is redirected to Google's authentication page.\n    *   User grants necessary permissions.\n4.  **Redirection**: Upon successful authentication, the user is redirected back to the application, specifically to the Dashboard Screen.\n\n**2.2. Dashboard Access**\n1.  **Post-Login**: User lands on the Dashboard Screen after successful authentication.\n2.  **Direct Access (Authenticated)**: If already logged in, the user directly accesses the Dashboard Screen upon visiting the application URL.\n\n### 3. UI Elements & States\n**3.1. Login Screen**\n*   **Layout**: Centered content, minimal design using `shadcn/ui` components.\n*   **Elements**:\n    *   **Header**: 'Welcome to [App Name]' (e.g., `H1` using `shadcn/ui` typography).\n    *   **Button**: 'Sign in with Google'.\n        *   **State: Default**: Visible, clickable.\n        *   **State: Loading**: Button disabled, optional spinner/loading indicator (e.g., `shadcn/ui` Button with `loading` prop).\n        *   **State: Error**: Temporary message (e.g., `shadcn/ui` Toast notification) indicating authentication failure.\n\n**3.2. Dashboard Screen**\n*   **Layout**: Simple header, main content area, optional basic navigation (e.g., sidebar or top nav).\n*   **Elements**:\n    *   **Header**: 'Dashboard' (e.g., `H2` using `shadcn/ui` typography).\n    *   **Mock Content Area**: A `shadcn/ui` Card or similar container displaying placeholder text or a simple list (e.g., 'Your Recent Activity', 'Item 1', 'Item 2').\n    *   **Basic Navigation (Optional for MVP)**: If included, simple links/buttons for 'Home', 'Settings', 'Logout' using `shadcn/ui` Button or NavigationMenu components.\n\n### 4. Copy (Example)\n*   **Login Screen**:\n    *   'Welcome to [App Name]'\n    *   'Sign in with Google'\n    *   (Error): 'Authentication failed. Please try again.'\n*   **Dashboard Screen**:\n    *   'Dashboard'\n    *   'Your Recent Activity:'\n    *   'Home' (Navigation)\n    *   'Settings' (Navigation)\n\n### 5. Error Handling\n*   **Google Login Failure**: Display a non-intrusive `shadcn/ui` Toast notification at the top/bottom of the screen with a clear, concise message like 'Authentication failed. Please try again.' The login button should revert to its default state.\n*   **Dashboard Content Loading Error**: If mock content fails to load (e.g., future API integration), display an inline message within the content area: 'Failed to load content. Please refresh or try again later.'\n\n### 6. Accessibility Considerations\n*   Ensure all interactive elements (buttons) are keyboard navigable.\n*   Provide appropriate ARIA labels for buttons and status messages.\n\n### 7. UI Consistency\n*   Strict adherence to `shadcn/ui` component styling and usage guidelines across both login and dashboard screens to maintain a unified visual language.",
+  "wireframe_json": [
+    {
+      "name": "LoginScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "WelcomeHeader",
+          "type": "TEXT",
+          "characters": "Welcome to [App Name]",
+          "fontSize": 28,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER",
+          "paddingTop": 200
+        },
+        {
+          "name": "GoogleLoginButton",
+          "type": "BUTTON",
+          "characters": "Sign in with Google",
+          "variant": "primary",
+          "width": 250,
+          "height": 48,
+          "marginTop": 50
+        }
+      ]
+    },
+    {
+      "name": "DashboardScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "TopBar",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "height": 60,
+          "backgroundColor": "#F8F8F8",
+          "children": [
+            {
+              "name": "DashboardTitle",
+              "type": "TEXT",
+              "characters": "Dashboard",
+              "fontSize": 20,
+              "marginLeft": 16,
+              "verticalAlign": "CENTER"
+            }
+          ]
+        },
+        {
+          "name": "ContentArea",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "marginTop": 20,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "children": [
+            {
+              "name": "RecentActivityCard",
+              "type": "FRAME",
+              "layoutSizingHorizontal": "FILL",
+              "layoutSizingVertical": "HUG",
+              "backgroundColor": "#FFFFFF",
+              "cornerRadius": 8,
+              "padding": 16,
+              "children": [
+                {
+                  "name": "CardHeader",
+                  "type": "TEXT",
+                  "characters": "Your Recent Activity",
+                  "fontSize": 18,
+                  "fontWeight": "BOLD"
+                },
+                {
+                  "name": "ActivityItem1",
+                  "type": "TEXT",
+                  "characters": "- Item A: Task completed",
+                  "fontSize": 14,
+                  "marginTop": 8
+                },
+                {
+                  "name": "ActivityItem2",
+                  "type": "TEXT",
+                  "characters": "- Item B: Report generated",
+                  "fontSize": 14,
+                  "marginTop": 4
+                },
+                {
+                  "name": "ActivityItem3",
+                  "type": "TEXT",
+                  "characters": "- Item C: Configuration updated",
+                  "fontSize": 14,
+                  "marginTop": 4
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "BottomNavigation",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "height": 60,
+          "backgroundColor": "#F8F8F8",
+          "position": "ABSOLUTE",
+          "bottom": 0,
+          "children": [
+            {
+              "name": "HomeNavLink",
+              "type": "BUTTON",
+              "characters": "Home",
+              "width": 100,
+              "height": 40,
+              "marginLeft": 20
+            },
+            {
+              "name": "SettingsNavLink",
+              "type": "BUTTON",
+              "characters": "Settings",
+              "width": 100,
+              "height": 40,
+              "marginLeft": 20
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "## Validation Checklist: Foundation UI & Google Login\n\n### 1. Overall Experience (Alignment with 'Obvious Product' Belief)\n*   **Can a new user predict what happens next?**\n    *   Is the purpose of the 'Sign in with Google' button immediately clear?\n    *   Is the transition from login to dashboard smooth and predictable?\n    *   Is the dashboard's purpose obvious upon first glance?\n*   **Is anything explained too late?**\n    *   Is the app's identity and primary action (login) presented clearly from the start?\n    *   Are any crucial instructions or context missing before a user takes action?\n*   **Does the UI match the intent?**\n    *   Does the UI feel modern, clean, and professional, aligning with the intent of a robust foundation?\n    *   Does the UI convey security and trustworthiness for the login process?\n    *   Is the design system (`shadcn/ui`) consistently applied to promote intuitiveness?\n\n### 2. Login Flow Specifics\n*   **Predictability**: Does the 'Sign in with Google' button clearly communicate its action?\n*   **Timing**: Are any pre-login messages or context provided at the optimal time?\n*   **UI Match**: Does the login screen's simplicity and directness align with the goal of easy access for technically competent users?\n*   **Error Handling**: Are error messages for failed login attempts clear, concise, and actionable? Are they displayed prominently but non-intrusively?\n*   **States**: Are loading states visually apparent during the authentication process?\n\n### 3. Dashboard Flow Specifics\n*   **Predictability**: Can a user easily infer the type of content they will find on the dashboard (even with mock data)?\n*   **Timing**: Is the dashboard immediately useful or informative upon arrival, or does it require further action/explanation?\n*   **UI Match**: Does the dashboard's layout and content organization reinforce the idea of an 'obvious' product, allowing users to quickly understand their next steps or current status?\n*   **Consistency**: Does the dashboard's aesthetic and interaction patterns align with the login screen and the overall `shadcn/ui` based design language?\n*   **Navigation**: If basic navigation is present, are the labels clear and their destinations predictable?",
+  "summary": "The Design Agent has successfully translated the product decision into a foundational UI/UX design. This includes a clear design intent focused on an 'obvious without documentation' experience for technically competent users, detailed design specifications for the Google login flow and a basic dashboard, and structured wireframes (as a JSON string) for developer implementation. A comprehensive validation checklist, based on core design principles and product beliefs, has also been provided to ensure the design meets its objectives for clarity, consistency, and user predictability."
+}
