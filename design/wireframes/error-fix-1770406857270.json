@@ -1,0 +1,79 @@
+{
+  "design_intent": "## Design Intent: Foundational UI/UX (Google Login & Basic Dashboard)\n\n### Why does this feature exist?\nThis feature exists to establish the foundational user interface and experience for the product. It aims to provide a modern, consistent, and intuitive UI framework using React and `shadcn/ui`, starting with a functional Google login and a basic dashboard. This foundation is critical for accelerating future UI development and ensuring a polished user experience from the outset.\n\n### How should it feel?\nThe experience should feel: \n- **Obvious and intuitive**: A new user should immediately understand how to sign in and navigate the basic dashboard without needing instructions.\n- **Modern and clean**: Leveraging `shadcn/ui` to convey a contemporary aesthetic that is visually appealing and uncluttered.\n- **Fast and efficient**: The login process should be straightforward, and the dashboard should load quickly, reinforcing the belief that 'Users value speed over configurability'.\n- **Consistent**: Establish a design language that can be easily extended to future features, ensuring a unified product feel.\n\n### Core Beliefs Supported:\n- \"The product must feel obvious without documentation\": Achieved through clear UI elements and a predictable flow.\n- \"Users value speed over configurability\": Prioritizing a streamlined login and a simple, unencumbered dashboard experience.\n- \"The primary user is technically competent\": While the UI is obvious, it's designed with the expectation that users are comfortable with standard web application interactions like Google OAuth.\n\nThis foundational design sets the stage for future feature development, ensuring a strong, consistent, and user-friendly starting point.",
+  "design_spec": "## Design Specification: Foundational UI/UX (Google Login & Basic Dashboard)\n\nThis specification details the user flow, states, copy, and error handling for the initial Google Login screen and the subsequent basic Dashboard page, leveraging `shadcn/ui` for a consistent and modern aesthetic.\n\n### 1. Login Screen\n\n**1.1. User Flow:**\n- **Initial State**: User navigates to the application's root URL.\n- **Action**: User is presented with the Login Screen.\n- **Interaction**: User clicks the 'Sign in with Google' button.\n- **External Flow**: User is redirected to Google's OAuth consent screen (handled by Google).\n- **Success**: Upon successful authentication, user is redirected to the Dashboard Screen.\n- **Failure**: Upon authentication failure or cancellation, user is returned to the Login Screen with an optional error message.\n\n**1.2. States:**\n- **Default**: Display 'Sign in with Google' button.\n- **Loading**: 'Sign in with Google' button displays a loading spinner/state (e.g., 'Signing in...').\n- **Error**: Display a transient error message (e.g., 'Login failed. Please try again.') below the button.\n\n**1.3. Copy:**\n- **Header**: \"Welcome to [Product Name]\"\n- **Call to Action Button**: \"Sign in with Google\"\n- **Error Message (example)**: \"Could not complete login. Please try again.\"\n\n**1.4. Styling (via `shadcn/ui` principles):**\n- **Layout**: Centered content, minimalist design.\n- **Button**: Primary button style, Google brand icon (if possible with `shadcn/ui` extensions).\n- **Typography**: Consistent with `shadcn/ui` defaults.\n\n### 2. Dashboard Screen\n\n**2.1. User Flow:**\n- **Initial State**: User successfully logs in and is redirected to this screen.\n- **Action**: User views basic application content.\n- **Interaction**: (No specific interactions for this basic version, primarily a view state.)\n\n**2.2. States:**\n- **Default**: Display a welcoming message and placeholder content.\n- **Loading**: (If content loads asynchronously) Display a skeleton loader for the content area.\n- **Empty**: (If no content is available) Display a message like 'No content yet. Start by...' (not applicable for this initial basic view).\n\n**2.3. Copy:**\n- **Header**: \"Dashboard\"\n- **Welcome Message**: \"Hello, [User's Name]!\"\n- **Placeholder Content**: \"Your journey starts here. Explore insights and manage your projects.\"\n\n**2.4. Styling (via `shadcn/ui` principles):**\n- **Layout**: Simple header, main content area. Responsive layout principles.\n- **Content**: Card-based layouts for placeholder content, consistent typography and spacing.\n- **Components**: Utilize `shadcn/ui` Card, Text, and potentially Avatar components.",
+  "wireframe_json": [
+    {
+      "name": "LoginScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "type": "TEXT",
+          "name": "WelcomeHeader",
+          "characters": "Welcome to [Product Name]",
+          "fontSize": 28,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER"
+        },
+        {
+          "type": "BUTTON",
+          "name": "GoogleSignInButton",
+          "label": "Sign in with Google",
+          "variant": "primary",
+          "width": 280,
+          "height": 48
+        }
+      ]
+    },
+    {
+      "name": "DashboardScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "type": "TEXT",
+          "name": "DashboardHeader",
+          "characters": "Dashboard",
+          "fontSize": 24,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "type": "TEXT",
+          "name": "WelcomeMessage",
+          "characters": "Hello, [User's Name]!",
+          "fontSize": 18,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "type": "FRAME",
+          "name": "ContentCard1",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "type": "TEXT",
+              "name": "CardTitle1",
+              "characters": "Your Journey",
+              "fontSize": 16
+            },
+            {
+              "type": "TEXT",
+              "name": "CardText1",
+              "characters": "Explore insights and manage your projects.",
+              "fontSize": 14
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "### Validation Checklist for Foundational UI/UX (Google Login & Basic Dashboard)\n\n**1. Can a new user predict what happens next?**\n- **Login Screen**: Yes. The prominent 'Sign in with Google' button clearly indicates the action and expected outcome of authenticating via Google. The flow is standard for web applications.\n- **Dashboard Screen**: Yes. After successful login, landing on a 'Dashboard' page with a welcome message and placeholder content is a common and predictable pattern for an application's main entry point.\n\n**2. Is anything explained too late?**\n- **Login Screen**: No. The screen is minimalist, focusing solely on the sign-in action. No complex concepts or options are introduced that would require prior explanation.\n- **Dashboard Screen**: No. As a basic dashboard with placeholder content, there are no features or functionalities that are introduced without sufficient context. Its simplicity ensures clarity.\n\n**3. Does the UI match the intent?**\n- **Modern, consistent UI framework (`shadcn/ui`)**: Yes, the design spec and wireframes adhere to a clean, component-based approach, which aligns with modern UI principles. The simplicity supports the intent of building a consistent foundation.\n- **Functional Google Login**: Yes, the wireframe clearly shows a dedicated 'Sign in with Google' button, directly addressing the requirement for Google OAuth integration.\n- **Basic Dashboard**: Yes, the dashboard wireframe includes a header, welcome message, and simple content cards, fulfilling the 'basic' requirement without introducing complexity.\n- **'Obvious without documentation'**: Yes, both screens are designed to be self-explanatory, requiring minimal cognitive load from the user.\n- **'Users value speed over configurability'**: Yes, the streamlined login process and uncluttered dashboard prioritize speed and ease of use over advanced configuration options at this foundational stage.\n\n**Overall Validation**: The design effectively translates the product intent into a clear, predictable, and simple user experience for the foundational UI/UX. It aligns well with the stated product beliefs and validation rules.",
+  "summary": "The design establishes the foundational UI/UX for the product, encompassing a Google login screen and a basic dashboard. It prioritizes clarity, simplicity, and consistency, leveraging a modern design approach to ensure an intuitive user experience. The design aligns with core product beliefs that the product should feel obvious without documentation and that users value speed over configurability, providing a solid base for future development."
+}
