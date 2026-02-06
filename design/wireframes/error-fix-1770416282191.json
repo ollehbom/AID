@@ -1,0 +1,47 @@
+{
+  "design_intent": "To establish the foundational user interface for the application, starting with a modern, consistent design system (shadcn/ui), a clear Google login flow, and a basic dashboard. The core intent is to deliver an \"obvious\" and intuitive experience from the first interaction, fulfilling the belief that \"the product must feel obvious without documentation.\" This design aims to reduce friction for technical users by providing a predictable and clean interface that requires no external guidance.",
+  "design_spec": "# Design Specification: Foundational UI and Design System (Login & Dashboard)\n\n## 1. Overview\nThis specification details the initial user interface for the application, focusing on establishing a robust React front-end with `shadcn/ui` components, a Google login flow, and a basic dashboard. The primary goal is to create an \"obvious\" and consistent user experience from the outset.\n\n## 2. Screens\n\n### 2.1 Login Screen\n*   **Purpose**: Provides the entry point for users to authenticate.\n*   **Flow**: \n    1.  Unauthenticated users land directly on this screen.\n    2.  User clicks \"Sign in with Google\" button.\n    3.  User is redirected to Google's authentication flow.\n    4.  Upon successful authentication, user is redirected to the Dashboard Screen.\n*   **Elements**:\n    *   Prominent \"Welcome\" header.\n    *   Instructional text: \"Sign in to continue.\"\n    *   Primary action button: \"Sign in with Google\".\n*   **States**:\n    *   **Initial**: Displays header, instruction, and Google login button.\n    *   **Loading**: (Briefly) A visual indicator during redirect to Google auth.\n    *   **Error**: If Google authentication fails (e.g., network issue, user cancels), a clear, concise error message (e.g., \"Login failed. Please try again.\") is displayed, with the option to retry by clicking the button again.\n*   **Visuals**: Utilizes `shadcn/ui` components for buttons and typography, ensuring a clean, modern aesthetic consistent with the design system.\n\n### 2.2 Dashboard Screen\n*   **Purpose**: Serves as the initial landing page for authenticated users.\n*   **Flow**: \n    1.  Users are redirected here upon successful Google login.\n*   **Elements**:\n    *   Simple header (e.g., \"Dashboard\" or \"Welcome, [User Name]\").\n    *   Placeholder for future content (e.g., a simple card or text block indicating success).\n*   **States**:\n    *   **Initial**: Displays basic layout and welcome message/placeholder.\n    *   **Loading**: If initial dashboard content requires data fetching, a loading state will be shown.\n*   **Visuals**: Adheres to `shadcn/ui` guidelines for layout, typography, and any basic components used.\n*   **Error Handling**: Basic error handling for dashboard content loading (e.g., \"Failed to load dashboard content. Please refresh.\").\n\n## 3. Design System Integration\nAll UI elements will leverage `shadcn/ui` components to ensure consistency, accessibility, and ease of development. This includes buttons, typography, and basic layout structures.",
+  "wireframe_json": {
+    "name": "Login Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "WelcomeHeader",
+        "type": "TEXT",
+        "characters": "Welcome",
+        "fontSize": 24,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "SignInInstruction",
+        "type": "TEXT",
+        "characters": "Sign in to continue",
+        "fontSize": 16,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "GoogleSignInButton",
+        "type": "FRAME",
+        "layoutSizingHorizontal": "FILL",
+        "layoutSizingVertical": "HUG",
+        "backgroundColor": "#4285F4",
+        "cornerRadius": 4,
+        "children": [
+          {
+            "name": "ButtonText",
+            "type": "TEXT",
+            "characters": "Sign in with Google",
+            "fontSize": 16,
+            "color": "#FFFFFF"
+          }
+        ]
+      }
+    ]
+  },
+  "validation_checklist": "1.  **Can a new user predict what happens next?**\n    *   Yes. The \"Sign in with Google\" button clearly indicates an external authentication flow, a common pattern. Upon successful login, redirection to a dashboard is a standard and predictable next step.\n2.  **Is anything explained too late?**\n    *   No. The login screen's purpose is immediately clear. The authentication flow itself is handled by Google, which is an established and generally understood process. Any errors during login are communicated promptly on the login screen.\n3.  **Does the UI match the intent?**\n    *   Yes. The clean, minimalistic design leveraging `shadcn/ui` aligns directly with the intent for an \"obvious without documentation\" product. The prominence of the Google login button and the lack of extraneous options reinforce simplicity and directness. The overall aesthetic supports a modern and consistent user experience.",
+  "summary": "The design establishes a clear and modern entry point for the application via a Google login screen, leading to a basic dashboard. It prioritizes intuitiveness, consistency, and a friction-free experience by leveraging `shadcn/ui` and standard authentication patterns. This aligns with the core product belief that the product must be obvious without documentation, ensuring a predictable user journey from the very first interaction."
+}
