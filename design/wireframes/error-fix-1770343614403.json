@@ -1,0 +1,57 @@
+{
+  "design_intent": "This design intent focuses on establishing robust, user-friendly error handling for the foundational MVP, specifically for critical issues during Google authentication and dashboard loading. The intent is to ensure that even when errors occur, the user experience remains clear and guiding, reinforcing the belief that 'the product must feel obvious without documentation'. By providing immediate feedback and actionable next steps, we aim to minimize user frustration and prevent abandonment, upholding the principle that 'users value speed over configurability' by quickly guiding them through unexpected hurdles.",
+  "design_spec": "This design specification details the core error handling for critical errors in the Foundational MVP, specifically for error-fix-1770343614403. When an unrecoverable error occurs during Google authentication or initial dashboard loading, the system will display a dedicated error screen. This screen will include: 1. Clear Error Message: A prominent header indicating 'Something went wrong'. 2. Descriptive Body: A concise explanation such as 'We encountered an unexpected error. Please try again or contact support if the issue persists.' 3. Call to Action: A primary 'Try Again' button to re-attempt the previous action (e.g., re-initiate login or dashboard load). 4. Secondary Action: A 'Contact Support' link for users who require further assistance. The states will cover the display of this screen, the action upon 'Try Again' (which will attempt to re-render the failing component or flow), and the action upon 'Contact Support' (which will typically open a pre-filled email or direct to a support page). Error handling ensures no blank screens or infinite loaders, providing immediate feedback.",
+  "wireframe_json": {
+    "name": "ErrorScreen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "ErrorIcon",
+        "type": "RECTANGLE",
+        "width": 64,
+        "height": 64,
+        "backgroundColor": "#FF0000"
+      },
+      {
+        "name": "ErrorMessageHeader",
+        "type": "TEXT",
+        "characters": "Something went wrong",
+        "fontSize": 24,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "ErrorMessageBody",
+        "type": "TEXT",
+        "characters": "We encountered an unexpected error. Please try again or contact support if the issue persists.",
+        "fontSize": 16,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "TryAgainButton",
+        "type": "BUTTON",
+        "characters": "Try Again",
+        "fontSize": 16,
+        "width": "FILL",
+        "height": 48,
+        "backgroundColor": "#007AFF",
+        "textColor": "#FFFFFF",
+        "cornerRadius": 8
+      },
+      {
+        "name": "ContactSupportLink",
+        "type": "TEXT",
+        "characters": "Contact Support",
+        "fontSize": 14,
+        "textColor": "#007AFF",
+        "width": "HUG",
+        "height": "HUG"
+      }
+    ]
+  },
+  "validation_checklist": "**Validation Checklist for Error Handling (error-fix-1770343614403)**: - **Can a new user predict what happens next?** Yes. The 'Try Again' button clearly indicates a re-attempt, and 'Contact Support' points to help. The error message explicitly states what happened and suggests next steps. - **Is anything explained too late?** No. The error screen is presented immediately upon encountering a critical failure, providing context and options without delay. - **Does the UI match the intent?** Yes. The UI provides clear, actionable feedback for unexpected errors, aligning with the intent to keep the product obvious and guide users even in failure states. It prevents dead ends, which supports the 'speed over configurability' belief by ensuring quick recovery or path to support.",
+  "summary": "Designed a clear and actionable error screen for critical failures during Google authentication and dashboard loading. The design prioritizes immediate feedback, simple explanations, and clear calls to action ('Try Again', 'Contact Support') to guide users through unexpected issues, aligning with the product's intent for an obvious and friction-free experience, even in error states."
+}
