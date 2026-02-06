@@ -77,6 +77,20 @@ def invoke_dev_agent_iterative(feature_id):
     """
     print("🔄 Invoking Dev Agent with iterative workflow...")
     
+    # Check for error context (error-fix ran)
+    error_context_file = os.getenv("ERROR_CONTEXT_FILE", "")
+    error_context = None
+    
+    if error_context_file and os.path.exists(error_context_file):
+        try:
+            with open(error_context_file, 'r') as f:
+                error_context = json.load(f)
+            print(f"⚠️  Error context detected: {error_context.get('error_type', 'unknown')}")
+            print(f"   Error fix was applied - validating and refining...")
+        except Exception as e:
+            print(f"⚠️  Failed to load error context: {e}")
+            error_context = None
+    
     # Load agent instructions
     agent_instructions = load_file(AGENT_FILE)
     if agent_instructions.startswith("[File not found"):
@@ -150,7 +164,8 @@ def invoke_dev_agent_iterative(feature_id):
                 iteration,
                 generated_files,
                 i,
-                len(iterations)
+                len(iterations),
+                error_context
             )
             
             # Track generated files
@@ -200,14 +215,39 @@ def invoke_dev_agent_iterative(feature_id):
 
 
 def _invoke_iteration(agent_instructions, adrs, technical_spec, design_spec, 
-                     feature_id, iteration, generated_files, iteration_num, total_iterations):
+                     feature_id, iteration, generated_files, iteration_num, total_iterations, error_context=None):
     """Execute a single iteration of dev work."""
     
     generated_list = "\n".join([f"- {f}" for f in generated_files]) if generated_files else "None yet"
     
+    error_context_prompt = ""
+    if error_context:
+        error_context_prompt = f"""
+## ⚠️  ERROR CONTEXT - FIX VALIDATION MODE
+
+An error-fix workflow has applied automated fixes. Your task is to:
+1. Review the fixes that were applied
+2. Validate they are correct and complete
+3. Make any necessary refinements
+4. Ensure the implementation is cohesive
+
+Error Details:
+- Error ID: {error_context.get('error_id', 'unknown')}
+- Type: {error_context.get('error_type', 'unknown')}
+- Timestamp: {error_context.get('timestamp', 'unknown')}
+- Message: {error_context.get('message', 'No message')}
+
+**IMPORTANT**: You are running in fix-validation mode. Focus on:
+- Reviewing what was fixed
+- Ensuring fixes align with original architecture
+- Making any necessary adjustments
+- Validating the implementation is now complete and correct
+"""
+    
     system_prompt = f"""{agent_instructions}
 
 You are the Dev Agent in iteration {iteration_num} of {total_iterations}.
+{error_context_prompt}
 
 ## THIS ITERATION: {iteration['name']}
 
