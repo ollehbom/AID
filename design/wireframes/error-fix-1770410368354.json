@@ -1,0 +1,64 @@
+{
+  "design_intent": "This design establishes the foundational user experience for the application, focusing on a clear and intuitive initial entry point. The core intent is to provide a seamless Google authentication flow leading directly to a basic, obvious dashboard. This aligns with the product belief that 'The product must feel obvious without documentation' and aims to validate 'Onboarding flow is intuitive without guidance' by ensuring new, technically competent users can easily access and understand the application's starting state without friction. The integration of a modern design system (Shadcn UI) reinforces a professional and accessible aesthetic from the outset.",
+  "design_spec": "### 1. User Flow: Initial Application Access & Dashboard#### 1.1. Application Launch & Authentication Check*   **Step 1: User navigates to the application URL.***   **Step 2: Application loads.** A fast-loading skeleton UI is displayed.*   **Step 3: Authentication Check.**    *   **IF authenticated:** User is redirected to the Dashboard Screen.    *   **IF NOT authenticated:** User is redirected to the Login Screen.#### 1.2. Login Screen*   **Purpose:** Allow users to authenticate via Google.*   **Elements:**    *   **Header:** 'Welcome to [App Name]' (e.g., 'Welcome to AID App')    *   **Call to Action:** 'Sign in with Google' button (prominent, using Shadcn UI button style)    *   **Optional:** Minimal introductory text about the app.*   **Interaction:** Clicking 'Sign in with Google' initiates the Google OAuth flow.*   **States:**    *   **Default:** Button visible.    *   **Loading:** Button disabled with a loading spinner during OAuth redirect.    *   **Error:** (Future consideration, but for MVP, assume success or Google handles errors)#### 1.3. Dashboard Screen*   **Purpose:** Provide the primary entry point for authenticated users, displaying core information.*   **Elements:**    *   **Header:** 'Dashboard' or 'Welcome, [User Name]'    *   **Main Content Area:** A simple card or section displaying placeholder content (e.g., 'Your Overview', 'Recent Activity').    *   **Navigation (Implicit):** A placeholder for future navigation elements (e.g., a simple menu icon or tab bar at the bottom, not explicitly detailed in wireframe but considered for future).*   **States:**    *   **Default:** Displays welcome message and basic content.    *   **Loading:** (For content within dashboard) Placeholder loaders.### 2. Design System & Components*   **Design System:** Shadcn UI.*   **Key Components:** Button (for Google Sign-in), Card (for dashboard content), Text, Frame.### 3. Error Handling*   **Authentication Errors:** Handled by Google OAuth flow; application will likely redirect to login screen on failure.*   **Application Load Errors:** Display a generic error message or retry option (out of scope for MVP wireframe).",
+  "wireframe_json": {
+    "name": "Dashboard Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "DashboardHeader",
+        "type": "TEXT",
+        "characters": "Welcome to your Dashboard",
+        "fontSize": 24,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "OverviewCard",
+        "type": "FRAME",
+        "layoutSizingHorizontal": "FILL",
+        "layoutSizingVertical": "HUG",
+        "backgroundColor": "#F0F0F0",
+        "cornerRadius": 8,
+        "children": [
+          {
+            "name": "OverviewTitle",
+            "type": "TEXT",
+            "characters": "Your Overview",
+            "fontSize": 18,
+            "width": "FILL",
+            "height": "HUG"
+          },
+          {
+            "name": "PlaceholderText1",
+            "type": "TEXT",
+            "characters": "Recent activity will appear here.",
+            "fontSize": 14,
+            "width": "FILL",
+            "height": "HUG"
+          },
+          {
+            "name": "PlaceholderText2",
+            "type": "TEXT",
+            "characters": "Connect integrations to see more.",
+            "fontSize": 14,
+            "width": "FILL",
+            "height": "HUG"
+          }
+        ]
+      },
+      {
+        "name": "SignOutButton",
+        "type": "BUTTON",
+        "label": "Sign Out",
+        "variant": "secondary",
+        "width": "HUG",
+        "height": "HUG"
+      }
+    ]
+  },
+  "validation_checklist": "Validation Checklist for Initial Application Access & Dashboard:1.  **Predictability for New Users:**    *   Can a new user predict that 'Sign in with Google' leads to the dashboard? (Yes, if authenticated successfully).    *   Is the purpose of the dashboard immediately clear upon arrival? (Yes, 'Welcome to your Dashboard', 'Your Overview').2.  **Timeliness of Explanation:**    *   Is any crucial information about getting started explained too late? (No, the flow is direct: Login -> Dashboard. The dashboard itself is self-explanatory for an MVP).    *   Does the UI provide immediate feedback during login (e.g., loading state)? (Implicit in 'Loading' state for button, but needs to be explicit in implementation).3.  **UI-Intent Match:**    *   Does the UI feel modern and utilize a well-defined design system (Shadcn UI)? (Yes, implied by component types and clean structure).    *   Does the Google login button clearly indicate the authentication method? (Yes, 'Sign in with Google').    *   Does the dashboard visually represent a 'basic user entry point' without overwhelming complexity? (Yes, simple header, overview card, sign-out button).    *   Does the experience feel 'obvious without documentation' for a technically competent user? (Yes, direct flow, clear labels).    *   Does the onboarding flow seem 'intuitive without guidance'? (This design aims to achieve this by minimizing steps and maximizing clarity).**Friction/Ambiguity Notes:***   The transition from Google OAuth back to the app needs to be smooth and handle potential loading states gracefully.*   Initial load time of the application shell should be optimized to prevent early user frustration.*   Ensure clear messaging if Google sign-in fails (though primarily handled by Google, app should have a fallback UI).",
+  "summary": "The design for the foundational application successfully translates the product intent into a clear and intuitive user experience. It outlines a direct flow from application launch, through Google authentication, to a basic, welcoming dashboard. The wireframe provides a simple, structured representation of the dashboard, emphasizing clarity and ease of use. The validation checklist confirms alignment with core product beliefs regarding obviousness and intuitive onboarding, identifying key areas for implementation focus (e.g., loading states, smooth transitions) to minimize friction for new, technically competent users. This design is ready for implementation by the Dev Agent, providing a robust foundation for future features."
+}
