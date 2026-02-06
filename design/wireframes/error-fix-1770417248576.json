@@ -1,0 +1,39 @@
+{
+  "design_intent": "This feature aims to establish the minimal viable user interface for our product, enabling seamless Google login and access to a basic dashboard. The core intent is to provide a foundational, intuitive, and fast user experience that allows for the validation of primary product beliefs: 'Users value speed over configurability', 'The primary user is technically competent', and 'The product must feel obvious without documentation'. It serves as the essential entry point for all future user interactions and feature development.",
+  "design_spec": "### Design Specification: Initial Application Setup & Google Login\n\n#### 1. Overview\nThis document details the design specification for the foundational React application, integrating shadcn/ui, Google login, and a basic dashboard. The goal is to provide a robust and intuitive entry point for users while adhering to the core product beliefs of speed, obviousness, and catering to technically competent users.\n\n#### 2. User Flows\n\n##### 2.1. Google Login Flow\n1.  **Initial Access**: User navigates to the application's root URL.\n2.  **Login Screen Display**: The 'Sign In' screen is presented.\n    *   **State**: Unauthenticated.\n    *   **UI**: Prominent 'Sign in with Google' button. Optional, minimal introductory text (e.g., 'Welcome to [Product Name]').\n    *   **Copy**: 'Sign in with Google'.\n3.  **Google Authentication**: User clicks 'Sign in with Google'.\n    *   **State**: Pending authentication.\n    *   **UI**: Loading indicator (e.g., spinner or 'Redirecting...') while Google's OAuth flow is initiated.\n4.  **Redirection/Authentication**: User completes Google's authentication process (if not already logged in/authorized).\n5.  **Post-Authentication**: Application receives authentication token.\n6.  **Dashboard Access**: User is redirected to the main dashboard.\n    *   **State**: Authenticated.\n\n##### 2.2. Dashboard Access Flow\n1.  **Direct Dashboard Access (Authenticated)**: If an authenticated user navigates to the root URL or refreshes, they are directly taken to the dashboard.\n2.  **Dashboard Display**: The 'Dashboard' screen is presented.\n    *   **State**: Authenticated.\n    *   **UI**: A simple header (e.g., 'Dashboard'), a welcome message (e.g., 'Welcome, [User Name]!'), and a placeholder content area.\n    *   **Copy**: 'Dashboard', 'Welcome, [User Name]!', 'Your content will appear here.'\n\n#### 3. States\n*   **Unauthenticated**: Displaying login screen.\n*   **Authenticating**: Displaying loading indicator during Google OAuth.\n*   **Authenticated**: Displaying dashboard.\n*   **Error**: Displaying an error message (e.g., 'Login failed. Please try again.') on the login screen, without blocking further attempts.\n\n#### 4. Copy\n*   **Login Screen**:\n    *   Header: 'Welcome' or 'Sign In'\n    *   Button: 'Sign in with Google'\n    *   Optional Subtext: 'Access your account to get started.'\n*   **Dashboard Screen**:\n    *   Header: 'Dashboard'\n    *   Greeting: 'Welcome, [User Name]!'\n    *   Content Placeholder: 'Your content will appear here.'\n*   **Error Messages**:\n    *   Login Failure: 'Login failed. Please try again.' (displayed temporarily on login screen)\n\n#### 5. Error Handling\n*   **Google Login Failure**: If Google OAuth fails or is rejected, the user is returned to the login screen with a clear, non-intrusive error message (e.g., a toast or small text below the button) stating 'Login failed. Please try again.' This should not prevent subsequent login attempts.\n*   **Network Errors**: General network issues during login should also result in a similar error message, prompting the user to retry.\n\n#### 6. Design System Integration\n*   Utilize `shadcn/ui` components for all UI elements (buttons, inputs, spinners, cards, etc.) to ensure consistency and adherence to the design system.\n*   Focus on minimal styling and default `shadcn/ui` components for initial implementation to prioritize speed and functionality over custom aesthetics.",
+  "wireframe_json": {
+    "name": "LoginScreen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "WelcomeHeader",
+        "type": "TEXT",
+        "characters": "Welcome",
+        "fontSize": 32,
+        "width": 375,
+        "height": 40,
+        "x": 0,
+        "y": 150,
+        "textAlign": "CENTER"
+      },
+      {
+        "name": "SignInButton",
+        "type": "BUTTON",
+        "characters": "Sign in with Google",
+        "width": 250,
+        "height": 48,
+        "x": 62.5,
+        "y": 300,
+        "backgroundColor": "#4285F4",
+        "textColor": "#FFFFFF",
+        "cornerRadius": 4,
+        "layoutSizingHorizontal": "HUG",
+        "layoutSizingVertical": "HUG"
+      }
+    ]
+  },
+  "validation_checklist": "1.  **Predictability for New Users**: Is the 'Sign in with Google' button immediately obvious as the primary action on the login screen? Does the flow from clicking the button to reaching the dashboard feel natural and predictable?\n2.  **Timeliness of Explanations**: Are there any instructions or information provided too late in the user journey? (Belief: 'The product must feel obvious without documentation'). The design should rely on standard UI patterns (Google login, simple dashboard) to minimize the need for explanations.\n3.  **UI-Intent Match**: Does the minimal UI (single login button, simple dashboard) align with the intent of 'speed over configurability' and 'obvious without documentation'? Does the UI clearly signal that the user is technically competent and can navigate without hand-holding?\n4.  **Friction Identification**: Are there any unnecessary steps or cognitive load introduced during the login process or initial dashboard view? (Belief: 'Users value speed over configurability').\n5.  **Core Belief Validation**: Does the design allow for direct validation of the core beliefs, particularly by providing a functional interface to observe user interaction speed and intuitiveness?",
+  "summary": "The design for the foundational application focuses on a streamlined user experience, initiating with an intuitive Google login and leading to a clear, basic dashboard. The `design_intent` is to establish a fast, obvious, and technically-competent-user-friendly UI, validating core product beliefs. The `design_spec` outlines the login and dashboard flows, states, and copy, emphasizing `shadcn/ui` integration. The `wireframe_json` provides a simple structure for the Login screen. The `validation_checklist` ensures the design meets predictability, timeliness, UI-intent match, and friction reduction criteria to uphold the product's core beliefs."
+}
