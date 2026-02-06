@@ -1,0 +1,69 @@
+{
+  "design_intent": "This feature establishes the core product infrastructure to enable initial user authentication via Google login and provides a consistent platform for future feature development. The primary intent is to provide an 'obvious without documentation' and 'intuitive' onboarding experience for technically competent users, allowing them to smoothly access the product and navigate to a basic dashboard. It should feel robust, secure, and lay a clear foundation for scalability and future interactions.",
+  "design_spec": "# Design Specification: Foundational React App with Google Login and Dashboard Flow: Initial Access & Onboarding1. User Arrives at Login Screen: User is presented with a clean login screen.2. Google Login Initiation: User clicks 'Sign in with Google'.3. Google Authentication Flow: User completes the Google authentication process (handled by Google).4. Successful Login & Redirect: Upon successful authentication, the user is redirected to the Dashboard.5. Dashboard Display: The dashboard displays a welcome message and a placeholder for future content, demonstrating basic navigation and a consistent design system.States:* Login Screen: Default, Loading (during Google auth), Error (Google auth failure).* Dashboard: Default (after successful login).Copy:* Login Screen: 'Welcome to [Product Name]', 'Sign in with Google'* Dashboard: 'Dashboard', 'Welcome, [User Name]!'Error Handling: If Google login fails, a clear, concise error message is displayed on the login screen, prompting the user to try again or contact support.",
+  "wireframe_json": {
+    "name": "LoginScreen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "Header",
+        "type": "TEXT",
+        "characters": "Welcome to [Product Name]",
+        "fontSize": 28,
+        "layoutSizingHorizontal": "FILL",
+        "layoutSizingVertical": "HUG",
+        "textAlignHorizontal": "CENTER"
+      },
+      {
+        "name": "Subtitle",
+        "type": "TEXT",
+        "characters": "Sign in to continue",
+        "fontSize": 16,
+        "layoutSizingHorizontal": "FILL",
+        "layoutSizingVertical": "HUG",
+        "textAlignHorizontal": "CENTER",
+        "marginTop": 16
+      },
+      {
+        "name": "GoogleSignInButtonContainer",
+        "type": "FRAME",
+        "layoutSizingHorizontal": "HUG",
+        "layoutSizingVertical": "HUG",
+        "width": 280,
+        "height": 48,
+        "backgroundColor": "#FFFFFF",
+        "cornerRadius": 4,
+        "borderWidth": 1,
+        "borderColor": "#E0E0E0",
+        "children": [
+          {
+            "name": "GoogleIconPlaceholder",
+            "type": "RECTANGLE",
+            "width": 24,
+            "height": 24,
+            "layoutAlign": "CENTER",
+            "marginLeft": 16,
+            "fill": "#4285F4"
+          },
+          {
+            "name": "ButtonText",
+            "type": "TEXT",
+            "characters": "Sign in with Google",
+            "fontSize": 16,
+            "layoutAlign": "CENTER",
+            "marginLeft": 8,
+            "color": "#424242"
+          }
+        ],
+        "layoutMode": "HORIZONTAL",
+        "primaryAxisAlignItems": "CENTER",
+        "counterAxisAlignItems": "CENTER",
+        "marginTop": 64
+      }
+    ]
+  },
+  "validation_checklist": "1. Predictability: Can a new user intuitively understand that clicking 'Sign in with Google' will log them in and take them to a dashboard?2. Timeliness of Explanation: Is the purpose of the login clear immediately? Are there any unexpected steps or information revealed too late in the flow?3. UI-Intent Match: Does the clean, minimal UI align with the intent of an 'obvious without documentation' and 'intuitive' experience?4. Core Belief Check: Does the login process feel fast and simple (users value speed over configurability)?5. Technical Competence Assumption: Is the Google login flow appropriate for a technically competent primary user?6. Onboarding Intuition: Does the overall flow (login -> dashboard) support the belief that 'Onboarding flow is intuitive without guidance'?7. Consistency: Does the basic dashboard (implied subsequent screen) demonstrate the application of a modern design system for consistency?",
+  "summary": "The design provides a minimal yet complete flow for user authentication via Google and access to a foundational dashboard. It prioritizes clarity and intuitiveness, aligning with the product's core belief of being 'obvious without documentation.' The wireframe outlines the essential UI elements for the primary login screen, ready for implementation by the Dev Agent. Validation focuses on user predictability, timely information, and alignment with the stated product intent and beliefs, ensuring a smooth initial user experience."
+}
