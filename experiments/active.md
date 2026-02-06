@@ -31,3 +31,10 @@
 -   **Owner**: Product Agent
 -   **Status**: Active
 -   **Success Signal**: Successful Google login, dashboard loads, consistent styling of initial components.
+
+### EXP-2024-05-15-FEATURE-2
+- **Belief**: A modern, consistent UI foundation is crucial for rapid product iteration and an intuitive user experience.
+- **Change**: Implement core React app with Shadcn UI, Google login, and a basic dashboard to establish the product's foundational UI.
+- **Owner**: Dev Team
+- **Status**: Active
+- **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.

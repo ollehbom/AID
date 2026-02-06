@@ -57,10 +57,14 @@ jobs:
 
       - name: Checkout feature branch
         run: |
+          # Remove temporary files that might conflict
+          rm -f issue_body.txt
+          
           git fetch origin ${{ steps.issue_info.outputs.feature_branch }}
           git checkout ${{ steps.issue_info.outputs.feature_branch }}
+          git pull origin ${{ steps.issue_info.outputs.feature_branch }}
 
-      - name: Run Error Recovery Agent
+      - name: Set up Python
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}

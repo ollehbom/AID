@@ -1,0 +1,117 @@
+{
+  "design_intent": "The intent is to establish a minimal, intuitive, and modern UI foundation for the application. This includes a clear Google login process and a basic dashboard, designed to enable rapid iteration and validation of core user workflows. The design prioritizes speed and clarity, ensuring new users can navigate without documentation, aligning with the belief that \"The product must feel obvious without documentation\" and \"Users value speed over configurability\".",
+  "design_spec": "# Design Specification: Core UI Foundation (feature-2)## 1. User Flow### A. Unauthenticated User Access & Login1.  **User Access**: User navigates to the application URL.2.  **Login Page Display**: If unauthenticated, the user is presented with a dedicated login page.3.  **Google Login Button**: The login page features a prominent \"Sign in with Google\" button.4.  **Authentication**: Upon clicking, the user is redirected to Google's authentication flow.5.  **Post-Authentication**: After successful authentication, the user is redirected to the dashboard.*   **States**:*   **Initial**: Login page with button.*   **Loading**: (Optional) Spinner or disabled button during Google redirect.*   **Error**: (If Google auth fails) A generic error message (e.g., \"Login failed. Please try again.\").### B. Authenticated User Dashboard1.  **Dashboard Display**: After successful login, the user is presented with a basic dashboard.2.  **Welcome Message**: A prominent welcome message (e.g., \"Welcome, [User Name]!\").3.  **Placeholder Content**: A simple card or section displaying mock content to indicate a functional area.*   **States**:*   **Initial**: Dashboard with welcome and placeholder.*   **Loading**: (Optional) Spinner while dashboard content loads.",
+  "wireframe_json": [
+    {
+      "name": "LoginScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "LoginHeader",
+          "type": "TEXT",
+          "characters": "Welcome",
+          "fontSize": 32,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER"
+        },
+        {
+          "name": "LoginCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FIXED",
+          "layoutSizingVertical": "HUG",
+          "width": 300,
+          "backgroundColor": "#FFFFFF",
+          "cornerRadius": 12,
+          "children": [
+            {
+              "name": "SignInPrompt",
+              "type": "TEXT",
+              "characters": "Sign in to continue",
+              "fontSize": 18,
+              "width": "FILL",
+              "height": "HUG",
+              "textAlign": "CENTER"
+            },
+            {
+              "name": "GoogleSignInButton",
+              "type": "FRAME",
+              "layoutSizingHorizontal": "FILL",
+              "layoutSizingVertical": "HUG",
+              "backgroundColor": "#4285F4",
+              "cornerRadius": 6,
+              "children": [
+                {
+                  "name": "ButtonText",
+                  "type": "TEXT",
+                  "characters": "Sign in with Google",
+                  "fontSize": 16,
+                  "color": "#FFFFFF",
+                  "textAlign": "CENTER",
+                  "width": "FILL",
+                  "height": "HUG"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DashboardScreen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "DashboardHeader",
+          "type": "TEXT",
+          "characters": "Dashboard",
+          "fontSize": 28,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER"
+        },
+        {
+          "name": "WelcomeMessage",
+          "type": "TEXT",
+          "characters": "Welcome, User!",
+          "fontSize": 20,
+          "width": "FILL",
+          "height": "HUG",
+          "textAlign": "CENTER"
+        },
+        {
+          "name": "ContentCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "name": "CardTitle",
+              "type": "TEXT",
+              "characters": "Your Activity",
+              "fontSize": 16,
+              "width": "FILL",
+              "height": "HUG"
+            },
+            {
+              "name": "BodyText",
+              "type": "TEXT",
+              "characters": "This is where your personalized content will appear.",
+              "fontSize": 14,
+              "width": "FILL",
+              "height": "HUG"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "- [ ] **Login Predictability:** Can a new user easily predict that clicking \"Sign in with Google\" will initiate a Google authentication flow and then lead to the dashboard?- [ ] **Timeliness of Explanation:** Is the purpose of the login page clear immediately upon arrival? Is any necessary information (e.g., \"Sign in to continue\") presented upfront?- [ ] **UI-Intent Match (Login):** Does the \"Sign in with Google\" button clearly convey its action? Does the overall simplicity of the login page align with the intent of \"speed over configurability\" and \"obvious without documentation\"?- [ ] **UI-Intent Match (Dashboard):** Does the basic dashboard clearly indicate a successful login and a starting point for interaction, aligning with the intent of providing a functional base?- [ ] **Shadcn Adherence:** Do the wireframe elements (e.g., button, card styling) align with general Shadcn UI principles for a clean, modern aesthetic?",
+  "summary": "The design establishes a clear and minimal UI foundation, comprising a Google login screen and a basic dashboard. The login flow is designed for immediate clarity and low friction, directly supporting the product belief that users value speed and the product should feel obvious. The dashboard provides a straightforward entry point post-authentication. Validation will focus on user predictability, timely information delivery, and a strong match between the UI's simplicity and the foundational product intent."
+}
