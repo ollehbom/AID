@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770402151039: Core User Onboarding & Access
+
+- **Belief**: Users need a secure and intuitive way to access the application and interact with its core functionality.
+- **Change**: Implement a React application with Google login and a basic dashboard (mock content) using Shadcn/UI for foundational styling.
+- **Owner**: Product Agent (definition), Engineering Team (implementation)
+- **Status**: Active
+- **Success Signal**: Internal testers can successfully log in via Google and land on the basic dashboard without issues.
