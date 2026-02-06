@@ -38,3 +38,13 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+# Active Experiments
+
+## EXP-2026-01-29-error-fix-1770398794708
+
+- **Belief**: A modern, consistent UI/UX with basic authentication is critical for initial user engagement and future development, supporting the core belief "The product must feel obvious without documentation."
+- **Change**: Implement a foundational React app using shadcn, integrate Google login, create a basic dashboard, and establish a design system.
+- **Owner**: Product Agent (handoff to Design/Dev)
+- **Status**: Defined, ready for Design Agent
+- **Success Signal**: Functional core application, Google login, dashboard, and design system are implemented and internally validated.
