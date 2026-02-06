@@ -38,3 +38,12 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+---
+id: EXP-2026-01-29-error-fix-1770406857270
+belief: A modern, consistent UI foundation is critical for developer velocity and user adoption.
+change: Implement a React app with shadcn/ui, Google login, and a basic dashboard.
+owner: Product Agent
+status: active
+success_signal: Positive developer feedback, reduced UI development time, high UI component consistency.
+---
