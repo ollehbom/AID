@@ -38,3 +38,12 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770407328968: Establish Core UI Foundation
+
+- **Belief**: "The product must feel obvious without documentation", "Onboarding flow is intuitive without guidance"
+- **Change**: Implement a React application with Shadcn UI, Google login, and a basic dashboard to establish the core UI foundation.
+- **Owner**: (To be assigned by Design/Engineering)
+- **Status**: Active
+- **Success Signal**: Functional UI foundation, founder approval of modern feel and intuitiveness.
+- **Decision Record**: `product/decisions/error-fix-1770407328968.md`
