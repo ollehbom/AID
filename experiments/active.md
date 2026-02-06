@@ -38,3 +38,5 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+---\nid: EXP-2026-01-29-error-fix-1770401642070\nbelief: "Laying a strong UI foundation supports 'The product must feel obvious without documentation' and 'Users value speed over configurability'."\nchange: "Implement a foundational React app with shadcn/ui, Google login, basic dashboard, and an initial design system."\nowner: "Product Agent (definition), Engineering (implementation)"\nstatus: "active"\nsuccess_signal: "Founder qualitative approval, successful handoff to Design Agent, positive developer feedback on design system utility."\n---
