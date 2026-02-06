@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770416759199
+
+- **Belief**: "The product must feel obvious without documentation" and "Users value speed over configurability."
+- **Change**: Build foundational React app with Shadcn UI, Google login, basic dashboard, and initial design system.
+- **Owner**: Frontend Team / Product Agent (for tracking)
+- **Status**: Active
+- **Success Signal**: Successful deployment, functional Google login, basic dashboard rendering, initial design system implemented, positive founder review.
