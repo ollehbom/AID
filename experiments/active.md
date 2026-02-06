@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2024-07-29-error-fix-1770413379323: Initial React UI & Design System
+
+- **Belief**: "The product must feel obvious without documentation", "Onboarding flow is intuitive without guidance" (foundational work to enable testing these).
+- **Change**: Implement a foundational React application with Google login, a basic mock dashboard, and an initial design system using shadcn/ui.
+- **Owner**: Frontend Team Lead
+- **Status**: Active
+- **Success Signal**: >95% successful Google logins; basic dashboard loads without critical errors.
