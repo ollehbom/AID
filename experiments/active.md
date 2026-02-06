@@ -38,3 +38,13 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+# Active Experiments
+
+## EXP-2026-01-29-error-fix-1770402428642
+
+- **Belief**: Establishing a modern, intuitive frontend foundation is critical for user adoption and efficient development, reinforcing "The product must feel obvious without documentation" and testing "Onboarding flow is intuitive without guidance."
+- **Change**: Implement a React application with `shadcn/ui` integration, a Google login screen, and a basic dashboard, guided by modern design system principles.
+- **Owner**: Product Agent (handoff to Design Agent, then Engineering)
+- **Status**: Active (Product stage complete, awaiting Design)
+- **Success Signal**: Functional React app with integrated `shadcn/ui`, working Google login, basic dashboard, and positive founder review on initial UI/UX.
