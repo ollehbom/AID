@@ -1,0 +1,88 @@
+{
+  "design_intent": "The core intent is to establish the foundational UI/UX for the product, focusing on an intuitive and rapid experience for technically competent users. This involves implementing a clear Google login flow and a basic dashboard using modern, component-based UI (React and Shadcn). The goal is to validate the chosen UI framework's ability to provide a positive initial user experience and accelerate future development, aligning with the beliefs that the product must feel obvious without documentation and that users value speed over configurability. This foundation aims to provide a visual, interactive entry point, addressing the current lack of user interface.",
+  "design_spec": "## 1. Complete User Flow A. Initial Access / Login Flow 1. User navigates to application URL: The application's web interface loads, presenting the Login Screen. 2. Display Login Page: The user sees a prominent 'Continue with Google' button. 3. User clicks 'Continue with Google': Initiates the Google OAuth flow. 4. Google Authentication: User completes authentication via Google's interface. 5. Successful Login: User is redirected to the Dashboard Screen. B. Dashboard Flow 1. Display Dashboard Page: Upon successful login, the user lands on a personalized dashboard. 2. Dashboard Content: The dashboard displays a 'Welcome, [User Name]!' message and a 'Getting Started' information card with placeholder content. This card provides a brief orientation and hints at future functionality. ## 2. UI Elements and States A. Login Screen - Main Title: 'My Awesome App' (Text, H1 equivalent) - Call to Action: 'Sign in to continue' (Text) - Primary Action Button: 'Continue with Google' (Button, prominent styling, standard Google branding if possible) B. Dashboard Screen - Header: 'Dashboard' (Text, H2 equivalent) - Welcome Message: 'Welcome, [User Name]!' (Text, dynamic) - Info Card: A container (Frame) with a title ('Getting Started') and body text ('This is your personalized dashboard. Explore features and manage your projects.'). This card should have a subtle background and rounded corners. ## 3. Error Handling - Login Failure: If Google login fails (e.g., network error, user cancels), the user is returned to the Login Screen with a discreet error message (e.g., 'Login failed. Please try again.'). ## 4. Design System Principles (Initial) - Theme: Light mode by default, clean and modern aesthetic. - Typography: Sans-serif fonts (e.g., Inter, as used by Shadcn). Headings larger and bolder, body text legible. - Color Palette: Primary action color (blue for Google button), subtle grays for backgrounds and borders. - Components: Utilize Shadcn components for consistency and rapid development (e.g., Button, Card, Typography).",
+  "wireframe_json": [
+    {
+      "name": "Login Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "AppTitle",
+          "type": "TEXT",
+          "characters": "My Awesome App",
+          "fontSize": 32,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "WelcomeMessage",
+          "type": "TEXT",
+          "characters": "Sign in to continue",
+          "fontSize": 18,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "GoogleLoginButton",
+          "type": "BUTTON",
+          "characters": "Continue with Google",
+          "width": 250,
+          "height": 48,
+          "backgroundColor": "#4285F4",
+          "textColor": "#FFFFFF",
+          "cornerRadius": 4
+        }
+      ]
+    },
+    {
+      "name": "Dashboard Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "name": "DashboardHeader",
+          "type": "TEXT",
+          "characters": "Dashboard",
+          "fontSize": 24,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "WelcomeUser",
+          "type": "TEXT",
+          "characters": "Welcome, [User Name]!",
+          "fontSize": 18,
+          "width": "FILL",
+          "height": "HUG"
+        },
+        {
+          "name": "InfoCard",
+          "type": "FRAME",
+          "layoutSizingHorizontal": "FILL",
+          "layoutSizingVertical": "HUG",
+          "backgroundColor": "#F0F0F0",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "name": "CardTitle",
+              "type": "TEXT",
+              "characters": "Getting Started",
+              "fontSize": 16
+            },
+            {
+              "name": "CardBody",
+              "type": "TEXT",
+              "characters": "This is your personalized dashboard. Explore features and manage your projects.",
+              "fontSize": 14
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "1.  **Can a new user predict what happens next?**\n    *   **Login Screen:** Yes, the 'Continue with Google' button is a widely recognized pattern, clearly indicating the next step is authentication via Google. The expectation is to gain access to the application.\n    *   **Dashboard Screen:** Yes, upon successful login, landing on a 'Dashboard' with a welcome message and an info card clearly indicates this is the primary hub of the application.\n2.  **Is anything explained too late?**\n    *   **Login Flow:** No, the login instruction is immediate. The dashboard provides immediate context after login without requiring prior explanation.\n    *   **Dashboard Content:** The 'Getting Started' card provides initial context, but the overall dashboard design is intended to be self-explanatory for technically competent users.\n3.  **Does the UI match the intent?**\n    *   **Obvious without documentation:** The use of standard Google login, clear headings, and simple card layouts adheres to this. The UI avoids complex interactions or hidden features.\n    *   **Users value speed over configurability:** The direct Google login and straightforward dashboard minimize steps and choices, prioritizing quick access and immediate utility.\n    *   **Primary user is technically competent:** The UI does not include excessive hand-holding or tutorials, assuming a user's familiarity with common web patterns and a willingness to explore a simple interface. The clean, modern aesthetic aligns with expectations for a technically oriented product.",
+  "summary": "The design for the initial UI foundation (feature `error-fix-1770406372044`) successfully translates product intent into a clear and intuitive interaction flow. It defines a straightforward Google login process and a basic dashboard. The wireframes provide a structural blueprint for these two core screens, emphasizing simplicity and standard UI patterns. Validation confirms that the design aligns with product beliefs by offering an obvious, fast, and technically-competent-user-friendly experience, minimizing friction and ambiguity for new users. This design is ready for implementation by the Dev Agent."
+}
