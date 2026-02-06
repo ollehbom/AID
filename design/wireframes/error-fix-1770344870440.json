@@ -1,0 +1,72 @@
+{
+  "design_intent": "This foundational design establishes a modern, robust, and visually consistent React application with Google login and a basic dashboard, leveraging shadcn UI. The primary intent is to provide a solid technical and user experience base that aligns with the product beliefs of valuing speed, targeting technically competent users, and ensuring an obvious, documentation-free interaction. It aims to enable rapid future feature development by providing a clear, intuitive starting point.",
+  "design_spec": "# Design Specification: Foundational App Setup (error-fix-1770344870440)This specification details the design for establishing the foundational React application, including Google login and a basic dashboard, styled with shadcn UI.## 1. User FlowThe user flow is minimal, focusing on establishing core functionality:1.  **Google Login Screen**: User lands on a dedicated login screen.2.  **Authentication**: User initiates Google login. Upon successful authentication, the user is redirected to the dashboard.3.  **Basic Dashboard**: User lands on a basic dashboard displaying mock content.## 2. Screens### 2.1. Google Login Screen-   **Purpose**: Allow users to authenticate using their Google account.-   **Elements**:-   **Header**: 'Welcome' or 'Sign In'-   **Subheader**: 'Sign in to continue'-   **Call to Action**: 'Sign in with Google' button (primary action)-   **Visuals**: Clean, centered layout, adhering to shadcn UI aesthetics.### 2.2. Basic Dashboard-   **Purpose**: Provide a landing page post-login, demonstrating a functional application base.-   **Elements**:-   **Header**: 'Dashboard'-   **Welcome Message**: A simple text welcoming the user and explaining the purpose of the dashboard.-   **Placeholder Content**: A card or section displaying mock data or placeholder text, indicating where future features will reside.-   **Visuals**: Simple, uncluttered layout, utilizing shadcn UI components for consistency.## 3. States and Error Handling### 3.1. Google Login Screen-   **Initial State**: Login button visible, ready for interaction.-   **Loading State**: During Google authentication, a minimal loading indicator (e.g., spinner on the button) may be shown.-   **Error State**: If Google login fails (e.g., network issue, permission denied), a transient, non-intrusive error message should appear (e.g., a toast notification or inline message below the button) suggesting to retry.## 4. Copy-   **Google Login Screen**:-   Header: 'Welcome'-   Subheader: 'Sign in to continue'-   Button: 'Sign in with Google'-   Error (generic): 'Login failed. Please try again.'-   **Basic Dashboard**:-   Header: 'Dashboard'-   Welcome Message: 'Welcome to your dashboard! This is where your content will appear.'-   Placeholder Card Title: 'Placeholder Card Title'-   Placeholder Card Body: 'Some important information or quick links will be displayed here.'## 5. Accessibility-   Ensure all interactive elements are keyboard navigable.-   Provide appropriate ARIA labels for buttons and status messages.",
+  "wireframe_json": [
+    {
+      "name": "Google Login Screen",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "type": "TEXT",
+          "content": "Welcome",
+          "fontSize": 28,
+          "name": "WelcomeHeader"
+        },
+        {
+          "type": "TEXT",
+          "content": "Sign in to continue",
+          "fontSize": 16,
+          "name": "SignInSubheader"
+        },
+        {
+          "type": "BUTTON",
+          "label": "Sign in with Google",
+          "variant": "primary",
+          "name": "GoogleSignInButton"
+        }
+      ]
+    },
+    {
+      "name": "Basic Dashboard",
+      "type": "FRAME",
+      "width": 375,
+      "height": 812,
+      "children": [
+        {
+          "type": "TEXT",
+          "content": "Dashboard",
+          "fontSize": 28,
+          "name": "DashboardHeader"
+        },
+        {
+          "type": "TEXT",
+          "content": "Welcome to your dashboard! This is where your content will appear.",
+          "fontSize": 16,
+          "name": "DashboardWelcomeText"
+        },
+        {
+          "type": "FRAME",
+          "name": "ContentCard",
+          "children": [
+            {
+              "type": "TEXT",
+              "content": "Placeholder Card Title",
+              "fontSize": 18,
+              "name": "CardTitle"
+            },
+            {
+              "type": "TEXT",
+              "content": "Some important information or quick links will be displayed here.",
+              "fontSize": 14,
+              "name": "CardBody"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validation_checklist": "-   **Can a new user predict what happens next?** Yes, the flow from 'Sign in with Google' to a 'Dashboard' is a standard and predictable pattern. The UI is minimal and direct.\n-   **Is anything explained too late?** No, the interaction is self-explanatory. The login screen clearly states its purpose, and the dashboard provides an immediate welcome message.\n-   **Does the UI match the intent?** Yes, the design prioritizes simplicity and directness, aligning with the intent to create an 'obvious without documentation' experience and cater to 'technically competent' users who value 'speed over configurability'. The use of shadcn UI for a clean, modern aesthetic supports this.\n-   **Alignment with 'Users value speed over configurability'**: The design offers a single, clear path to entry (Google Login) and a straightforward dashboard, avoiding complex configurations.\n-   **Alignment with 'The primary user is technically competent'**: The UI is clean and functional, assuming a user who doesn't need excessive hand-holding for standard web interactions.\n-   **Alignment with 'The product must feel obvious without documentation'**: The flow and UI elements are standard and intuitive, requiring no external explanation.",
+  "summary": "The design for the foundational application successfully translates the product intent of establishing a modern, fast, and intuitive React application base. The design specification outlines a clear user flow from a Google Login screen to a Basic Dashboard, with minimal, direct interactions. The wireframes provide a simple, structured representation of these screens, focusing on essential UI elements. Validation confirms that the design is predictable for new users, explains nothing too late, and directly matches the product's core beliefs regarding speed, technical users, and obviousness. This design is ready for the Dev Agent to implement, providing a solid foundation for future development."
+}
