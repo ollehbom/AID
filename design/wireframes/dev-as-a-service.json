@@ -1,0 +1,38 @@
+{
+  "design_intent": "The primary intent is to provide a swift, modern, and intuitive entry point for technical founders into the 'dev-as-a-service' application. This foundational UI/UX aims to significantly reduce initial development overhead and ensure immediate visual consistency, aligning with the core belief that users value speed and intuitive design. The user experience should feel instantly \"obvious\" and \"fast,\" allowing technically competent users to get started without needing extensive documentation or complex setup. It should convey a sense of professionalism and a strong, extensible base for future development.",
+  "design_spec": "# Design Specification: 'dev-as-a-service' Application Foundation\n\n### 1. Overview\nThis design specification outlines the initial user experience for the 'dev-as-a-service' application, focusing on a streamlined Google OAuth login and a basic dashboard, built on a modern React foundation with foundational design system elements.\n\n### 2. User Flow\n1.  **Arrival**: User navigates to the application URL.\n2.  **Login Screen Display**: The user is presented with a clear login page.\n3.  **Google Sign-in**: User clicks the \"Sign in with Google\" button.\n4.  **OAuth Process**: The user is redirected to Google's authentication page.\n5.  **Authentication & Redirect**: Upon successful Google authentication, the user is redirected back to the application.\n6.  **Dashboard Display**: The user is landed on a basic dashboard page.\n\n### 3. UI Elements & States\n\n#### Screen: Login\n*   **Title**: \"Welcome to dev-as-a-service\"\n*   **Call to Action**: \"Sign in to continue.\"\n*   **Primary Action**: \"Sign in with Google\" Button\n    *   **States**: Default, Hover, Active, Loading (during OAuth redirect), Disabled (if an error prevents login temporarily).\n*   **Error State**:\n    *   If Google OAuth fails (e.g., network issue, user cancels): Display a transient, clear message below the button: \"Google sign-in failed. Please try again.\"\n    *   Optionally, a \"Retry\" link next to the message.\n\n#### Screen: Dashboard\n*   **Header**: \"Dashboard\"\n*   **Welcome Message**: \"Welcome, [User Name]!\" (dynamically populated)\n*   **Content Area**: Placeholder for \"Your Projects\" or \"Quick Actions\".\n    *   Example: A simple list or card display for mock projects, or a \"Start New Project\" button.\n*   **Navigation (Implied)**: Future navigation elements will extend from this base.\n\n### 4. Copy\n*   **Login Screen**:\n    *   Title: \"dev-as-a-service\"\n    *   Subtitle: \"Welcome! Sign in to continue.\"\n    *   Button: \"Sign in with Google\"\n    *   Error Message: \"Google sign-in failed. Please try again.\"\n*   **Dashboard Screen**:\n    *   Header: \"Dashboard\"\n    *   Welcome: \"Welcome, [User Name]!\"\n    *   Section Header: \"Your Projects\" (or similar)\n    *   Button: \"Start New Project\" (or similar placeholder)\n\n### 5. Design System Elements\n*   **Typography**: Establish base font sizes, weights, and line heights for headings (H1, H2), body text, and button labels.\n*   **Color Palette**: Define primary, secondary, success, warning, and error colors.\n*   **Components**: Basic Button (primary, secondary), Input field (for future use), Card, Frame/Container.",
+  "wireframe_json": {
+    "name": "LoginScreen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "AppTitle",
+        "type": "TEXT",
+        "characters": "dev-as-a-service",
+        "fontSize": 28,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "WelcomeMessage",
+        "type": "TEXT",
+        "characters": "Welcome! Sign in to continue.",
+        "fontSize": 16,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "GoogleSignInButton",
+        "type": "BUTTON",
+        "characters": "Sign in with Google",
+        "variant": "primary",
+        "width": "FILL",
+        "height": 48
+      }
+    ]
+  },
+  "validation_checklist": "*   **Can a new user predict what happens next?**\n    *   **Yes**: The \"Sign in with Google\" button clearly indicates the action. Post-login, a dashboard is a standard expectation. This aligns with the belief that \"The product must feel obvious without documentation.\"\n*   **Is anything explained too late?**\n    *   **No**: The UI is minimal and relies on widely understood patterns (Google OAuth). No complex features are introduced early that would require delayed explanation. This supports \"The product must feel obvious without documentation.\"\n*   **Does the UI match the intent?**\n    *   **Yes**: The direct Google sign-in prioritizes \"speed over configurability.\" The clean, modern aesthetic (implied by the design system foundation) aims for an \"obvious\" and \"modern\" feel, catering to \"technically competent\" users who value efficiency.\n*   **Alignment with Core Belief: Users value speed over configurability.**\n    *   **Pass**: The single-click Google sign-in and direct dashboard access prioritize a fast, low-friction entry.\n*   **Alignment with Core Belief: The primary user is technically competent.**\n    *   **Pass**: Assumes familiarity with OAuth flows and standard web application layouts, requiring minimal hand-holding.\n*   **Alignment with Core Belief: The product must feel obvious without documentation.**\n    *   **Pass**: Standard patterns for login and dashboard, clear labels, and minimal UI complexity contribute to an obvious experience.",
+  "summary": "The design for the 'dev-as-a-service' application foundation successfully translates product intent into a clear, fast, and intuitive user experience. It prioritizes speed and obviousness through a streamlined Google OAuth login and a minimalist dashboard, directly aligning with core product beliefs about technical users and efficiency. The proposed wireframe and specification provide a solid, extensible base that should feel modern and easy to navigate for new users, validated against key criteria for predictability and intent matching."
+}
