@@ -1,0 +1,92 @@
+{
+  "design_intent": "# Design Intent: Foundational React App and Design System (error-fix-1770400560624)Why This Feature ExistsThis initiative is a foundational prerequisite, not a direct user-facing feature experiment. Its primary purpose is to establish a modern, intuitive, and consistent application shell that supports future feature development and validates core product beliefs.The design intent is to create a seamless, low-friction initial experience for new users (developers and future end-users) by providing a clear login path and a basic dashboard structure. This foundation should feel:1.  **Obvious and Intuitive:** A new user should immediately understand how to sign in and what the dashboard represents, without needing documentation. This directly supports the belief \"The product must feel obvious without documentation.\"2.  **Fast and Efficient:** The UI should be clean, responsive, and provide a sense of speed, aligning with \"Users value speed over configurability.\"3.  **Consistent and Modern:** By integrating a robust design system (shadcn), the UI will maintain a consistent aesthetic and interaction pattern, reducing cognitive load and accelerating future development.4.  **Extensible:** The design should be modular and easily adaptable for adding new features and content in subsequent stages.## How It Should FeelThe experience should feel professional, robust, and welcoming. Upon first interaction, users should feel confident that they are engaging with a well-engineered product. The login process should be straightforward, leading smoothly into a clear, albeit basic, dashboard that signifies successful entry and readiness for further interaction.",
+  "design_spec": "# Design Specification: Foundational React App and Design System (error-fix-1770400560624)Feature ID: error-fix-1770400560624Agent: Design AgentDate: 2026-01-29---### 1. Overview & IntentThis specification details the user experience for the foundational React application, encompassing the initial login screen and a basic dashboard. The primary goal is to provide a clear, intuitive, and consistent interface using a modern design system (shadcn) to align with core product beliefs and enable efficient future development.### 2. User Flows#### 2.1. Initial Access & Login1.  **User arrives at the application URL.**2.  **System displays the Login Screen.**    *   **State:** Requires user authentication.    *   **UI:** Prominently features a \"Sign in with Google\" button. Optional: A small, unobtrusive link for \"Learn more\" or \"Contact support\" for non-technical issues.3.  **User clicks \"Sign in with Google\".**4.  **System initiates Google OAuth flow.**    *   **State:** Redirects to Google authentication page.    *   **Error Handling (Google side):** Handled by Google's standard flow.5.  **User successfully authenticates with Google.**6.  **System receives authentication token.**    *   **State:** Processing login. Display a temporary loading indicator (e.g., spinner) on a blank or branded screen.7.  **System redirects to the Dashboard.**#### 2.2. Dashboard (Basic)1.  **User lands on the Dashboard after successful login.**    *   **State:** Authenticated, main application view.    *   **UI:** Displays a simple header with \"Dashboard\" and a greeting. Contains placeholder content areas for future features. No complex navigation initially.### 3. UI Elements & Components (based on shadcn principles)#### 3.1. Login Screen-   **Layout:** Centered content, minimalist design.-   **Header:** `TEXT` element: \"Welcome\" or \"Sign In\" (e.g., `h1` equivalent).-   **Subtitle/Instruction:** `TEXT` element: \"Sign in to continue\" (e.g., `p` equivalent).-   **Google Sign-In Button:** `BUTTON` component.    *   **Label:** \"Sign in with Google\".    *   **Icon:** Google logo (SVG/font icon) to the left of the label.    *   **Variant:** Primary/Solid, clearly distinct.-   **Loading Indicator:** `SPINNER` or `PROGRESS BAR` during authentication process.#### 3.2. Dashboard Screen-   **Layout:** Simple header with main content area.-   **App Header:** `TEXT` element: \"Dashboard\" (e.g., `h1` equivalent) at the top.-   **Greeting:** `TEXT` element: \"Welcome, [User Name]!\" (e.g., `h2` equivalent).-   **Content Card (Placeholder):** `FRAME` or `CARD` component.    *   **Title:** `TEXT` element: \"Your Overview\" or \"Quick Actions\".    *   **Body:** `TEXT` element: \"Details will appear here as you use the product.\" or \"Start by configuring your settings.\"    *   **Action Button (Optional):** `BUTTON` component: \"Explore Features\" (disabled or placeholder).### 4. States & Error Handling-   **Login Pending:** A full-screen spinner or loading animation shown after clicking \"Sign in with Google\" until the dashboard loads.-   **Login Failed (Generic):** If Google authentication fails for an unexpected reason, display a transient `TOAST` notification: \"Login failed. Please try again.\" or \"An error occurred. Contact support if the issue persists.\" (This is less likely for Google OAuth but good practice).-   **Dashboard Loading:** Initial dashboard content might show skeleton loaders for data-driven sections (not required for this basic stage, but noted for future).### 5. Copy & Content-   **Login Screen:**    *   Header: \"Welcome\" / \"Sign In\"    *   Subtitle: \"Sign in to continue\"    *   Button: \"Sign in with Google\"-   **Dashboard Screen:**    *   Header: \"Dashboard\"    *   Greeting: \"Welcome, [User Name]!\"    *   Placeholder text: \"Your overview will appear here.\" / \"No data yet. Get started!\"### 6. Accessibility-   All interactive elements (buttons) must be keyboard navigable.-   Clear focus states for interactive elements.-   Semantic HTML structures (headings, buttons, etc.).### 7. Performance-   Fast initial load time for the login screen.-   Efficient rendering of basic dashboard elements.### 8. Hand-off Criteria-   Clear visual representation of login and dashboard screens.-   All states (initial, loading, success) defined.-   Text content/copy provided.-   Ready for Dev Agent implementation based on shadcn components.",
+  "wireframe_json": {
+    "name": "LoginAndDashboardApp",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "LoginScreenContainer",
+        "type": "FRAME",
+        "layoutSizingHorizontal": "FILL",
+        "layoutSizingVertical": "HUG",
+        "children": [
+          {
+            "name": "WelcomeHeader",
+            "type": "TEXT",
+            "characters": "Welcome",
+            "fontSize": 28,
+            "width": "FILL",
+            "height": "HUG"
+          },
+          {
+            "name": "SignInSubtitle",
+            "type": "TEXT",
+            "characters": "Sign in to continue",
+            "fontSize": 16,
+            "width": "FILL",
+            "height": "HUG"
+          },
+          {
+            "name": "GoogleSignInButton",
+            "type": "BUTTON",
+            "label": "Sign in with Google",
+            "variant": "primary",
+            "width": "FILL",
+            "height": 48
+          }
+        ]
+      },
+      {
+        "name": "DashboardScreenContainer_Placeholder",
+        "type": "FRAME",
+        "layoutSizingHorizontal": "FILL",
+        "layoutSizingVertical": "HUG",
+        "children": [
+          {
+            "name": "DashboardHeader",
+            "type": "TEXT",
+            "characters": "Dashboard",
+            "fontSize": 24,
+            "width": "FILL",
+            "height": "HUG"
+          },
+          {
+            "name": "WelcomeMessage",
+            "type": "TEXT",
+            "characters": "Welcome, User!",
+            "fontSize": 18,
+            "width": "FILL",
+            "height": "HUG"
+          },
+          {
+            "name": "ContentCardPlaceholder",
+            "type": "FRAME",
+            "layoutSizingHorizontal": "FILL",
+            "layoutSizingVertical": "HUG",
+            "backgroundColor": "#F0F0F0",
+            "cornerRadius": 8,
+            "children": [
+              {
+                "name": "CardTitle",
+                "type": "TEXT",
+                "characters": "Your Overview",
+                "fontSize": 16
+              },
+              {
+                "name": "CardBody",
+                "type": "TEXT",
+                "characters": "Details will appear here as you use the product.",
+                "fontSize": 14
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "validation_checklist": "## Validation Checklist for Foundational React App and Design System (error-fix-1770400560624)This checklist validates the design against the stated intent and core product beliefs.### General Principles-   **Clarity:** Is the purpose of each screen and interaction immediately clear?-   **Simplicity:** Are there any unnecessary elements or complexities?-   **Consistency:** Does the design adhere to the principles of a modern design system (e.g., shadcn)?### Validation Rules (from Agent Description)1.  **Can a new user predict what happens next?**    *   **Login Screen:** After clicking \"Sign in with Google\", is it obvious that they will be redirected for Google authentication and then to the application dashboard?    *   **Dashboard:** Is the purpose of the dashboard clear as the primary application view?2.  **Is anything explained too late?**    *   **Login:** Are all necessary instructions or options (e.g., Google sign-in) present before the user needs them?    *   **Dashboard:** Is the initial content self-explanatory, or does it require prior knowledge? (Should be self-explanatory/placeholder).3.  **Does the UI match the intent?**    *   **Intent:** \"The product must feel obvious without documentation.\" Does the login flow require external guidance? Is the dashboard structure intuitive?    *   **Intent:** \"Users value speed over configurability.\" Does the UI feel streamlined and efficient? Is the Google login quick and direct?    *   **Intent:** \"The primary user is technically competent.\" Does the UI assume a basic level of digital literacy without being overly simplistic or patronizing?    *   **Intent:** Establish a modern, consistent, and extensible foundation. Does the wireframe reflect a modern aesthetic (e.g., clean lines, clear typography) and modular components?### Specific Feature Validation-   **Login Screen:**    *   Is the \"Sign in with Google\" button prominent and easily discoverable?    *   Is there a clear visual indication during the loading/authentication phase?    *   Are potential error states (e.g., failed login) handled gracefully with user-friendly messages? (Yes, via toast).-   **Dashboard Screen:**    *   Is the \"Dashboard\" header clear and present?    *   Is the placeholder content logically structured and easy to understand as a future content area?    *   Are there any elements that might confuse a new user about the purpose of this foundational dashboard? (Should be minimal).### Belief Validation-   **\"The product must feel obvious without documentation\"**: Does the entire login-to-dashboard flow require any external explanation? (No, it should be self-evident).-   **\"Users value speed over configurability\"**: Is the login process direct and efficient? Does the dashboard avoid overwhelming users with too many options initially? (Yes, it's basic).-   **\"The primary user is technically competent\"**: Does the UI respect this by not over-explaining basic digital interactions, while still remaining intuitive? (Yes, Google login is standard).",
+  "summary": "The Design Agent has successfully translated the product decision to implement a foundational React app and design system into a clear design intent, a detailed design specification, and a basic wireframe.The design prioritizes clarity, consistency, and an intuitive user experience, directly supporting core product beliefs such as \"the product must feel obvious without documentation\" and \"users value speed over configurability.\"The wireframe for the Login Screen and a basic Dashboard provides a simple, extensible structure for the Dev Agent to implement, focusing on a straightforward Google login process and a placeholder dashboard.The validation checklist ensures that the design addresses potential friction points and aligns with user expectations for a modern, efficient application. This stage provides a solid UI/UX foundation, ready for the Dev Agent to build upon and for subsequent feature development."
+}
