@@ -1,0 +1,29 @@
+{
+  "design_intent": "The primary intent of this design is to establish a clear, intuitive, and efficient entry point for new users into the application. By integrating a familiar Google login and a straightforward dashboard, we aim to validate the belief that the product feels obvious without documentation and that the onboarding flow is intuitive without guidance. The experience should feel smooth, secure, and immediately prepare the user for engaging with core product features, minimizing friction and cognitive load.",
+  "design_spec": "# Design Specification: Google Login & Basic Dashboard Flow\n\n## 1. Overview\nThis design specification outlines the user flow and interface for the initial application frontend, focusing on Google OAuth login and a foundational dashboard. The goal is to provide a seamless and familiar onboarding experience, aligning with the product belief of intuitiveness and speed.\n\n## 2. User Flow\n1.  **Landing/Login Screen**: User lands on an unauthenticated screen.\n2.  **Google Login Action**: User clicks \"Sign in with Google\" button.\n3.  **Authentication Process**: User is redirected to Google's OAuth consent screen.\n4.  **Post-Login Redirection**: Upon successful authentication, user is redirected to the application's basic dashboard.\n5.  **Dashboard View**: User sees a basic dashboard with placeholder content.\n\n## 3. Screen Details\n\n### 3.1. Login Screen\n*   **Purpose**: Allow users to authenticate using their Google account.\n*   **Key Elements**:\n    *   **Header**: \"Welcome to [App Name]\" (e.g., \"Welcome to Our App\")\n    *   **Call to Action**: Large, prominent \"Sign in with Google\" button.\n    *   **Optional**: Brief, encouraging tag-line (e.g., \"Your journey to productivity starts here.\").\n*   **States**:\n    *   **Default**: Button enabled.\n    *   **Loading**: After click, button changes to a loading spinner/state.\n    *   **Error**: Display a temporary, clear error message if login fails (e.g., \"Login failed. Please try again.\").\n*   **Copy**:\n    *   Header: \"Welcome\"\n    *   Button: \"Sign in with Google\"\n    *   Error: \"Login failed. Please try again.\"\n\n### 3.2. Dashboard Screen\n*   **Purpose**: Provide an initial landing page post-authentication, demonstrating a functional UI.\n*   **Key Elements**:\n    *   **Header**: \"Dashboard\"\n    *   **Content Area**: Placeholder cards or text blocks to simulate future content.\n    *   **Example**: A simple card with \"Your first step!\" and a placeholder description.\n*   **States**:\n    *   **Default**: Displays mock content.\n*   **Copy**:\n    *   Header: \"Dashboard\"\n    *   Card Title: \"Welcome Aboard!\"\n    *   Card Body: \"This is your personalized dashboard. More features coming soon!\"\n\n## 4. Design System Integration\n*   Initial design system variables (primary colors, font families, spacing tokens) from Shadcn UI will be applied consistently across both screens.\n*   Focus on clear typography and accessible color contrasts.\n\n## 5. Error Handling\n*   **Login Failure**: Display a temporary, non-intrusive toast or inline message on the login screen, prompting the user to retry.\n*   **Post-Login Redirection Error**: If dashboard loading fails, provide a generic error message and an option to refresh or return to login.",
+  "wireframe_json": {
+    "name": "Login Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "type": "TEXT",
+        "content": "Welcome to the App",
+        "fontSize": 28
+      },
+      {
+        "type": "TEXT",
+        "content": "Your journey to productivity starts here.",
+        "fontSize": 14
+      },
+      {
+        "type": "BUTTON",
+        "label": "Sign in with Google",
+        "variant": "primary"
+      }
+    ]
+  },
+  "validation_checklist": "1.  **Predictability**: Can a new user easily predict that clicking 'Sign in with Google' will lead to authentication and then to a dashboard?\n2.  **Timeliness of Explanation**: Is the purpose of the Google login and the subsequent dashboard immediately clear, or is any crucial information explained too late?\n3.  **UI-Intent Match (Simplicity & Intuitiveness)**: Does the UI (minimal login screen, basic dashboard) match the intent of providing an obvious, intuitive, and efficient entry point, aligning with beliefs 'product must feel obvious without documentation' and 'onboarding flow is intuitive without guidance'?\n4.  **Friction Points**: Are there any steps in the login or dashboard display that could cause unnecessary friction or confusion for a new user?\n5.  **Error Clarity**: Are login error messages clear, concise, and actionable, guiding the user on how to proceed?",
+  "summary": "This design establishes the foundational frontend with a Google login and a basic dashboard, directly addressing the need for a functional application and user authentication. The design prioritizes simplicity and intuitiveness, aiming for a smooth user entry experience that aligns with the product beliefs of 'obvious without documentation' and 'intuitive onboarding'. The wireframe provides a clear visual structure for the login screen. The validation checklist ensures that the design effectively translates product intent into a user-friendly interaction, minimizing friction and ambiguity for new users. This design is now ready for the Dev Agent to implement."
+}
