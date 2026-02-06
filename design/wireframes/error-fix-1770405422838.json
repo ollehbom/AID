@@ -1,0 +1,29 @@
+{
+  "design_intent": "This design establishes the foundational React frontend application, integrating a modern design system (shadcn/ui), Google OAuth authentication, and a basic dashboard. The core intent is to provide a robust, consistent, and intuitive user interface foundation to significantly accelerate future feature development and ensure a high-quality, 'obvious' user experience without the need for extensive documentation. It reinforces the product beliefs that 'Users value speed over configurability' (through developer velocity) and 'The product must feel obvious without documentation' (through consistent UI patterns).",
+  "design_spec": "# Design Specification: Foundational Frontend Application\n\nThis document details the design specifications for the foundational React frontend application, incorporating `shadcn/ui`, Google OAuth login, and a basic dashboard.\n\n## 1. User Flow\n\n### A. Login Flow\n1.  **Initial State**: User lands on the Login Screen.\n2.  **Action**: User clicks the 'Sign in with Google' button.\n3.  **Authentication**: The application initiates the Google OAuth flow.\n4.  **Success State**: Upon successful authentication, the user is redirected to the Dashboard Screen.\n5.  **Error State**: If Google authentication fails (e.g., network error, user cancels), an inline error message or a toast notification appears on the Login Screen, prompting the user to try again.\n\n### B. Dashboard Flow\n1.  **Initial State**: User lands on the Dashboard Screen post-login.\n2.  **Content**: The dashboard displays mock content, serving as a placeholder for future features and demonstrating the integrated design system.\n\n## 2. Key UI Elements & States\n\n### A. Login Screen\n-   **Header**: 'Welcome' (large, prominent text).\n-   **Call to Action**: 'Sign in with Google' button.\n    -   **Default**: Enabled, visually distinct.\n    -   **Loading**: Button state changes (e.g., spinner, disabled) during Google OAuth initiation.\n    -   **Error**: Button returns to default, error message displayed.\n-   **Error Message**: (Optional) Small, red text below the button or as a temporary toast notification upon authentication failure.\n\n### B. Dashboard Screen\n-   **Header**: 'Dashboard' (clear title).\n-   **Content Area**: A simple card or section displaying placeholder text and potentially a small icon or image to demonstrate basic layout capabilities of shadcn/ui. Example text: 'Welcome to your dashboard! Here you will find your key metrics and actions.'\n\n## 3. Copy\n-   **Login Screen**: 'Welcome', 'Sign in with Google'\n-   **Dashboard Screen**: 'Dashboard', 'Welcome to your dashboard! Here you will find your key metrics and actions.'\n\n## 4. Error Handling\n-   **Google OAuth Failure**: Display a temporary, non-intrusive message (e.g., toast or small inline text) stating 'Google sign-in failed. Please try again.' The user can then re-attempt login.\n\n## 5. Design System Integration\n-   All components (buttons, text, frames) will utilize `shadcn/ui` components and adhere to established design tokens (e.g., typography, color palette, spacing, border-radius) to ensure consistency.",
+  "wireframe_json": {
+    "name": "LoginScreen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "WelcomeHeader",
+        "type": "TEXT",
+        "characters": "Welcome",
+        "fontSize": 28,
+        "layoutAlign": "CENTER"
+      },
+      {
+        "name": "SignInButton",
+        "type": "BUTTON",
+        "characters": "Sign in with Google",
+        "width": 250,
+        "height": 50,
+        "layoutAlign": "CENTER"
+      }
+    ]
+  },
+  "validation_checklist": "- **Login Screen Predictability**: Yes, the 'Sign in with Google' button clearly indicates the next action. A new user can predict that clicking it will initiate Google authentication.\n- **Login Screen Explanation Timing**: No, nothing is explained too late. The primary action is clear and immediately available. Any errors are communicated promptly.\n- **Login Screen UI vs. Intent**: Yes, the UI (simple welcome, clear sign-in button) directly matches the intent of providing a straightforward and modern entry point into the application.\n- **Dashboard Screen Predictability**: Yes, after logging in, a new user can predict they will land on a main content area or 'dashboard' as indicated by the header and placeholder content.\n- **Dashboard Screen Explanation Timing**: No, the dashboard immediately presents its purpose with a clear header and introductory text, ensuring the user understands their current location and what to expect.\n- **Dashboard Screen UI vs. Intent**: Yes, the UI (clear 'Dashboard' header, placeholder content within a card) matches the intent of providing a basic, structured landing page post-authentication, demonstrating the design system in practice.",
+  "summary": "The design establishes the foundational Login and Dashboard screens for the new React application. The Login screen features a clear 'Welcome' header and a 'Sign in with Google' button, ensuring a predictable and intuitive entry point. The Dashboard screen provides a simple, structured view with a clear header and placeholder content, demonstrating the integrated shadcn/ui design system. The design prioritizes clarity and consistency to accelerate future development and align with the product belief of an 'obvious' user experience."
+}
