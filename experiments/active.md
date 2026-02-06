@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770405422838: Frontend Foundation and Design System
+
+- **Belief**: Establishing a modern, component-based design system (like shadcn) for the React app will accelerate future feature development and ensure a consistent, intuitive user experience.
+- **Change**: Implement a React application with `shadcn/ui` integration, a Google OAuth login screen, and a basic dashboard with mock content.
+- **Owner**: Development Team
+- **Status**: Active
+- **Success Signal**: Completion of core application setup, positive internal developer feedback on velocity, and future user feedback confirming UI consistency and intuitiveness.
