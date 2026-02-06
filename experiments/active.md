@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770414901368: Core React App & Design System Setup
+
+- **Belief**: Establishes a foundation supporting "The product must feel obvious without documentation" and "Users value speed over configurability" by enabling rapid and consistent UI development.
+- **Change**: Implement core React application with Shadcn UI, including login screen (Google OAuth) and basic dashboard, along with an initial design system.
+- **Owner**: Product Agent (assigned to dev team for execution)
+- **Status**: Active
+- **Success Signal**: Initial app setup completed within 5 days; subsequent small feature implementation time is <= 2 days.
