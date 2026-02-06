@@ -1,0 +1,46 @@
+{
+  "design_intent": "This foundational feature establishes the essential application shell, user authentication via Google Login, and a basic dashboard. Its primary purpose is to enable the very first user interaction with the product, providing a clear, intuitive, and modern entry point. The intent is to validate the core user experience, ensure seamless onboarding for technically competent users, and provide a robust technical foundation for future feature development, aligning with the beliefs that the product must feel obvious without documentation and users value speed.",
+  "design_spec": "# Design Specification: Core UI, Google Login & Basic Dashboard\n\n## 1. User Flow\n1.  **Application Access**: User navigates to the product's root URL (e.g., `app.product.com`).\n2.  **Login Screen Display**: If not authenticated, the user is presented with a clear login screen.\n3.  **Google Login**: User clicks 'Sign in with Google' button.\n4.  **Authentication**: User completes Google's authentication flow.\n5.  **Dashboard Access**: Upon successful authentication, the user is redirected to a basic dashboard displaying mock content.\n\n## 2. UI Elements & States\n\n#### Login Screen\n-   **Title**: 'Product Name' (e.g., H1, large font, centered)\n-   **Call to Action**: 'Sign in to get started' (e.g., H2, smaller font, centered)\n-   **Google Sign-in Button**: Primary button, clearly labeled 'Sign in with Google', prominently displayed.\n    -   *States*: Default, Hover, Active, Disabled (e.g., during authentication process).\n-   **Loading Indicator**: (Optional, if authentication takes time) A subtle spinner or message after clicking the button.\n\n#### Basic Dashboard\n-   **Header**: Application header with product logo/name.\n-   **Navigation**: (Implicit for future, for now just dashboard content).\n-   **Content Area**: Displays mock data or placeholder content (e.g., \"Welcome to your dashboard, [User Name]!\").\n\n## 3. Error Handling\n-   **Google Login Failure**: If Google authentication fails (e.g., network error, user cancels), an immediate, clear, and concise error message should be displayed on the login screen, prompting the user to try again.\n-   **Redirection Errors**: If any post-login redirection fails, ensure a graceful fallback to the dashboard or a generic error page.\n\n## 4. Accessibility\n-   Ensure all interactive elements are keyboard navigable and have appropriate ARIA labels.\n-   Sufficient color contrast for text and interactive elements.\n\n## 5. Responsiveness\n-   Layout should adapt gracefully to various screen sizes (mobile-first approach, scaling up).",
+  "wireframe_json": {
+    "name": "Login Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "AppTitle",
+        "type": "TEXT",
+        "characters": "Product Name",
+        "fontSize": 32,
+        "width": "FILL",
+        "height": "HUG",
+        "textAlign": "CENTER"
+      },
+      {
+        "name": "WelcomeMessage",
+        "type": "TEXT",
+        "characters": "Sign in to get started",
+        "fontSize": 18,
+        "width": "FILL",
+        "height": "HUG",
+        "textAlign": "CENTER"
+      },
+      {
+        "name": "Spacer",
+        "type": "RECTANGLE",
+        "width": 1,
+        "height": 150
+      },
+      {
+        "name": "GoogleSignInButton",
+        "type": "BUTTON",
+        "label": "Sign in with Google",
+        "variant": "primary",
+        "width": "FILL",
+        "height": 48
+      }
+    ]
+  },
+  "validation_checklist": "- **Can a new user predict what happens next?**\n    - Is the \"Sign in with Google\" button clearly indicating its action? Yes, this is a standard and widely understood pattern.\n    - Is the flow from login to dashboard obvious? Yes, the interaction implies direct access upon successful authentication.\n- **Is anything explained too late?**\n    - Is the purpose of logging in clear from the screen? Yes, \"Sign in to get started\" clearly indicates the next step and goal.\n    - Are errors communicated immediately? Yes, the spec mandates immediate, clear, and concise error messages for login failures.\n- **Does the UI match the intent?**\n    - Does the UI feel modern and consistent with Shadcn expectations? The abstract wireframe supports a clean, modern aesthetic, aligning with the intent for a modern React UI with Shadcn.\n    - Does the login flow prioritize speed and simplicity for technically competent users? Yes, a single, prominent button minimizes friction and complexity.\n    - Does the UI support the belief that the product must feel obvious without documentation? Yes, leveraging a standard Google login pattern makes the interaction self-explanatory.",
+  "summary": "The design for the core UI, Google Login, and basic dashboard focuses on delivering a clear, intuitive, and modern first user experience. The wireframe for the login screen emphasizes simplicity with a prominent 'Sign in with Google' button, aligning with the product's intent for speed and minimal friction. The design spec outlines a straightforward user flow from login to dashboard access, with considerations for error handling and accessibility. Validation against product beliefs confirms the design's alignment with providing an obvious and efficient onboarding for technically competent users, forming a robust foundation for future feature development."
+}
