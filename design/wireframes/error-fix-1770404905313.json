@@ -1,0 +1,29 @@
+{
+  "design_intent": "This feature establishes the foundational user interface for the product, comprising a modern React frontend with shadcn/ui for a consistent design system, integrated Google login for user authentication, and a basic dashboard accessible post-authentication. The core intent is to accelerate future feature development by providing a robust and standardized UI foundation, and to ensure a cohesive, intuitive user experience from the very first interaction. It directly supports the beliefs that 'the product must feel obvious without documentation' and 'onboarding flow is intuitive without guidance' by creating a clear, predictable entry point and immediate value post-login.",
+  "design_spec": "# Design Specification: Core UI Foundation (error-fix-1770404905313)Objective: Allow users to access the application via Google login and view a basic dashboard.Flow:1.  User Accesses Application (Unauthenticated)    *   Action: User opens the app URL.    *   Expected State: Login Screen displayed.    *   UI Elements:        *   Application Title (e.g., 'My Application')        *   Welcome/Instructional Text (e.g., 'Sign in to continue to your dashboard.')        *   'Sign in with Google' Button (primary call to action)        *   Optional: Link to Terms & Privacy.2.  User Initiates Google Login    *   Action: User clicks 'Sign in with Google' button.    *   Expected State: Redirect to Google authentication flow.3.  User Completes Google Authentication    *   Action: User grants necessary permissions to Google.    *   Expected State: Redirect back to the application.4.  User Views Dashboard (Authenticated)    *   Action: Application receives authentication token.    *   Expected State: Dashboard Screen displayed.    *   UI Elements:        *   Header (e.g., 'Dashboard')        *   Placeholder for future content (e.g., 'Welcome, [User Name]! Your journey starts here.')        *   Basic navigation (e.g., 'Home', 'Settings' - minimal for now).Error Handling:    *   If Google authentication fails: Display a generic error message (e.g., 'Login failed. Please try again.') on the Login Screen.    *   If user cancels Google authentication: Return to Login Screen.Copy:    *   Login Screen Title: 'Welcome to My Application'    *   Login Screen Prompt: 'Sign in with Google to access your dashboard.'    *   Google Button: 'Sign in with Google'    *   Dashboard Welcome: 'Welcome [User Name]'States:    *   Unauthenticated (Login Screen)    *   Authenticating (via Google)    *   Authenticated (Dashboard Screen)    *   Error (on Login Screen after failed attempt)",
+  "wireframe_json": {
+    "name": "Login Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "type": "TEXT",
+        "content": "My Application",
+        "fontSize": 28
+      },
+      {
+        "type": "TEXT",
+        "content": "Sign in to continue to your dashboard.",
+        "fontSize": 16
+      },
+      {
+        "type": "BUTTON",
+        "label": "Sign in with Google",
+        "variant": "primary"
+      }
+    ]
+  },
+  "validation_checklist": "- **Predictability**: Is it immediately clear to a new user that clicking 'Sign in with Google' is the single path to access the application and what the next step (dashboard) will be?- **Timeliness of Information**: Is all necessary information for a first-time user presented before or during the login process, without crucial explanations appearing too late?- **UI-Intent Alignment**: Does the login screen design clearly prioritize and present the Google login option as intended, and does the concept of a basic dashboard after login align with the goal of a foundational UI?- **Belief: 'Obvious without documentation'**: Does the flow from landing page to dashboard via Google login require no external documentation for a technically competent user?- **Belief: 'Onboarding intuitive without guidance'**: Can a user complete the initial login and reach the dashboard without any explicit in-app guidance or prompts?",
+  "summary": "The design for the Core UI Foundation establishes a clear, minimal, and intuitive flow for user authentication via Google login, leading to a basic dashboard. The wireframe focuses on the initial login experience, ensuring direct alignment with the product intent to provide an obvious and friction-free entry point. Validation centers on predictability, timely information, and the direct match between the UI and the foundational product beliefs regarding user experience and onboarding."
+}
