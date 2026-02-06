@@ -1,0 +1,32 @@
+{
+  "design_intent": "This feature establishes the foundational user interface for the product, focusing on implementing a modern design system, streamlined user login, and a basic, functional dashboard. Its primary purpose is to provide a consistent and intuitive initial experience, validating the belief that the product should feel obvious without documentation. It aims to reduce friction for new users during the initial access and provide a clear entry point to the application.",
+  "design_spec": "# Design Specification: error-fix-1770410827707 - Foundational UI\n\n## 1. User Flow: Initial Access & Login\n\n**Objective**: Allow new and returning users to sign in via Google and access a basic dashboard.\n\n**Flow:**\n\n1.  **Initial Access / Unauthenticated State:**\n    *   User navigates to the application URL.\n    *   System displays the \"LoginScreen\".\n\n2.  **Login Action:**\n    *   User clicks \"Sign in with Google\" button.\n    *   System initiates Google OAuth flow.\n    *   Upon successful authentication, user is redirected to the \"DashboardScreen\".\n    *   Upon failed authentication, an error message is displayed (e.g., \"Sign-in failed. Please try again.\") and user remains on \"LoginScreen\".\n\n## 2. Screens\n\n### 2.1 LoginScreen\n\n*   **Components:**\n    *   Header: \"Welcome\" (Large text, centered)\n    *   Sub-header: \"Sign in to access your dashboard.\" (Smaller text, centered)\n    *   Button: \"Sign in with Google\" (Prominent, centered, utilizing shadcn button styling)\n*   **States:**\n    *   **Default:** Displays header, sub-header, and button.\n    *   **Loading:** Button may show a loading indicator or be disabled during Google OAuth initiation.\n    *   **Error:** Displays a temporary error message below the button (e.g., \"Sign-in failed.\")\n*   **Copy:**\n    *   \"Welcome\"\n    *   \"Sign in to access your dashboard.\"\n    *   \"Sign in with Google\"\n    *   \"Sign-in failed. Please try again.\"\n\n### 2.2 DashboardScreen (Basic)\n\n*   **Components:**\n    *   Header: \"Dashboard\" (Left-aligned)\n    *   Placeholder Content: \"Your content will appear here.\" (Centered, simple text)\n*   **States:**\n    *   **Default:** Displays header and placeholder content.\n*   **Copy:**\n    *   \"Dashboard\"\n    *   \"Your content will appear here.\"\n\n## 3. Design System & Consistency\n\n*   All UI elements (text, buttons, frames) must adhere to the shadcn UI design system.\n*   Typography, spacing, colors, and component styles should be consistent across all implemented screens.\n\n## 4. Error Handling\n\n*   Login failures should be communicated clearly and concisely to the user.\n*   No sensitive error details should be exposed.",
+  "wireframe_json": {
+    "name": "LoginScreen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "type": "TEXT",
+        "name": "WelcomeHeader",
+        "content": "Welcome",
+        "fontSize": 28
+      },
+      {
+        "type": "TEXT",
+        "name": "SignInPrompt",
+        "content": "Sign in to access your dashboard.",
+        "fontSize": 16
+      },
+      {
+        "type": "BUTTON",
+        "name": "GoogleSignInButton",
+        "label": "Sign in with Google",
+        "variant": "primary"
+      }
+    ]
+  },
+  "validation_checklist": "- Can a new user predict what happens after clicking \"Sign in with Google\"? Yes, expects to sign in or get an error. - Is anything explained too late? No, instructions are clear on the login screen. - Does the UI match the intent of \"obvious without documentation\"? Yes, a clear \"Sign in with Google\" button is a universally recognized pattern for quick access. - Is the purpose of the login clear? Yes, \"Sign in to access your dashboard.\" - Is the dashboard content self-explanatory as a placeholder? Yes, \"Your content will appear here.\" - Does the design system (shadcn) ensure visual consistency and professionalism? Yes, by definition of using a modern design system.",
+  "summary": "The Design Agent has created the foundational UI design for feature `error-fix-1770410827707`. This includes a clear login flow via Google and a basic dashboard placeholder, all designed to leverage a modern design system (shadcn). The design intent is to provide an intuitive and professional initial user experience, directly supporting the core product belief that the product must feel obvious without documentation. The design spec details the two main screens (LoginScreen, DashboardScreen), their components, states, and copy. The validation checklist confirms that the design addresses user predictability, timely explanations, and alignment with the product's core intent. The wireframe JSON provides a structural representation for the LoginScreen, ready for the Dev Agent."
+}
