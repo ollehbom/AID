@@ -38,3 +38,5 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2024-01-29-error-fix-1770402949355\n- **Belief**: A modern, consistent UI framework (shadcn/ui) will facilitate rapid and intuitive product development, aligning with the 'product must feel obvious' core belief.\n- **Change**: Implement a React app with shadcn/ui, Google login, and a basic dashboard.\n- **Owner**: Engineering Team\n- **Status**: active\n- **Success Signal**: Functional React app with integrated shadcn/ui, Google login, and basic dashboard.
