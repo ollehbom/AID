@@ -1,0 +1,41 @@
+{
+  "design_intent": "This design establishes the foundational user interface and authentication flow, enabling initial user interaction and laying the groundwork for future feature development. The primary intent is to provide a clear, intuitive, and modern experience that aligns with the belief that 'The product must feel obvious without documentation' and 'Onboarding flow is intuitive without guidance'. It aims to facilitate seamless Google login and present a basic dashboard as the entry point to the application.",
+  "design_spec": "# Design Specification: Initial UI/UX and Authentication Setup (error-fix-1770398794708)\n\n## 1. Overview\nThis specification details the initial user interface (UI) and user experience (UX) for the application, focusing on the unauthenticated state, Google login process, and the initial authenticated dashboard view. It leverages a React application with shadcn styling to ensure a consistent and modern look and feel.\n\n## 2. User Flow\n**2.1 Unauthenticated User Flow:**\n1.  **Landing Page Display:** User navigates to the application URL.\n2.  **Call to Action:** The application displays a prominent 'Sign in with Google' button.\n3.  **Authentication Trigger:** User clicks 'Sign in with Google'.\n4.  **Google Authentication:** User is redirected to Google's authentication flow.\n5.  **Redirect & Login:** Upon successful authentication with Google, the user is redirected back to the application.\n6.  **Dashboard Display:** The user is presented with the main application dashboard.\n\n**2.2 Authenticated User Flow (Initial Dashboard):**\n1.  **Welcome Message:** The dashboard displays a personalized welcome message (e.g., 'Welcome, [User Name]!').\n2.  **Basic Content:** Mock content or placeholder sections are displayed to indicate the dashboard's purpose and structure.\n\n## 3. UI States & Components\n**3.1 Unauthenticated State (Login Screen):\n    - **Layout:** Centered content with clear hierarchy.\n    - **Elements:**\n        -   `App Title/Logo`: 'Welcome to the App' (H1/H2 font size).\n        -   `Prompt Text`: 'Please sign in to continue' (Body text).\n        -   `Sign In Button`: 'Sign in with Google' (Primary button style, Google branding if possible).\n\n**3.2 Loading State (During Google Authentication):\n    - **Layout:** Full screen overlay or central spinner.\n    - **Elements:**\n        -   `Loading Indicator`: Spinner or progress bar.\n        -   `Loading Text`: 'Loading...' or 'Signing in...'\n\n**3.3 Authenticated State (Dashboard):\n    - **Layout:** Standard application layout (e.g., header, main content area).\n    - **Elements:**\n        -   `Header`: Contains application title/logo, possibly user avatar/name.\n        -   `Welcome Text`: 'Welcome, [User Name]!' (H2/H3 font size).\n        -   `Mock Content Area`: Placeholder cards or sections (e.g., 'Your Projects', 'Recent Activity') to demonstrate dashboard structure. This content will be static initially.\n\n## 4. Copy\n-   **Login Screen:**\n    -   Title: 'Welcome to the App'\n    -   Prompt: 'Please sign in to continue'\n    -   Button: 'Sign in with Google'\n-   **Loading:**\n    -   Text: 'Loading...'\n-   **Dashboard:**\n    -   Welcome: 'Welcome, [User Name]!'\n    -   Placeholder Card Titles: 'Your Dashboard', 'Quick Links'\n\n## 5. Error Handling\n**5.1 Google Login Failure:**\n-   **Scenario:** User fails to authenticate with Google (e.g., cancels login, network error).\n-   **Display:** User is redirected back to the login screen with a temporary error message (e.g., 'Login failed. Please try again.') displayed prominently, perhaps as a toast or inline message.\n\n## 6. Design System Integration\n-   All UI components (buttons, text styles, layout) will adhere to shadcn/ui best practices and components to ensure consistency and a modern aesthetic.",
+  "wireframe_json": {
+    "name": "Initial Welcome & Login",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "AppTitle",
+        "type": "TEXT",
+        "characters": "Welcome to the App",
+        "fontSize": 28,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "LoginPrompt",
+        "type": "TEXT",
+        "characters": "Please sign in to continue",
+        "fontSize": 16,
+        "width": "FILL",
+        "height": "HUG"
+      },
+      {
+        "name": "GoogleSignInButton",
+        "type": "BUTTON",
+        "characters": "Sign in with Google",
+        "fontSize": 18,
+        "width": 200,
+        "height": 48,
+        "backgroundColor": "#4285F4",
+        "textColor": "#FFFFFF",
+        "cornerRadius": 4
+      }
+    ]
+  },
+  "validation_checklist": "- **Predictability:** Does the 'Sign in with Google' button clearly communicate that clicking it will initiate an authentication flow, leading to the dashboard upon success?\n- **Timeliness of Information:** Is all essential information (e.g., what the app is for, why login is needed) presented at the right time? Is anything explained too late, or is there ambiguity before the user commits to an action?\n- **UI-Intent Match:** Does the simplicity of the login screen and the directness of the 'Sign in with Google' button align with the intent of providing an obvious and intuitive experience without documentation?\n- **Onboarding Clarity:** For a new user, is the transition from unauthenticated to authenticated (dashboard) intuitive without external guidance? Does the dashboard immediately provide context or direction with its mock content?\n- **Error Feedback:** Is the error message for failed login clear, concise, and actionable for the user?",
+  "summary": "The design establishes the core UI/UX and authentication for the product, focusing on a clean login screen and a basic dashboard. The intent is to provide an obvious and intuitive initial experience, validating the belief that users value a polished and seamless entry point. The wireframe outlines the primary welcome and login screen, while the spec details the user flow, UI states, copy, and error handling for the initial setup. Validation will focus on ensuring predictability, timely information delivery, and a strong UI-to-intent match to minimize user friction."
+}
