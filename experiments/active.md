@@ -38,3 +38,11 @@
 - **Owner**: Dev Team
 - **Status**: Active
 - **Success Signal**: Functional Google login, accessible dashboard, consistent styling via Shadcn UI for all implemented components.
+
+### EXP-2026-01-29-error-fix-1770405900463: Foundational UI and Design System
+
+- **Belief**: A consistent and functional UI is a prerequisite for testing any user-facing feature or core product belief.
+- **Change**: Implement a foundational React application with shadcn/ui, Google login, and a basic mock dashboard.
+- **Owner**: Engineering Team
+- **Status**: Active
+- **Success Signal**: User can successfully log in via Google and view a basic dashboard.
