@@ -1,0 +1,40 @@
+{
+  "design_intent": "This design establishes the foundational user experience for the new React application, focusing on intuitive navigation and a modern aesthetic. The primary intent is to provide a seamless entry point via Google authentication and present a clear, uncluttered dashboard as the initial authenticated view. This design reinforces the product belief that the application must feel obvious without documentation, by utilizing familiar UI patterns and a consistent design system (shadcn/ui). The goal is to make the initial user journey from unauthenticated to authenticated state as friction-less and predictable as possible.",
+  "design_spec": "# Design Specification: Foundational Application Setup (Google Auth & Basic Dashboard)## 1. User Flows### 1.1. Unauthenticated User (Login Flow)1.  **Entry Point**: User navigates to the application URL.2.  **Display**: A \"Login\" screen is presented.    *   **Header**: \"Welcome\" or \"Sign In\" (H1)    *   **Action**: A prominent button labeled \"Sign in with Google\".3.  **User Action**: Clicks \"Sign in with Google\" button.4.  **System Action**: Initiates Google OAuth flow (redirect to Google, handle callback).5.  **States**:    *   **Initial**: Login button visible.    *   **Loading**: Button might show a loading spinner or become disabled during OAuth redirect.    *   **Error**: If Google OAuth fails, a transient error message \"Login failed. Please try again.\" appears near the button.6.  **Transition**: Upon successful authentication, user is redirected to the Dashboard.### 1.2. Authenticated User (Dashboard View)1.  **Entry Point**: Successful login or direct access while authenticated.2.  **Display**: A \"Dashboard\" screen is presented.    *   **Header**: \"Dashboard\" or \"Welcome, [User Name]!\" (H1)    *   **Content**: A simple placeholder card or text block, e.g., \"Your journey begins here. Explore your data and features.\"    *   **Optional**: A \"Sign Out\" button (less prominent than login, maybe in a header/footer).3.  **User Action**: None explicitly required for this basic view.4.  **States**:    *   **Initial**: Dashboard content displayed.    *   **Loading**: (If dashboard data was being fetched) A loading indicator.5.  **Transition**: N/A for this foundational spec.## 2. UI Components (Leveraging shadcn/ui principles)*   **Button**: Primary button for \"Sign in with Google\", secondary for \"Sign Out\".*   **Text**: Standard typography for headers and body text.*   **Layout**: Simple center-aligned content for login, basic top-aligned header and main content area for dashboard.*   **Form**: Not applicable for this initial setup, as Google handles the input part.## 3. Copy*   **Login Screen**:    *   Header: \"Welcome\" or \"Sign In\"    *   Button: \"Sign in with Google\"    *   Error Message: \"Login failed. Please try again.\"*   **Dashboard Screen**:    *   Header: \"Dashboard\"    *   Content: \"Your journey begins here. Explore your data and features.\"    *   (Optional) Sign Out: \"Sign Out\"## 4. Error Handling*   **Google OAuth Failure**: Display a temporary, non-blocking error message \"Login failed. Please try again.\" on the login screen.*   **Application Load Errors**: (Out of scope for this design, handled at a lower level).",
+  "wireframe_json": {
+    "name": "Login Screen",
+    "type": "FRAME",
+    "width": 375,
+    "height": 812,
+    "children": [
+      {
+        "name": "WelcomeHeader",
+        "type": "TEXT",
+        "characters": "Welcome",
+        "fontSize": 32,
+        "width": 300,
+        "height": 40
+      },
+      {
+        "name": "SignInButtonContainer",
+        "type": "FRAME",
+        "backgroundColor": "#1A73E8",
+        "cornerRadius": 4,
+        "width": 280,
+        "height": 48,
+        "children": [
+          {
+            "name": "SignInButtonText",
+            "type": "TEXT",
+            "characters": "Sign in with Google",
+            "fontSize": 16,
+            "width": "FILL",
+            "height": "HUG"
+          }
+        ]
+      }
+    ]
+  },
+  "validation_checklist": "- [ ] **Clarity of Intent**: Is it immediately clear that the user needs to sign in to proceed?- [ ] **Predictability**: Can a new user predict that clicking \"Sign in with Google\" will initiate a Google authentication flow and then lead to a dashboard?- [ ] **Timeliness of Explanation**: Is any necessary information explained too late?- [ ] **UI-Intent Match**: Does the UI (simple screen, clear button) match the intent of providing an obvious, friction-less entry point?- [ ] **Consistency**: Does the UI adhere to modern design principles, aligning with shadcn/ui's expected clean aesthetic?- [ ] **Obviousness**: Does the overall experience feel \"obvious without documentation\"?",
+  "summary": "The design for the foundational application setup prioritizes clarity and a modern user experience, directly addressing the belief that the product must feel obvious without documentation. The interaction flow is streamlined from a clear Google login prompt to a basic, informative dashboard. The wireframe provides a blueprint for the initial login screen, ensuring a consistent and intuitive entry point. This design is ready for implementation by the Dev Agent, providing a solid, predictable foundation for future feature development."
+}
